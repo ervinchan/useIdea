@@ -1,0 +1,153 @@
+﻿@import "_class.less";
+@import "_config.less";
+@import "./less/_head.less";
+@import "./less/_icon.less";
+@import "./less/_user.menu.less";
+@import "./less/_contact.list.less";
+@import "./less/_bartool.less";
+@import "./less/_more.less";
+@import "./less/_fixed.less";
+@import "./less/_footer.less";
+@import "./less/_title.less";
+@import "./less/_seat.less";
+@import "./less/_swiper.less";
+@import "./less/_modal.less";
+//module
+@import "./less/_wheel.less";
+@import "./less/_fs.book.less";
+@import "./less/_select.less";
+@import "./less/_read.less";
+@import "./less/_pages.less";
+@import "./less/_search.less";
+@import "./less/_menu.shu.less";
+@import "./less/_fs.scene.less";
+
+.fs-new { padding: 15px 40px; background-color: @background; margin-bottom: 30px;
+    li { line-height: 30px; .nowrap(); position: relative; padding-left: 110px; font-size: 13px;
+        span { display: inline-block; .absolute(); left: 0; top: 50%; line-height: 20px; color: #aaa; margin-top: -10px; }
+    }
+}
+ 
+.g-fanshu { padding: 30px 0;
+    .g-left { width: 840px; }
+    .g-right { width: 255px; }
+    .u-title3 { padding-bottom: 10px; position: relative;
+        .u-select {.absolute(); top: 0; right: 0; }
+        .in_sort { position: relative; padding-left: 16px;
+            &:after { content: ' '; display: inline-block; .absolute(); left: 0; top: 50%; width: 14px; height: 20px; margin-top: -10px; background: url(../images/icon-x1.png) -200px 0 no-repeat; }
+        }
+    }
+}
+
+//蜗牛翻书列表
+.fs-list { padding-top: 50px;
+    ul { margin: 0 -10px; }
+    li { float: left; width: 33.33%; padding: 0 10px; margin-bottom: 30px; }
+}
+
+
+
+//蜗牛翻书-阅读场景
+.fs-read { padding-top: 40px;
+    ul { margin: 0 -10px; }
+    li { float: left; width: 33.33%; padding: 0 10px; margin-bottom: 30px; }
+}
+
+
+//图书展示.切换
+.fs-preview { position: relative; margin-bottom: 50px;
+    .swiper-slide { background-size: contain !important; background-position: center !important; background-repeat: no-repeat; }
+    .gallery-top { width: 100%; height: 490px; background-color: @background; margin-bottom: 10px;
+        .swiper-slide { width: 100%; height: 490px; }
+    }
+    .gallery-thumbs { height: 57px; overflow: hidden;
+        .swiper-slide { width: 70px; height: 55px; border: 1px transparent solid; background-color: @background; cursor: pointer;
+            &.active { border-color: @color; }
+        }
+    }
+}
+
+
+.fs-item-buy { margin-bottom: 40px;
+    .g-left { width: 400px; color: #333; }
+    .g-right { width: 310px; }
+    .itemname { margin-bottom: 30px;
+        h1 { font-weight: bold; font-size: 23px; margin-bottom: 10px; }
+        .txt { line-height: 25px; color: #aaa; height: 60px; }
+    }
+    .itemdepict {
+        h1 { font-weight: bold; font-size: 17px; margin-bottom: 30px; }
+        .txt { line-height: 25px; font-size: 13px;
+            p { margin-bottom: 10px; }
+        }
+    }
+    .itembuy { margin-bottom: 50px; text-align: center;
+        .buy { display: block; line-height: 65px; .nowrap(); background-color: @color; color: #fff; font-size: 16px; .border-radius(4px); margin-bottom: 20px;
+            span { display: inline-block; position: relative; padding-left: 40px; }
+            i { display: inline-block; width: 30px; height: 30px; .absolute(); left: 0; top: 50%; margin-top: -15px; }
+            &:hover { .opacity(80); }
+        }
+        ul { margin: 0 -1%;
+            li { float: left; width: 48%; margin: 0 1%; line-height: 30px; background-color: #fff; border: 1px #ccc solid; font-size: 12px; .transition();
+                a { display: inline-block; position: relative; padding-left: 24px; }
+                i { display: inline-block; width: 20px; height: 20px; .absolute(); left: 0; top: 50%; margin-top: -10px; }
+                &:hover { border-color: @color;
+                    a { color: @color; }
+                }
+            }
+            .shop:hover i { background-position: -300px 0; }
+            .weixin:hover i { background-position: -340px 0; }
+        }
+    }
+    .iteminfo li { padding: 10px 0 10px 100px; position: relative; line-height: 24px; color: #333; border-top: 1px #eee solid;
+        &:first-child { border: none; }
+        > span { display: inline-block; line-height: 24px; color: #aaa; .absolute(); left: 0; top: 10px; font-size: 12px; }
+    }
+}
+
+.fs-detail-content { border-top: 1px #eee solid; padding: 40px 0; text-align: center;
+    img { margin-bottom: 10px; max-width: 720px; }
+}
+
+
+
+//阅读场景
+.fs-sight { padding-bottom: 20px;
+    ul { margin: 0 -20px; }
+    li { float: left; width: 50%; margin-bottom: 40px;
+        > * { margin: 0 20px; }
+        .thumb-img { display: block; height: 130px; background: #000; overflow: hidden; margin-bottom: 15px;
+            img { width: 100%; background-color: @fuzhu; .transition(all .6s ease-in-out); }
+        }
+        h1 { line-height: 1; .nowrap(); font-size: 17px; font-weight: bold; position: relative; margin-bottom: 15px; }
+        .alt {.nowrap(); line-height: 21px; color: #aaa;
+            .j_name { padding-left: 24px; position: relative; color: #666;
+                img {.absolute(); width: 18px; height: 18px; .border-radius(100%); left: 0; top: 50%; margin-top: -9px; overflow: hidden; background-color: #00ae8c; }
+            }
+            .dot { height: 20px; }
+            span { padding: 0 4px; font-size: 13px; }
+        }
+        &:hover {
+            h1 a { color: @color; }
+            .thumb-img img { .opacity(80); }
+        }
+    }
+}
+
+.fs-tuijian { position: relative; padding: 0 0 70px 440px; margin: 10px 0 50px; min-height: 235px;
+    .thumb-img { display: block; height: 235px; background: #000; overflow: hidden; .absolute(); left: 0; top: 0; .border-radius(8px);
+        img { width: 100%; background-color: @fuzhu; .transition(all .6s ease-in-out); }
+    }
+    h1 { line-height: 34px; font-size: 22px; font-weight: bold; margin-bottom: 20px; max-height: 68px; overflow: hidden; }
+    .txt { max-height: 75px; line-height: 25px; font-size: 15px; color: #666;
+        a { margin-left: 0.5rem; display: inline-block; color: @fuzhu;
+            &:hover { color: @color; }
+        }
+    }
+    ul { .absolute(); bottom: 5px; right: 0;
+        li { float: left; margin-left: 30px; text-align: center; font-size: 15px; color: @color;
+            b { display: block; font-size: 25px; margin-bottom: 5px; }
+        }
+    }
+}
+

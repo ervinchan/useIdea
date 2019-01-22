@@ -1,0 +1,58 @@
+﻿.lx-article {
+    > li { position: relative; padding: 30px 70px 30px 160px; border: 1px #eee solid; .border-radius(6px); background-color: #fff; margin-bottom: 40px; .box-shadow(0 2px 4px rgba(0,0,0,0.04));
+        &:after { content: ''; display: block; width: 100%; height: 0; clear: both; }
+        &:hover { .box-shadow(0 4px 20px rgba(0,0,0,0.12)); .transition(); }
+    }
+    .face, .thumb-img, .thumb-txt {.absolute(); display: inline-block; overflow: hidden;
+        img { width: 100%; height: 100%; }
+    }
+    .face { width: 50px; height: 50px; left: 70px; top: 30px; .border-radius(100%); }
+    .lx_box { height: 70px; padding: 5px 20px 5px 130px; position: relative; background-color: #f8f8f8; margin-bottom: 15px;
+        &:after { content: ''; display: inline-block; width: 10px; height: 10px; background-color: #f8f8f8; .absolute(2); left: 105px; top: 15px; .rotate(45deg); }
+        .thumb-img, .thumb-txt { top: 0; left: 0; width: 110px; height: 70px; }
+        .thumb-txt { line-height: 70px; background-color: #90b2c6; text-align: center; .nowrap(); font-size: 15px;color:#fff; }
+        h1 { line-height: 30px; .nowrap(); font-size: 16px; }
+        p { line-height: 30px; font-size: 13px; color: #999; .nowrap(); }
+    }
+    .lx_alt { line-height: 30px; .nowrap(); margin-bottom: 15px; font-size: 15px; color: #aaa;
+        span { margin-left: 6px; }
+        .j_name { color: #333; font-size: 16px; font-weight: bold;
+            &:hover { color: @color; }
+        }
+    }
+    .lx_txt { line-height: 28px; font-size: 15px; color: #555; margin-bottom: 15px; position: relative;
+        &.mg { padding-left: 40px;
+            .lx-del { .absolute(); line-height: 20px; display: inline-block; left: 0; top: 4px;
+                i, span { display: inline-block; height: 20px; float: left; }
+                i { width: 20px; }
+                &.active, &:hover { background-position: -320px -150px; }
+            }
+        }
+    }
+    .lx-bar { margin-bottom: 15px;
+        > a { display: inline-block; line-height: 20px; padding-left: 23px; position: relative; margin: 0 10px; color: #999;
+            i { .absolute(); width: 20px; height: 20px; display: inline-block; left: 0; top: 50%; margin-top: -10px; }
+            &.active, &:hover { color: @color;
+                .icon-reply { background-position: -300px -150px; }
+                .icon-thumbs { background-position: -80px -150px; }
+            }
+        }
+    }
+    .lx-artfrom { text-align: right;
+        &:after { content: ''; display: block; width: 100%; height: 0; clear: both; }
+        textarea { display: block; width: 100%; max-width: 100%; padding: 5px 10px; height: 120px; line-height: 2; border: 1px solid #dcdcdc; background-color: #fff; border-radius: 2px; font-size: 14px; color: #333; margin-bottom: 15px;
+            &:focus { border-color: @color; background-color: #fff; box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px fade(@color, 40%);
+                &.border-none { border-color: transparent; }
+            }
+            &:disabled { background-color: #f8f8f8; color: #e0e5ea; }
+            &::-webkit-input-placeholder { color: #999; }
+            &:-moz-placeholder { color: #999; }
+            &::-moz-placeholder { color: #999; }
+            &:-ms-input-placeholder { color: #999; }
+            &[readonly] { cursor: pointer; }
+        }
+        a { display: inline-block; line-height: 25px; padding: 0 1.2em; .border-radius(30px); color: #333; margin-left: 15px;
+            &.active { background-color: @color; color: #fff; }
+        }
+    }
+}

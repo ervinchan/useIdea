@@ -1,0 +1,25 @@
+﻿.ue-minav { font-size: 15px; margin-bottom: 60px; position: relative;
+    li { float: left; margin-right: 45px; color: #666;
+        a { display: inline-block; position: relative; color: #666;
+            span { padding-left: 4px; color: #999; }
+            &:hover { color: @color !important;
+                span { color: @color !important; }
+            }
+        }
+        .badge { bottom: 50%; left: 100%; margin-left: -0.8em; padding: 1px 4px; }
+        &.active {
+            a { color: @color;
+                span { color: @color; }
+            }
+        }
+    }
+    &.cl1 li {
+        a { color: #888; }
+        &.active a { color: #333;
+            span { color: #999; }
+        }
+    }
+    .edit { display: inline-block; line-height: 30px; padding: 0 1.5em; .border-radius(30px); border: 1px #ddd solid; font-size: 14px; .absolute(); right: 0; top: 50%; color: #666; margin-top:-15px;
+        &:hover { border-color: @color; color: @color; }
+    }
+}

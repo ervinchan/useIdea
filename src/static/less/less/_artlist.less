@@ -1,0 +1,28 @@
+﻿//W文章列表
+.m-artlist {
+    > .item { position: relative; padding-left: 283px; height: 160px; border-bottom: 1px #eee solid; margin-bottom: 40px; overflow: hidden;
+        .thumb-img { .absolute(); left: 0; top: 0; height: 160px; background-color: #000;
+            img { height: 160px; max-width: 255px; background-color: @fuzhu; .transition(); }
+            &:hover img { .opacity(75); }
+        }
+        .tit { line-height: 28px; font-size: 18px; font-weight: bold; max-height: 56px; overflow: hidden; margin-bottom: 10px;
+            a { color: #333;
+                &:hover { color: @color; }
+                &:active { color: #999; }
+            }
+        }
+        .txt { max-height: 40px; line-height: 20px; overflow: hidden; font-size: 13px; color: #666; margin-bottom: 15px; }
+        .bar { .absolute(); bottom: 10px; left: 283px; right: 0; height: 30px; overflow: hidden; color: #666;
+            .user-img { float: left; display: inline-block; overflow: hidden; margin-right: 0.6rem;
+                img { height: 30px; background-color: @color; }
+            }
+            > span { float: left; display: inline-block; height: 30px; line-height: 28px; .nowrap(); max-width: 150px; color: #666; margin-right: 0.3rem; }
+            .f-bartool { float: right; height: 30px; padding: 5px 0; }
+        }
+        &.user {
+            .txt { max-height: 66px; line-height: 22px; }
+            .bar > span { font-size: 13px; }
+        }
+    }
+    .seat-push { margin-bottom: 40px; }
+}

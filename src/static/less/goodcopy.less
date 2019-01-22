@@ -1,0 +1,53 @@
+﻿@import "_class.less";
+@import "_config.less";
+@import "./less/_head.less";
+@import "./less/_icon.less";
+@import "./less/_user.menu.less";
+@import "./less/_contact.list.less";
+@import "./less/_bartool.less";
+@import "./less/_more.less";
+@import "./less/_fixed.less";
+@import "./less/_footer.less";
+@import "./less/_title.less";
+@import "./less/_seat.less";
+@import "./less/_swiper.less";
+@import "./less/_modal.less";
+//module
+@import "./less/_wheel.less";
+@import "./less/_search.less";
+@import "./less/_pages.less";
+@import "./less/_read.less";
+
+
+/*4-吃口文案.html*/
+.wa-search { background-color: @background; margin-bottom: 40px; padding: 50px 100px 50px 410px; position: relative;
+    .bar { .absolute(); left: 50px; top: 50px; width: 280px; }
+    .tag {
+        a { float: left; display: inline-block; width: 21%; margin: 0 2% 0.5rem; line-height: 1.8; .nowrap(); }
+    }
+    .alt { padding-top: 0.8rem; line-height: 1.6; color: #aaa; font-size: 13px; }
+}
+
+//吃口文案列表
+.wa-list {
+    ul { margin: 0 -1%; }
+    li { float: left; width: 23%; margin: 0 1% 30px; background-color: #fff; .transition(all .5s ease-in-out);
+        .thumb-img { display: block; position: relative; color: rgba(255,255,255,0.75); background: #000; height: 190px; overflow: hidden;
+            img { width: 100%; height: 190px; background-color: @fuzhu; .transition(all .5s ease-in-out); }
+            span { .absolute(); left: 1rem; top: 1rem; display: inline-block; line-height: 20px; padding: 0 0.8rem; .border-radius(20px); background-color: rgba(0,0,0,0.5); font-size: 12px; .transition(all .5s ease-in-out); }
+            &:hover {
+                img { .opacity(70); }
+            }
+        }
+        h1 { margin: 5px 8px 10px; height: 50px; line-height: 25px; overflow: hidden; font-size: 15px; font-weight: bold; }
+        .alt {.nowrap(); margin: 5px 8px 10px; line-height: 21px; color: #aaa;
+            .j_name { padding-left: 24px; position: relative; color: #666;
+                img {.absolute(); width: 18px; height: 18px; .border-radius(100%); left: 0; top: 50%; margin-top: -9px; overflow: hidden; background-color: #00ae8c; }
+            }
+            .dot { height: 20px; }
+            span { padding: 0 4px; font-size: 13px; }
+        }
+        &:hover { /*.translate(0,-3px); .box-shadow(0 2px 6px rgba(0,0,0,.16));*/ h1 a { color: @color; }
+        }
+    }
+}

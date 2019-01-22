@@ -1,0 +1,11 @@
+﻿.qy-hotart {
+    li { position: relative; padding-left: 100px; min-height: 56px; margin-bottom: 15px;
+        .thumb-img { display: block; .absolute(); left: 0; top: 0; .border-radius(4px); overflow: hidden;
+            span {.absolute(2); left: 0; top: 0; display: inline-block; padding: 2px 4px; min-width: 18px; text-align: center; background-color: rgba(0,0,0,0.6); color: #fff; font-size: 12px; }
+            img { height: 56px; width: 80px; background-color: @fuzhu; .transition(); }
+        }
+        h1 { height: 40px; line-height: 20px; overflow: hidden; font-size: 13px; margin-bottom: 8px; }
+        h3 { line-height: 1.2; .nowrap(); color: #888; font-size: 12px; }
+        &:hover .thumb-img img { .opacity(90); }
+    }
+}

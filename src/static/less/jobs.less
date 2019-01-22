@@ -1,0 +1,91 @@
+﻿@import "_class.less";
+@import "_config.less";
+@import "./less/_head.less";
+@import "./less/_icon.less";
+@import "./less/_user.menu.less";
+@import "./less/_contact.list.less";
+@import "./less/_bartool.less";
+@import "./less/_more.less";
+@import "./less/_fixed.less";
+@import "./less/_footer.less";
+@import "./less/_title.less";
+@import "./less/_seat.less";
+@import "./less/_swiper.less";
+@import "./less/_modal.less";
+//module
+@import "./less/_city.less";
+@import "./less/_job.search.less";
+@import "./less/_job.list.less";
+@import "./less/_job.hot.less";
+@import "./less/_pages.less";
+
+//招聘
+.jb-head { height: 500px; padding: 20px 20px 20px 370px; position: relative; background-color: @background;
+    .jb-menu { .absolute(); left: 0; top: 0; bottom: 0; padding: 20px 0; width: 330px; background-color: #fff; .box-shadow(0 4px 14px rgba(0,0,0,0.08));
+        .tit { padding: 0 40px; line-height: 45px; color: @color; font-size: 18px; font-weight: bold; }
+        .menu > li { position: relative;
+            .navs { padding: 0 50px 0 95px; line-height: 42px; position: relative; .nowrap(); font-size: 13px;
+                > * { margin-right: 0.4rem; }
+                span { color: #ccc; display: none; }
+                b, i { .absolute();.absolute(); line-height: 20px; top: 50%; margin: -10px 0 0 0; }
+                i { right: 25px; }
+                b { left: 40px; font-size: 16px; font-weight: 500; color: #333; }
+                a { color: #777; margin-right: 1rem;
+                    &:hover { color: @color; }
+                }
+                &:after { content: ''; display: none; .absolute(); right: 0; top: 0; bottom: 0; width: 4px; background-color: @color; }
+            }
+            .sub { display: none; .absolute(100); left: 100%; top: 0; width: 750px; min-height: 260px; padding: 0 225px 0 45px; background-color: #fff; .box-shadow(0 1px 6px rgba(0,0,0,0.08));
+                .brand {.absolute(); top: 0; right: 0; bottom: 0; width: 190px; padding: 10px; overflow: hidden; border-left: 10px #fbfbfb solid;
+                    li { float: left; width: 50%; text-align: center;
+                        a { display: block; padding: 10px; }
+                        img { width: 60px; height: 60px; background-color: @background; }
+                    }
+                }
+                .nav { padding: 20px 0 10px;
+                    li { line-height: 30px; padding-left: 80px; position: relative; font-size: 13px; margin-bottom: 10px;
+                        &:after { content: ''; display: block; width: 100%; height: 0; clear: both; }
+                        a { display: inline-block; line-height: 30px; margin-right: 0.8rem; }
+                        span { display: inline-block; line-height: 30px; .absolute(); width: 70px; .nowrap(); color: @color; left: 0; top: 0; }
+                    }
+                }
+            }
+            &:hover { background-color: @background;
+                .navs:after, .sub { display: block; }
+            }
+        }
+    }
+    .jb-seat-x3, .jb-seat-x2 { height: 175px; margin: 0 -5px 10px;
+        li { float: left;
+            a { display: block; margin: 0 5px; height: 175px; overflow: hidden; background-color: #000;
+                img { display: block; width: 100%; height: 175px; .transition(all .5s ease-in-out); }
+                &:hover { .box-shadow(0 4px 14px rgba(0,0,0,0.08));
+                    img { .opacity(60); }
+                }
+            }
+        }
+    }
+    .jb-seat-x3 li { width: 33.33%; }
+    .jb-seat-x2 li { width: 50%; }
+}
+
+.jb-search-hd { padding: 30px 0 15px; background-color: @background; margin-bottom: 30px; }
+
+.g-jobs { padding: 50px 0 20px;
+    .g-left { width: 740px; }
+    .g-right { width: 315px;
+        [class^="seat-"], [class*=" seat-"] { margin-bottom: 10px; }
+    }
+}
+
+//搜索条件
+.jb-search-where { padding: 40px 80px; background-color: @background; border-bottom: 1px #eee solid;
+    li { padding: 6px 0 6px 90px; position: relative; line-height: 30px;
+        &:before { content: ''; display: block; border-bottom: 1px #eee solid; .absolute(); left: 90px; right: 0; bottom: 0; }
+        &:after { content: ''; display: block; width: 100%; height: 0; clear: both; }
+        b { display: inline-block; line-height: 30px; .absolute(); left: 0; top: 6px; color: #333; }
+        a { float: left; display: inline-block; margin-right: 1.8rem;
+            &.active { color: @color; }
+        }
+    }
+}

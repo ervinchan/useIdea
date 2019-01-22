@@ -1,0 +1,40 @@
+﻿//用户中心banner
+.ue-userBanner { background-color: #000; height: 400px; text-align: center; color: #fff;
+    .wrapper { height: 400px; position: relative; padding-top: 110px; }
+    .userTx { margin-bottom: 45px; text-align: center;
+        a { display: inline-block; width: 130px; height: 130px; border: 2px #fff solid; .border-radius(100%); background-color: #c09d76; overflow: hidden; position: relative; color: #fff;
+            img { width: 130px; height: 130px; }
+            p { .absolute(); width: 100%; height: 100%; left: 0; top: 0; padding-top: 40px; background-color: rgba(0,0,0,0.6); .opacity(0);.transition();
+                i { display: inline-block; width: 30px; height: 30px; }
+                span { display: block; line-height: 30px; font-size: 15px; }
+            }
+            &:hover p { .opacity(100); }
+        }
+    }
+    .nick-name { text-align: center; margin-bottom: 15px; line-height: 25px;
+        h1 { display: inline-block;
+            b { float: left; display: inline-block; font-size: 23px; font-weight: normal; }
+            a { float: left; height: 25px; line-height: 25px; .border-radius(25px); background-color: @color; font-size: 13px; margin-left: 30px; padding: 0 26px 0 14px; color: #fff; position: relative;
+                &:after { content: ''; display: inline-block; width: 20px; height: 20px; .absolute(); right: 6px; top: 50%; margin-top: -10px; background: url(../../images/icon-x1.png) -420px 0 no-repeat; }
+                &.active:after { background-position: -400px 0; }
+            }
+        }
+    }
+    .nick-data { line-height: 20px; font-size: 14px; text-align: center;
+        p { display: inline-block; padding-left: 40px;
+            > * { display: inline-block; line-height: 20px; float: left; }
+            b { font-weight: normal; margin-left: 5px; padding-right: 40px; font-size: 16px; }
+            .active { font-size: 20px }
+        }
+    }
+    .userFx { .absolute(); bottom: 30px; right: 0; text-align: left;
+        h2 { margin-bottom: 15px; position: relative; padding-left: 30px; line-height: 20px;
+            i {.absolute(); width: 20px; height: 20px; display: inline-block; left: 0; top: 50%; margin-top: -10px; }
+        }
+        .bar { height: 20px; overflow: hidden;
+            a { display: inline-block; width: 20px; height: 20px; overflow: hidden; float: left; margin-right: 8px;
+                &:hover { .opacity(80); }
+            }
+        }
+    }
+}

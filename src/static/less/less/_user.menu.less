@@ -1,0 +1,33 @@
+﻿//用户信息菜单
+.fm-userinfo {.opacity(0); display: none; .transition(all 1s ease-in-out); .absolute(100); left: -40px; top: 100%; width: 280px; background-color: #fff; .box-shadow(0 4px 20px rgba(0,0,0,0.16));.border-radius(10px);
+    &:before { content: ''; display: block; width: 280px; height: 30px; .absolute(); top: -25px; left: 0; }
+    &:after { content: " "; display: inline-block; width: 16px; height: 16px; background-color: #fff; .box-shadow(-2px 4px 2px rgba(0,0,0,0.06));.absolute(); left: 42px; top: -8px; .rotate(@arg:135deg) }
+    .info { padding: 20px 25px 20px 90px; position: relative;
+        .thumb {.absolute(); left: 25px; top: 50%; margin-top: -25px; width: 50px; height: 50px; .border-radius(100%); background-color: @fuzhu; overflow: hidden;
+            img { width: 100%; }
+            &.qy {.border-radius(0); }
+        }
+        h1, h3 { line-height: 24px; .nowrap(); font-size: 13px; }
+        h1 a { font-weight: bold; font-size: 16px; }
+    }
+    .inlet { padding: 40px 25px; border-top: 1px #eee solid; border-bottom: 1px #eee solid; margin-bottom: 40px;
+        a { float: left; display: inline-block; width: 50%; padding-left: 35px; line-height: 30px; position: relative; .nowrap();
+            img { display: inline-block; width: 30px; height: 30px; .absolute(); left: 0; top: 50%; margin-top: -15px; }
+        }
+    }
+    .nav { border-top: 1px #eee solid; padding: 12px 0 0;
+        li { padding: 6px 25px; .nowrap();
+            a { display: inline-block; position: relative; line-height: 20px; font-size: 13px; color: #696969;
+                span { display: inline-block; width: 20px; height: 20px; float: left; margin-right: 6px; }
+                .badge { left: 100%; top: 50%; bottom: initial; margin: -7px 0 0 5px; padding: 0 0.5rem; }
+                &:hover { color: @color; }
+                &:active { color: fade(@color, 70%); }
+            }
+            &.esc { border-top: 1px #eee solid; border-bottom: none; padding: 10px 25px; margin-top: 12px;
+                &:hover {
+                    .icon-exit { background-position: -380px 0; }
+                }
+            }
+        }
+    }
+}

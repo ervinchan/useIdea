@@ -1,0 +1,26 @@
+﻿
+//T图书导航
+.m-menu-shu { padding: 0 20px;
+    .nav {
+        li { line-height: 40px; .nowrap(); padding-left: 40px; position: relative;
+            i { display: inline-block; width: 20px; height: 20px; .absolute(); left: 0; top: 50%; margin-top: -10px; }
+        }
+    }
+    .u-search { margin-bottom: 15px; }
+    .menu {
+        > li { border-top: 1px #eee solid;
+            &:first-child { border: none; }
+            > a { display: block; line-height: 44px; .nowrap(); }
+            ul { border-top: 1px #eee solid; padding: 5px 0;
+                li { line-height: 30px; .nowrap(); padding-left: 30px;
+                    a { margin-right: 0.4rem; }
+                }
+            }
+        }
+    }
+    .seat { padding-top: 20px; text-align: center; display: block; border-top: 1px #eee solid; margin-bottom: 10px;
+        img { max-width: 100%; }
+    }
+    .fixedbox { padding-top: 20px; }
+    &.fixed .fixedbox { position: fixed; right: 50%; top: 0; .transform(translateZ(0)); width: 255px; z-index: 1000; padding: 20px; background-color: #fff; margin-right: 0 - (@max-width/2); }
+}

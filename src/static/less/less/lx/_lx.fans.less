@@ -1,0 +1,28 @@
+﻿.lx-fans { margin: 0 -15px;
+    &:after { content: ''; display: block; width: 100%; height: 0; clear: both; }
+    > li { float: left; width: 50%; padding: 0 15px; margin-bottom: 40px; }
+    .lx-item { position: relative; padding: 30px 115px 30px 110px; border: 1px #eee solid; .border-radius(6px); background-color: #fff; .box-shadow(0 2px 4px rgba(0,0,0,0.04));
+        &:after { content: ''; display: block; width: 100%; height: 0; clear: both; }
+        &:hover { .box-shadow(0 4px 20px rgba(0,0,0,0.12)); .transition(); }
+    }
+    .face {.absolute(); display: inline-block; overflow: hidden; width: 50px; height: 50px; left: 40px; top: 30px; .border-radius(100%);
+        img { width: 100%; height: 100%; }
+    }
+    h1 { line-height: 30px; .nowrap();
+        .j_name { color: #333; font-size: 16px; font-weight: bold;
+            &:hover { color: @color; }
+        }
+    }
+    .lx_txt { line-height: 28px; font-size: 13px; color: #aaa; margin-bottom: 10px; .nowrap(); }
+    .lx_alt { font-size: 12px;
+        &:after { content: ''; display: block; width: 100%; height: 0; clear: both; }
+        > * { display: inline-block; line-height: 20px; float: left; margin-right: 1.5em; }
+        span { padding-left: 0.2em; font-size: 17px; }
+    }
+    .a_follow { display: inline-block; line-height: 28px; .absolute(); right: 30px; top: 50%; margin-top: -14px; font-size: 13px; color: #999; min-width: 76px; border: 1px #eee solid; .border-radius(30px); text-align: center; overflow: hidden;
+        span { display: none; .absolute(); left: 0; top: 0; right: 0; bottom: 0; line-height: 28px; color: #fff; background-color: @color; }
+        &:hover { color: #fff; background-color: @color; border-color: @color;
+            span { display: inline-block; }
+        }
+    }
+}

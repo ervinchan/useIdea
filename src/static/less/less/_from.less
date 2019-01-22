@@ -1,0 +1,93 @@
+﻿//单选、复选框
+.u-checkbox,.u-radio { display: none !important; z-index: 1; width: 16px; height: 16px; opacity: 0;
+    & + label { position: relative; display: inline-block; max-width: 100%; padding-left: 6px; margin-left: 16px; vertical-align: middle; min-height: 16px; line-height: 16px; cursor: pointer;
+        &:before, &:after { position: absolute; left: 0; top: 50%; margin: -8px 0 0 -16px; display: inline-block; width: 16px; height: 16px; }
+        &:before { content: ""; z-index: 1; background-color: #fff; border: 1px solid #b4b4b4; border-radius: 3px; .transition(all .3s ease-in-out 0s); }
+        &:after { content: "\f00c"; font-family: "FontAwesome"; display: none; z-index: 2; font-size: 12px; line-height: 20px; color: #fff; text-align: center; }
+    }
+    &:checked + label {
+        &:after { display: inline-block; }
+    }
+    &:disabled {
+        &:checked + label:after { color: #e0e5ea; cursor: not-allowed; }
+        & + label:before, &:checked + label:before { cursor: not-allowed; background-color: #f3f7f9; border-color: #b4b4b4; border-width: 1px; }
+    }
+    &.radius {
+        & + label {
+            &:before { .border-radius(100%); }
+        }
+        &:checked + label {
+            &:after { display: inline-block; content: " "; width: 6px; height: 6px; margin: -3px 0 0 -11px; .border-radius(100%); background-color: #b4b4b4; }
+        }
+    }
+}
+
+.u-radio {
+    & + label {
+        &:before { .border-radius(100%); }
+    }
+    &:checked + label {
+        &:after { display: inline-block; content: " "; width: 6px; height: 6px; margin: -3px 0 0 -11px; .border-radius(100%); background-color: #b4b4b4; }
+    }
+}
+/*表单元素*/
+.u-row { max-width: 100%;
+    &:after, &:before { content: ''; display: block; clear: both; height: 0; }
+}
+.u-inline, .u-form-input, .u-form-select { position: relative; display: inline-block; vertical-align: middle; max-width: 100%; }
+.u-inline { float: left; margin-bottom: 25px; padding-right: 20px; }
+.u-form-input, .u-form-select { max-width: 100%; width: 100% }
+.u-form-select { width: 100%; }
+.u-form-label { display: block; padding: 0 10px 15px 0;   font-weight: 400;  font-size:15px; color:#888; }
+.u-input, .u-textarea { display: block; width: 100%; max-width: 100%; padding: 0 10px; height: 36px; line-height: 36px; border: 1px solid #dcdcdc; background-color: #fff; border-radius: 2px; font-size: 14px; color: #333;
+    &:focus { border-color: @color; background-color: #fff;
+        &.border-none { border-color: transparent; }
+    }
+    &:disabled { background-color: #f8f8f8; color: #e0e5ea; }
+    &::-webkit-input-placeholder { color: #999; }
+    &:-moz-placeholder { color: #999; }
+    &::-moz-placeholder { color: #999; }
+    &:-ms-input-placeholder { color: #999; }
+    &[readonly] { cursor: pointer; }
+}
+.u-textarea { height: auto; line-height: 1.6; padding: 4px 12px; .scrollbar(); }
+.u-form-select { position: relative;
+    .u-input { padding-right: 14px; cursor: pointer; text-overflow: ellipsis; }
+    &:after { content: ''; display: inline-block; width: 0; height: 0; .absolute(20); top: 50%; right: 8px; vertical-align: middle; border-top: 4px solid #e0e5ea; border-right: 4px solid transparent; border-left: 4px solid transparent; .transform(scale(1.002)); transition: .25s; }
+}
+
+@media (max-width:640px) {
+    [class^="width-"], [class*=" width-"] { width: initial; }
+    .u-inline { float: initial; width: 100%; padding-right: 0; }
+    .u-form-input, .u-form-select { width: 100%; }
+    .form-horizontal {
+        &.u-inline { padding: 0; }
+        .u-form-label { position: initial; left: initial; top: initial; width: initial; text-align: initial; }
+        .u-form-input, .u-form-select { width: 100%; }
+    }
+    .u-form-title label { left: 0; }
+}
+
+.u-helptxt { font-size: 14px; color: #888; line-height: 2; }
+
+.width-30 { width: 30px; }
+.width-50 { width: 50px; }
+.width-80 { width: 80px; }
+.width-100 { width: 100px; }
+.width-120 { width: 120px; }
+.width-150 { width: 150px; }
+.width-180 { width: 180px; }
+.width-200 { width: 200px; }
+.width-250 { width: 250px; }
+.width-300 { width: 300px; }
+.width-350 { width: 350px; }
+.width-400 { width: 400px; }
+.width-450 { width: 450px; }
+.width-500 { width: 500px; }
+.width-550 { width: 550px; }
+.width-600 { width: 600px; }
+.width-650 { width: 650px; }
+.width-700 { width: 700px; }
+.width-800 { width: 800px; }
+.width-900 { width: 900px; }
+.width-full { width: 100%; }

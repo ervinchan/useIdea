@@ -1,0 +1,286 @@
+﻿//加深 darken(@color-A,5%) 主色减谈 lighten(@color-A,10%)
+.pre(@style,@value) {
+    -webkit-@{style}: @value;
+    -moz-@{style}: @value;
+    -ms-@{style}: @value;
+    -o-@{style}: @value;
+    @{style}: @value;
+}
+
+
+.nowrap() { white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+
+//宽高
+.wh (@width: initial, @height: initial) { 
+    width: @width; 
+    height: @height;
+}
+
+//定位
+.absolute (@index: 1) { 
+    position: absolute; 
+    z-index: @index; 
+    zoom: 1; 
+}
+
+//float排列
+.float-li (@width: 100%,@num: 1,@right: 0,@bottom:0) {
+    min-width: @width + @right;
+    li { 
+        position: relative; 
+        float: left; 
+        width: floor((@width+@right)/@num)-@right; 
+        margin-right: @right; 
+        margin-bottom:@bottom;
+    }
+}
+
+//字体
+.font-face(@fontname,@fontdir) {
+    //字体名称 string  字体文件目录
+    @font-face {
+        font-family: @fontname;
+        src: url('@{fonturl}/@{fontname}.eot');
+        src: url('@{fonturl}/@{fontname}.eot?#iefix') format('embedded-opentype'), url('@{fonturl}/@{fontname}.woff') format('woff'), url('@{fonturl}/@{fontname}.ttf') format('truetype'), url('@{fonturl}/@{fontname}.svg#@{fontname}') format('svg');
+        font-weight: normal;
+        font-style: normal;
+    }
+}
+
+//透明度
+.opacity(@number: 100) when (isnumber(@number)) {
+    -khtml-opacity: @number/100;
+    .pre(opacity,@number/100);
+    filter: alpha(opacity=@number);
+    -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=@number);
+    filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=@number);
+}
+
+//圆角
+.border-radius(@arg: 0px) {
+    //border-radius:0 0 15px 0;
+    .pre(border-radius,@arg);
+}
+
+//盒子模型
+.box-sizing(@arg: border-box) {
+    //box-sizing: content-box|border-box|inherit;
+    //content-box 宽度和高度之外绘制元素的padding内边距和border边框;
+    //border-box 宽度和高度之内绘制元素的padding内边距和border边框;
+    .pre(box-sizing,@arg);
+}
+
+//盒子阴影
+.box-shadow(@arg: 0 0 0 #fff) {
+    //box-shadow: h-shadow v-shadow blur spread color inset;
+    //h-shadow水平, v-shadow垂直, blur模糊距离, spread阴影的尺寸, color颜色, inset外部阴影 (outset改为内部阴影)
+    .pre(box-shadow,@arg);
+}
+
+//字体阴影
+.text-shadow(@arg: 0 0 0 #fff) {
+    .pre(text-shadow,@arg);
+}
+
+//背景渐变
+.gradient(@deg: 90deg,@start: #fff, @stop: #eee) {
+    background-color: @start;
+    background: -webkit-linear-gradient(@deg, @start, @stop);
+    background: -moz-linear-gradient(@deg, @start, @stop); 
+    background: -ms-linear-gradient(@deg, @start,@stop);
+    background: -o-linear-gradient(@deg, @start,@stop);
+    background: linear-gradient(@deg, @start,@stop);
+}
+
+//滚动条
+.scrollbar(@background: #f9f9f9,@color:rgba(47,64,80,0.46),@width: 6px,@radius:1px) { 
+    //scrollbar-base-color: @background; 
+    //scrollbar-3dlight-color: @background; 
+    //scrollbar-highlight-color: @background; 
+    //scrollbar-track-color: @color; 
+    //scrollbar-arrow-color: @color; 
+    //scrollbar-shadow-color: @background; 
+    //scrollbar-dark-shadow-color: @background; 
+    &::-webkit-scrollbar { width: @width; height: @width;  }
+    &::-webkit-scrollbar-thumb { .border-radius(@radius); background: @color; border: none; }
+    &::-webkit-scrollbar-track { background: @background; border: none; }
+    &::-webkit-scrollbar-button { display: none; }
+    &::-webkit-scrollbar-corner { background: @background; }
+}
+
+//过渡::
+.transition(@arg: all .21s ease-in-out) {
+    //transition: property属性名称 duration过渡毫秒 timing-function速度效果 delay等待开始;
+    //参数timing-function:linear相同速度|ease 慢-快-慢,ease-in慢速开始, ease-out慢速结束,ease-in-out慢速开始和结束,cubic-bezier(n,n,n,n) 定义自己的值0-1;
+    //参数transition-delay: 最近参数(all .3s ease-in-out .2s)，开始前等待 2 秒，默认为0秒；
+    .pre(transition,@arg);
+}
+
+//变形::
+.transform(@arg) {
+    //rotate(), skew(), scale(),translate(,)分别还有x、y之分，比如：rotatex() 和 rotatey() ，以此类推。
+    .pre(transform,@arg);
+}
+
+// - 基点位置
+.transform-origin(@arg: center center) {
+    //transform-origin: x-axis y-axis z-axis; axis值（left center right length %）
+    .pre(transform-origin,@arg);
+}
+
+// - 2D旋转
+.rotate(@arg: 0deg) {
+    .transform(rotate(@arg));
+}
+
+// - X轴3D旋转
+.rotateX(@arg: 0deg) {
+    .transform(rotateX(@arg));
+}
+// - Y轴3D旋转
+.rotateY(@arg: 0deg) {
+    .transform(rotateY(@arg));
+}
+
+// - 倾斜
+.skew(@arg: 0deg) {
+    .transform(skew(@arg));
+}
+
+// - 比例放大缩小
+.scale(@arg: 1.0) {
+    //比例“1.5”表示以1.5的比例放大，如果要放大2倍，须写成“2.0”，缩小则为负“-”;
+    .transform(scale(@arg));
+}
+
+// - 位移
+.translate(@dx: 0,@dy: 0) {
+    //translate(dx, dy)水平的和垂直位移;
+    .transform(translate(@dx,@dy));
+}
+
+// - Z轴位移|fixed 防抖动
+.translateZ(@dxz: 0) {
+     *zoom: 1;
+    .transform(translate(@dxz)); 
+}
+
+// - 透视
+.perspective(@arg: 0) {
+    //perspective: number|none;元素距离视图的距离，以像素计;
+    .transform(perspective(@arg));
+}
+
+//动画::
+.animation(@arg: myname 3s linear 0s infinite) {
+    //animation: name名称(keyframes @myname) duration需要毫秒 timing-function完成周期 delay延迟 iteration-count播放次数 direction是否轮流反向播放 fill-mode不播放时应用的样式 play-state指定动画是否正在运行或已暂停;
+    //参数timing-function: linear相同速度|ease 慢-快-慢|ease-in慢速开始|ease-out慢速结束|ease-in-out慢速开始和结束|cubic-bezier(n,n,n,n) 定义自己的值0-1;
+    //参数iteration-count: n次|infinite永远
+    //参数animation-direction: normal正常播放|reverse反向播放|alternate奇数次正向播放，偶数次反向播放|alternate-reverse奇数次反向播放，偶数次正向播放|initial|inherit;
+    .pre(animation,@arg);
+}
+
+
+//flex弹性(排列)布局::
+.flex(@arg: 0 1 auto) {
+    //flex: none | [ <'flex-grow'> <'flex-shrink'>? || <'flex-basis'> ]
+    //flex-grow属性 放大比例，默认为0，即如果存在剩余空间，也不放大。
+    //flex-shrink属性 缩小比例，默认为1，即如果空间不足，该项目将缩小。
+    //flex-basis属性定义了在分配多余空间之前，项目占据的主轴空间（main size）。浏览器根据这个属性，计算主轴是否有多余空间。它的默认值为auto，即项目的本来大小。
+    //Flex 布局以后，子元素的float、clear和vertical-align属性将失效
+    .pre(flex,@arg);
+}
+
+.flexbox() {
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -o-flex;
+    display: -ms-flex;
+    display: -ms-flexbox;
+    display: flex;
+}
+
+// - 排列方向
+.flex-direction(@arg: row) {
+    //flex-direction: row水平向右 | row-reverse水平向左 | column垂直向下 | column-reverse垂直向上;
+    .pre(flex-direction,@arg);
+}
+
+// - 排列换行
+.flex-wrap(@arg: nowrap) {
+    //flex-wrap: nowrap不换行 | wrap换行 | wrap-reverse换行，第一行在下方;
+    .pre(flex-wrap,@arg);
+}
+
+// - 排列方向+换行
+.flex-flow(@arg: row nowrap) {
+    //flex-flow: <flex-direction> || <flex-wrap>;
+    .pre(flex-flow,@arg);
+}
+
+// - 排列项目对齐方式
+.justify-content(@arg: flex-start) {
+    //justify-content: flex-start左对齐 | flex-end右对齐 | center居中 | space-between两端对齐 | space-around两侧间隔相等;
+    .pre(justify-content,@arg);
+}
+
+// - 排列交叉轴对齐方式
+.align-items(@arg: stretch) {
+    //align-items: flex-start起点对齐 | flex-end终点对齐 | center中点对齐 | baseline第一行文字的基线对齐 | stretch占满整个容器的高度;
+    .pre(align-items,@arg);
+}
+
+// - 排列多根轴线对齐方式
+.align-content(@arg: stretch) {
+    //align-content: flex-start起点对齐 | flex-end终点对齐 | center中点对齐 | space-between两端对齐 | space-around两侧的间隔都相等 | stretch轴线占满整个交叉轴;
+    .pre(align-content,@arg);
+}
+
+
+//columns多列（文本宽度和列数）::
+.columns(@arg: 1) {
+    //columns: column-width列的宽度 column-count列数;
+    .pre(columns,@arg);
+}
+
+// - 列间隔
+.column-gap(@arg: 20px) {
+    .pre(column-gap,@arg);
+}
+
+// - 列之间的宽度,样式,颜色
+.column-rule(@arg: 0 #fff solid) {
+    .pre(column-rule,@arg);
+}
+
+//垂直水平居中
+.align() { display: -webkit-box; display: -ms-flexbox; display: -webkit-flex; display: flex; .pre(box-orient,horizontal); .pre(box-align,center); .pre(box-pack,center); }
+
+//水平居中
+.align-center() { display: -webkit-box; display: -ms-flexbox; display: -webkit-flex; display: flex; .pre(box-orient,horizontal); .pre(box-align,center); }
+
+//垂直居中
+.align-middle() { display: -webkit-box; display: -ms-flexbox; display: -webkit-flex; display: flex; .pre(box-orient,horizontal); .pre(box-pack,center); }
+
+
+
+//去掉手持设备点击时出现的透明层(一般在头部做格式化)
+.delete-highlight() {
+    a, button, input {
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
+        -webkit-tap-highlight-color: transparent; /* For some Androids */
+    }
+}
+
+//去掉苹果浏览器自带input[submit/reset/button]的ui渲染效果
+.delete-appearance() {
+    input[type="submit"],
+    input[type="reset"],
+    input[type="button"],
+    button {
+        -webkit-appearance: none;
+    }
+}
+
+
+.center() { display: -webkit-box; display: -ms-flexbox; display: -webkit-flex; display: flex; -webkit-box-pack: center; -ms-flex-pack: center; -webkit-justify-content: center; justify-content: center; -webkit-box-align: center; -ms-flex-align: center; -webkit-align-items: center; align-items: center; }

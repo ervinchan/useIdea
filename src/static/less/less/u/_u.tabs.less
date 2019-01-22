@@ -1,0 +1,21 @@
+﻿.ue-tabnav { text-align: center; position: relative;
+    ul { display: inline-block;
+         li { //float: left; line-height: 30px; padding-bottom: 10px; /*border-bottom: 2px transparent solid;*/ color: #999; font-size: 17px; margin: 0 30px; cursor: pointer; position: relative;
+            &:after { content: " "; background-color: @color; height: 2px; position: absolute; left: 0; bottom: 0; width: 0; -webkit-animation: line-out 0.4s cubic-bezier(0.215, 0.61, 0.355, 1); animation: line-out 0.4s cubic-bezier(0.215, 0.61, 0.355, 1); }
+            a { color: #999; position: relative; }
+            .badge { bottom: 60%; left: 100%; margin-left: -0.5em; padding: 0 3px; }
+            &.active { color: #333; border-color: @color;
+                a { color: #333; }
+            }
+            &.active:after { -webkit-animation: line-in 0.4s cubic-bezier(0.22, 0.61, 0.36, 1) both; animation: line-in 0.4s cubic-bezier(0.22, 0.61, 0.36, 1) both; }
+            &:hover { color: #333;
+                a { color: #333; }
+                &:after {display:block !important; -webkit-animation: line-in 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) both; animation: line-in 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) both; }
+            }
+        }
+        &:hover .active:after { display: none; }
+    }
+    .edit { display: inline-block; line-height: 30px; padding: 0 1.5em; .border-radius(30px); border: 1px #ddd solid; font-size: 14px; .absolute(); right: 0; top: 0; color: #666;
+        &:hover { border-color: @color; color: @color; }
+    }
+}

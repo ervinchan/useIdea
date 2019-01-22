@@ -1,0 +1,66 @@
+@import "../../static/less/_class.less";
+@import "../../static/less/_config.less";
+.u-pages {
+    padding: 40px 0;
+    max-width: @max-width;
+    margin: 0 auto;
+    &:before,
+    &:after {
+        content: '';
+        display: block;
+        width: 100%;
+        height: 0;
+        clear: both;
+    }
+    .box {
+        display: inline-block;
+        margin: 0 auto;
+    }
+    a,
+    span,
+    b {
+        display: inline-block;
+        float: left;
+        line-height: 2.6rem;
+        padding: 0 1rem;
+        color: @font;
+        margin: 0 4px 0.4rem 0;
+        background-color: #f2f2f2;
+        border-radius: 1px;
+        .transition();
+        .border-radius(2px);
+        text-decoration: none;
+        cursor: pointer;
+    }
+    b {
+        color: #fff;
+        background-color: @color;
+        cursor: no-drop;
+        padding: 0 1.4rem;
+        text-align: center;
+    }
+    a {
+        &:hover {
+            background-color: #666;
+            color: #fff;
+        }
+        &:active {
+            background-color: @color;
+        }
+    }
+    .ant-pagination-item {
+        border: none;
+        margin-right: 0;
+    }
+    .ant-pagination-item-active {
+        border: none;
+        a {
+            background-color: @color;
+            color: #fff;
+        }
+    }
+    .ant-pagination-prev,
+    .ant-pagination-next {
+        margin-right: 0;
+    }
+}

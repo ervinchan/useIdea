@@ -1,0 +1,35 @@
+﻿//标题栏
+.u-title { position: relative;
+    > b { display: inline-block; line-height: 1.2; border-left: 5px @color solid; color: @color; font-weight: bold; font-size: 18px; padding-left: 1rem; }
+    .more { display: inline-block; line-height: 20px; .absolute(); right: 0; top: 50%; margin-top: -10px; color: #999; .transition();
+        i { .transition(); margin-right: 0.4rem; }
+        &:hover { color: @color; }
+        &:active { .opacity(80);
+            i { .transform(rotate(180deg)); }
+        }
+    }
+}
+
+.u-title2 { text-align: center; padding: 40px 0; position: relative;
+    > h1 { font-size: 31px; font-weight: bold; color: #333; margin-bottom: 1rem; letter-spacing: 4px;
+        &.font-28 { font-size: 28px; letter-spacing: 1px; }
+    }
+    > h3 { font-size: 16px; color: #ababab; letter-spacing: 3px;
+        .book { display: inline-block; height: 20px; line-height: 20px; letter-spacing: 1px; padding-left: 80px; margin-top: 10px; font-size: 13px; color: #4481cf; background: url(../../images/book.png) left center no-repeat;
+            i { margin-left: 3px; }
+            &:hover { color: @color; }
+        }
+    }
+}
+.u-title3 { padding-bottom: 20px; border-bottom: 1px #eee solid; line-height: 25px; position: relative;
+    > b { display: inline-block; margin-right: 1rem; font-size: 21px; color: #333; }
+    > a { display: inline-block; color: #1789fe;
+        &:hover { color: @color; }
+    }
+    > .more { .absolute(); right: 0; top: 0; color: #333; }
+}
+.u-title4 { padding-bottom: 15px; border-bottom: 1px #eee solid; line-height: 20px; margin: 25px 0 20px; position: relative;
+    > b { display: inline-block; margin-right: 1rem; font-size: 16px; color: #333; }
+}
+
+.u-title5 { color: #333; font-size: 17px; padding-bottom: 30px; font-weight: 600; position: relative; }

@@ -1,0 +1,52 @@
+﻿
+//个人动态文章
+.ue-article { max-width: 1000px; margin: 0 auto;
+    > li { padding: 25px 50px 30px; min-height: 280px; border: 1px #eee solid; .border-radius(6px); background-color: #fff; margin-bottom: 50px; .box-shadow(0 2px 4px rgba(0,0,0,0.04));
+        &:after { content: ''; display: block; width: 100%; height: 0; clear: both; }
+        .ue_info { padding-left: 55px; line-height: 22px; position: relative; margin-bottom: 20px; color: #aaa;
+            .face { .absolute(); left: 0; width: 44px; height: 44px; .border-radius(100%); background-color: #00ae8c; overflow: hidden;
+                img { width: 100%; }
+            }
+            .alt > * { display: inline-block; float: left; margin-right: 0.5rem; font-size: 14px; }
+            a { color: #333 !important; font-size: 17px !important;
+                &:hover { color: @color !important; }
+            }
+            .dot { height: 22px }
+            .date { font-size: 12px; }
+        }
+        h1 { line-height: 30px; font-size: 21px; font-weight: bold; .nowrap(); margin-bottom: 20px; }
+        .txt, .ue-txt { line-height: 27px; overflow: hidden; font-size: 15px;
+            a { color: @fuzhu; display: inline-block; margin-left: 15px;
+                &:hover { color: @color; }
+                i { padding-left: 6px; }
+            }
+        }
+        .ue_box { position: relative; padding-right: 330px;
+            &:after { content: ''; display: block; width: 100%; height: 0; clear: both; }
+            .thumb-img { .absolute(); display: inline-block; right: 30px; top: 50%; width: 260px; height: 160px; margin-top: -80px; overflow: hidden;
+                img { width: 260px; height: 160px; }
+            }
+            .txt { height: 55px; margin-bottom: 30px; }
+        }
+        .f-bartool { float: right; }
+        &.pl, &.qj {
+            .ue-txt { margin-bottom: 15px; }
+            .ue_box { padding: 25px 330px 25px 25px; min-height: 180px; background-color: #f6f6f6;
+                &:before { content: ''; display: inline-block; width: 15px; height: 15px; background-color: #f6f6f6; .absolute(); left: 35px; top: -8px; }
+                .thumb-img { width: 200px; height: 130px; margin-top: -65px;
+                    img { width: 200px; height: 130px; }
+                }
+            }
+            .txt { margin: 0; }
+        }
+        &.qj {
+            .ue_box { padding: 25px; margin-bottom: 25px;
+                &:before { display: none; }
+            }
+        }
+        .thumb-img { background: #000;
+            &:hover img { .opacity(80); .transition(); }
+        }
+        &:hover { .box-shadow(0 4px 20px rgba(0,0,0,0.12)); .transition(); }
+    }
+}

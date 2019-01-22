@@ -1,0 +1,20 @@
+﻿//swiper
+.u-pagination { width: 100%; text-align: center;
+    .bull { display: inline-block; width: 8px; height: 8px; .border-radius(8px); background-color: #afafaf; margin: 0 3px; cursor: pointer;
+        &.active { background-color: @color; }
+    }
+    &.wide .active { width: 1.6rem !important; }
+}
+.u-next, .u-prev { display: inline-block; .absolute(20); top: 50%; margin-top: -23px; width: 46px; height: 46px; line-height: 44px; font-size: 28px; color: #fff; text-align: center; .border-radius(100%); background-color: fade(#e50112, 50%); cursor: pointer; .transition();.opacity(0);
+    &:hover { background-color: fade(#e50112,75%); }
+    &:active { background-color: #e50112; }
+}
+.m-prev, .m-next { .absolute(20); display: inline-block; width: 20px; height: 40px; top: 50%; margin-top: -20px; cursor: pointer; background: url(../../images/icon-x1.png) no-repeat; .opacity(40);
+    &:hover { color: @color; .opacity(100); }
+}
+.m-prev { background-position: -60px -50px; left: -40px;
+    &:hover { background-position: -80px -50px; }
+}
+.m-next { background-position: -100px -50px; right: -40px;
+    &:hover { background-position: -120px -50px; }
+}
