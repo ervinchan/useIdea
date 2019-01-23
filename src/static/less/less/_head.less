@@ -10,6 +10,7 @@
     .m-menu { padding-right: 2rem;
         > li { float: left; position: relative; margin: 0 1rem; padding: 25px 0;
             > a { display: inline-block; height: 70px; line-height: 1; font-weight: 400; padding: 30px 0 0; font-size: 15px; color: @color; position: relative;
+                &.active:after { -webkit-animation: line-in 0.4s cubic-bezier(0.22, 0.61, 0.36, 1) both; animation: line-in 0.4s cubic-bezier(0.22, 0.61, 0.36, 1) both; }
                 &:after { content: " "; background-color: @color; height: 2px; position: absolute; left: 0; bottom: 8px; width: 0; -webkit-animation: line-out 0.4s cubic-bezier(0.215, 0.61, 0.355, 1); animation: line-out 0.4s cubic-bezier(0.215, 0.61, 0.355, 1); }
             }
             > ul { .opacity(0); display: none; .transition(all 1s ease-in-out); .absolute(100); left: -18px; top: 100%; width: 225px; background: rgba(0,0,0,0.74); .box-shadow(0 4px 20px rgba(0,0,0,0.16));.border-radius(0 0 6px 6px);

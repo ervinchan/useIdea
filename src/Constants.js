@@ -1,3 +1,4 @@
 global.constants = {
-    loading: false
+    loading: false,
+    userInfo: JSON.parse(localStorage.getItem("userInfo"))
 };

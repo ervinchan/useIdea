@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Menu, Icon, Badge, Tabs, List, Avatar, Divider, Button, Card, Popover } from 'antd';
+import { Tabs, Button, Upload } from 'antd';
 import Slider from "react-slick";
 import { StickyContainer, Sticky } from 'react-sticky';
 
@@ -33,7 +33,10 @@ export default class Question extends Component {
             bannerAList: [],
             bannerBList: [],
             recommendBooks: [],
-            activeKey: 'news'
+            activeKey: 'news',
+            questionTit: "",
+            questionTxt: "",
+            fileList: []
         };
     }
 
@@ -257,9 +260,85 @@ export default class Question extends Component {
         console.log(key);
     }
 
+    setQuestionTxt = (e) => {
+        this.setState({ questionTxt: e.target.value })
+    }
+    setQuestionTit = (e) => {
+        this.setState({ questionTit: e.target.value })
+    }
+    submitQuestion = () => {
+        const { questionTit, questionTxt, fileList } = this.state;
+        var oMyForm = new FormData();
+        oMyForm.append("userId", 1);
+        oMyForm.append("categoryId", "4812062598ec4b10bedfb38b59ea3e94");
+        oMyForm.append("title", questionTit);
+        oMyForm.append("content", questionTxt);
+        fileList.forEach((file) => {
+            oMyForm.append('image', file);
+        });
+        // axios({
+        //     url: "/zsl/a/cms/article/consultationSave?",
+        //     method: "post",
+        //     data: oMyForm,
+        //     processData: false,// 告诉axios不要去处理发送的数据(重要参数)
+        //     contentType: false,   // 告诉axios不要去设置Content-Type请求头
+        // }).then((response) => {
+        //     /*global layer */
+        //     global.constants.loading = false
+        //     layer.msg(response.data.message)
+        // })
+        //     .catch((error) => {
+        //         global.constants.loading = false
+        //         console.log(error)
+        //     })
+        POST({
+            url: "/a/cms/article/consultationSave?",
+            opts: {
+                userId: 1,
+                categoryId: "4812062598ec4b10bedfb38b59ea3e94",
+                title: questionTit,
+                content: questionTxt,
+                image:fileList[0]
+            },
+            processData: false,
+            data: oMyForm,
+        }).then((response) => {
+            /*global layer */
+            global.constants.loading = false
+            layer.msg(response.data.message)
+        })
+            .catch((error) => {
+                global.constants.loading = false
+                console.log(error)
+            })
+    }
+    createCategory = () => {
+
+    }
+
     render() {
 
-        const { questionList, recoList, replyList } = this.state;
+        const { questionList, recoList, replyList, questionTit, questionTxt, fileList } = this.state;
+        const props = {
+            onRemove: (file) => {
+                this.setState((state) => {
+                    const index = state.fileList.indexOf(file);
+                    const newFileList = state.fileList.slice();
+                    newFileList.splice(index, 1);
+                    return {
+                        fileList: newFileList,
+                    };
+                });
+            },
+            beforeUpload: (file) => {
+                this.setState(state => ({
+                    fileList: [...state.fileList, file],
+                }));
+                return false;
+            },
+            fileList,
+            showUploadList: false
+        };
         return (
             <div className="">
                 {/* 头部 */}
@@ -283,18 +362,22 @@ export default class Question extends Component {
                     <div className="g-left" data-fixed=".g-qingjiao">
                         <div className="fm-qj">
                             <div className="in_title">
-                                <input type="text" placeholder="请在此输入请教的标题……" />
+                                <input type="text" placeholder="请在此输入请教的标题……" value={questionTit} onChange={this.setQuestionTit} />
                             </div>
                             <div className="in_txt">
-                                <textarea placeholder="清晰简短的问题描述，能有效提升35%的请教成功率……"></textarea>
+                                <textarea placeholder="清晰简短的问题描述，能有效提升35%的请教成功率……" maxlength="500" value={questionTxt} onChange={this.setQuestionTxt}></textarea>
                             </div>
                         </div>
                         <div className="fm-qj-tool clearfix">
-                            <a href="javascript:;" className="tl-img"><i className="icon-img"></i>图片</a>
+                            <Upload className="upload-btn" {...props}>
+                                <a href="javascript:;" className="tl-img"><i className="icon-img"></i>图片</a>
+                            </Upload>
+                            {/* <a href="javascript:;" className="tl-img"><i className="icon-img"></i>图片</a> */}
                             <div className="u-select">
                                 <div className="in_fenlei" role="note">选择分类</div>
                                 <div data-for=".in_fenlei" role="menu">
                                     <ul>
+                                        {this.createCategory()}
                                         <li>文案进阶</li>
                                         <li>设计审美</li>
                                         <li>写作经验</li>
@@ -307,8 +390,8 @@ export default class Question extends Component {
                                     </ul>
                                 </div>
                             </div>
-                            <span className="count">0/500 字</span>
-                            <a href="javascript:;" className="submit">提交请教</a>
+                            <span className="count">{questionTxt.length}/500 字</span>
+                            <a href="javascript:;" onClick={this.submitQuestion} className="submit">提交请教</a>
                         </div>
                         {this.createBannerB()}
                         {/* <!--占位--> */}

@@ -57,9 +57,12 @@
         &:after { content: "#"; display: inline-block; line-height: 20px; color: #ffb11f; font-size: 16px; .absolute(); left: 0; top: 50%; margin-top: -10px; }
         &:hover { color: @color; }
     }
-    .tl-img { position: relative; padding-left: 25px; line-height: 20px; margin-right: 5px;
-        i { content: " "; display: inline-block; height: 20px; width: 20px; .absolute(); left: 0; top: 50%; margin-top: -10px; }
+    .upload-btn{display:inline-block;
+        .tl-img { position: relative; padding-left: 25px; line-height: 20px; margin-right: 5px;
+            i { content: " "; display: inline-block; height: 20px; width: 20px; .absolute(); left: 0; top: 50%; margin-top: -10px; }
+        }
     }
+    
     .submit { display: inline-block; .absolute(); padding: 0 10px; line-height: 24px; font-size: 12px; .border-radius(24px); background-color: @color; color: #fff; right: 0; top: 50%; margin-top: -12px;
         &:active { .opacity(80); }
     }
