@@ -7,6 +7,7 @@ import Swiper from 'swiper/dist/js/swiper.min.js'
 
 import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
+import FormatDate from '../../static/js/utils/formatDate.js'
 import { POST } from '../../service/service'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
@@ -27,16 +28,26 @@ export default class App extends Component {
             bannerAList: [],
             bannerBList: [],
             bannerCList: [],
+            bannerEList: [],
             questionList: [],
             viewPointList: [],
             goodcopyList: [],
             bootStoreList: [],
+            recommendBooks: [],
+            topAuthorList: [],
+            hitsArticleList: [],
             jobList: []
         };
     }
 
     componentDidMount() {
         $(function () {
+            $("#utabs").find("li").on("mouseenter", function () {
+                let tab = $($(this).attr("tabfor"));
+                $(this).addClass("active").siblings().removeClass("active")
+                tab.show();
+                tab.siblings().hide();
+            })
             $("#tabNav").find("li").on("click", function () {
                 let item = $("#tabCont").find(".group").eq($(this).index());
                 $(this).addClass("active").siblings().removeClass("active")
@@ -173,6 +184,11 @@ export default class App extends Component {
         this.getBannerA();
         this.getBannerB();
         this.getBannerC();
+        this.getBannerE();
+        this.getRecommendBooks();
+        this.getTopAuthor();
+        this.getHitsArticle();
+
     }
 
     getBannerA = () => {
@@ -222,6 +238,22 @@ export default class App extends Component {
             })
 
     }
+    getBannerE = () => {
+        POST({
+            url: "/a/cms/article/adsList?",
+            opts: {
+                categoryId: "981892a5c2394fe7b01ce706d917699e"
+            }
+        }).then((response) => {
+            if (response.data.status === 1) {
+                this.setState({ bannerEList: response.data.data })
+            }
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+
+    }
     createBannerA = () => {
         const { bannerAList } = this.state
         let bannerList = bannerAList.map((item, index) => {
@@ -263,32 +295,25 @@ export default class App extends Component {
     }
     createBannerC = () => {
         const { bannerCList } = this.state
-        return bannerCList.map((item, index) => {
+        return bannerCList.slice(0, 3).map((item, index) => {
             return <a href={item.url} className="seat-h110 lighten"><img src={item.imageSrc} /></a>
         })
     }
-    getQuestionList = () => {
-        POST({
-            url: "/a/cms/article/getAllArticle?",
-            opts: {
-                categoryId: "846cd0769ef9452aad0cc9c354ba07e3"
-
-            }
-        }).then((response) => {
-            global.constants.loading = false
-            let viewPointList = response.data.data
-            this.setState({ viewPointList })
+    createBannerD = () => {
+        const { bannerCList } = this.state
+        let bannerDList = bannerCList.slice(3, 5)
+        return bannerDList.map((item, index) => {
+            return <a href={item.url} className="seat-h110 lighten"><img src={item.imageSrc} /></a>
         })
-            .catch((error) => {
-                console.log(error)
-            })
     }
+
     getViewPointList = () => {
         POST({
             url: "/a/cms/article/getAllArticle?",
             opts: {
-                categoryId: "846cd0769ef9452aad0cc9c354ba07e3"
-
+                categoryId: "846cd0769ef9452aad0cc9c354ba07e3",
+                pageNo: 1,
+                pageSize: PAGESIZE
             }
         }).then((response) => {
             global.constants.loading = false
@@ -303,8 +328,9 @@ export default class App extends Component {
         POST({
             url: "/a/cms/article/getAllArticle?",
             opts: {
-                categoryId: "ce009ff186fa4203ab07bd1678504228"
-
+                categoryId: "ce009ff186fa4203ab07bd1678504228",
+                pageNo: 1,
+                pageSize: PAGESIZE
             }
         }).then((response) => {
             global.constants.loading = false
@@ -350,39 +376,37 @@ export default class App extends Component {
             })
     }
 
-    createList = (data) => {
-        // const listData = [];
-        // for (let i = 0; i < 3; i++) {
-        //     listData.push({
-        //         href: '#',
-        //         title: `${name}-索尼X王俊凯特别套装 ${i}，你pick了吗`,
-        //         avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
-        //         description: '本栏所有精品美文都是从文章阅读网里面精选出来的,包括爱情美文欣赏,经典亲情、友情等情感美文摘抄,欢迎读者慢慢品味。',
-        //         content: 'We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure), to help people create their product prototypes beautifully and efficiently.',
-        //     });
-        // }
-        const IconText = ({ type, text }) => (
-            <span>
-                <Icon type={type} style={{ marginRight: 8 }} />
-                {text}
-            </span>
-        );
+    createList = (data, router) => {
         return data.list && data.list.map((item, index) => {
+            let Hours = FormatDate.apartHours(item.updateDate)
+            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours}小时前`
             return (
-                <div className="item">
-                    <a className="thumb-img" href="javascript:;"><img src={item.imageSrc} />
+                // <div className="item">
+                //     <a className="thumb-img" href="javascript:;"><img src={item.imageSrc} />
+                //     </a>
+                //     <div className="tit"><a href="javascript:;">{item.title}</a></div>
+                //     <div className="txt">
+                //         <span>今天 22:32</span><br />
+                //         <span>Brand：锤子科技</span>
+                //     </div>
+                //     <div className="bar">
+                //         <a href="javascript:;" className="user-img">
+                //             <img src="css/images/1x1.png" />
+                //         </a>
+                //         <span className="name">企业用户名</span>
+                //         <div className="f-bartool clearfix"><a href="javascript:;"><i className="icon-heart"></i><span>99</span></a><a href="javascript:;"><i className="icon-thumbs"></i><span>36</span></a><a href="javascript:;"><i className="icon-comment"></i><span>51</span></a></div>
+
+                //     </div>
+                // </div>
+                <div class="item user" onClick={() => this.gotoRouter(`${router}/${item.id}`)}>
+                    <a class="thumb-img" href="javascript:;">
+                        <img src={item.imageSrc} />
                     </a>
-                    <div className="tit"><a href="javascript:;">{item.title}</a></div>
-                    <div className="txt">
-                        <span>今天 22:32</span><br />
-                        <span>Brand：锤子科技</span>
-                    </div>
-                    <div className="bar">
-                        <a href="javascript:;" className="user-img">
-                            <img src="css/images/1x1.png" />
-                        </a>
-                        <span className="name">企业用户名</span>
-                        <div className="f-bartool clearfix"><a href="javascript:;"><i className="icon-heart"></i><span>99</span></a><a href="javascript:;"><i className="icon-thumbs"></i><span>36</span></a><a href="javascript:;"><i className="icon-comment"></i><span>51</span></a></div>
+                    <div class="tit"><a href="javascript:;">{item.title || item.bookName}</a></div>
+                    <div class="txt">{item.description}</div>
+                    <div class="bar">
+                        <span>{item.author}</span><span>·</span><span>{Time}</span>
+                        <div class="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item)}><i class="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item)}><i class="icon-thumbs"></i><span>{item.likeNum || item.praiseNum}</span></a><a href="javascript:;"><i class="icon-comment"></i><span>0</span></a></div>
 
                     </div>
                 </div>
@@ -395,6 +419,7 @@ export default class App extends Component {
         const { bootStoreList } = this.state;
 
         return bootStoreList.list && bootStoreList.list.map((item, index) => {
+
             return (
                 <a key={index} className="swiper-slide" href={`/Bookbuy/${item.id}`}>
                     <em><img src={item.img} /> </em>
@@ -415,8 +440,197 @@ export default class App extends Component {
         </Sticky>
     );
 
+    //主编荐书
+    getRecommendBooks = () => {
+        POST({
+            url: "/a/book/bookManager/bookSoft?",
+            opts: {
+                isRecommend: 1
+            }
+        }).then((response) => {
+            if (response.data.status === 1) {
+                let recommendBooks = response.data.data
+                this.setState({ recommendBooks })
+            }
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+    createRecommonList = () => {
+        const { recommendBooks, bannerEList } = this.state
+        return recommendBooks && recommendBooks.list && recommendBooks.list.map((item, index) => {
+            let Hours = FormatDate.apartHours(item.updateDate)
+            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours}小时前`
+            let bookImagUrl = item.bookImagUrl.split('|')[1]
+            let banner = ''
+            if ((index + 1) % 5 === 0) {
+                let i = (index + 1) / 5
+                let bannerItem = bannerEList[i - 1]
+                if (bannerItem) {
+                    banner = (
+                        <a href={bannerItem.url} class="seat-push">
+                            <img src={bannerItem.imageSrc} />
+                            <span class="badge">推荐</span>
+                            <p class="txt">{bannerItem.title}</p>
+                        </a>
+                    )
+                }
+
+            }
+            return (
+                [
+                    banner,
+                    <div class="item user">
+                        <a class="thumb-img" href="javascript:;">
+                            <img src={bookImagUrl} />
+                        </a>
+                        <div class="tit"><a href="javascript:;">{item.bookName}</a></div>
+                        <div class="txt">{item.authorIntroduce}</div>
+                        <div class="bar">
+                            <span>{item.author}</span><span>·</span><span>{Time}</span>
+                            <div class="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item.id)}><i class="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item.id)}><i class="icon-thumbs"></i><span>{item.praiseNum}</span></a><a href="javascript:;"><i class="icon-comment"></i><span>0</span></a></div>
+
+                        </div>
+                    </div>
+                ]
+            )
+        })
+    }
+
+    getQuestionList = () => {
+        POST({
+            url: "/a/cms/comment/consultationList?",
+            opts: {
+                pageNo: 1,
+                pageSize: PAGESIZE
+            }
+        }).then((response) => {
+            if (response.data.status === 1) {
+                global.constants.loading = false
+                let questionList = response.data.data
+                this.setState({ questionList })
+            }
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+
+    getTopAuthor = () => {
+        POST({
+            url: "/a/cms/article/getHostAuthor"
+        }).then((response) => {
+            if (response.data.status === 1) {
+                global.constants.loading = false
+                let topAuthorList = response.data.data
+                this.setState({ topAuthorList })
+            }
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+
+    createTopAuthor = (router) => {
+        const { topAuthorList } = this.state;
+
+        return topAuthorList && topAuthorList.slice(0, 10).map((item, index) => {
+
+            return (
+                <li key={index}>
+                    <a href="javascript:;" onClick={() => this.gotoRouter(router)}>
+                        <em><img src={item.user.photo} /></em>
+                        <span>{item.author}</span>
+                        <i className="fa-angle-right"></i>
+                    </a>
+                </li>
+            )
+        })
+    }
+
+    getHitsArticle = () => {
+        POST({
+            url: "/a/cms/article/getAllArticle?",
+            opts: {
+                hits: 1
+            }
+        }).then((response) => {
+            if (response.data.status === 1) {
+                global.constants.loading = false
+                let hitsArticleList = response.data.data
+                this.setState({ hitsArticleList })
+            }
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+
+    createHitsArticle = () => {
+        const { hitsArticleList } = this.state;
+        return hitsArticleList && hitsArticleList.slice(0, 10).map((item, index) => {
+
+            return (
+                <li key={index} onClick={() => this.gotoRouter()}>
+                    <a href="javascript:;" className="thumb-img">
+                        <span>{index}</span>
+                        <img src={item.imageSrc} />
+                    </a>
+                    <h1><a href="javascript:;">{item.title}</a></h1>
+                    <h3>{item.author}</h3>
+                </li>
+            )
+        })
+    }
+
+    gotoRouter = (router) => {
+        this.props.history.push(router)
+    }
+
+    handleLike = (item) => {
+        POST({
+            url: "/a/cms/article/like?",
+            opts: {
+                id: item.id
+            }
+        }).then((response) => {
+            global.constants.loading = false
+            if (response.data.status === 1) {
+                item.likeNum++
+                this.setState({})
+            }
+            /* global layer */
+            layer.msg(response.data.message)
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+    handleCollect = (item) => {
+        POST({
+            url: "/a/artuser/articleCollect/collectArticle?",
+            opts: {
+                userId: 1,
+                articleId: item.id
+            }
+        }).then((response) => {
+            global.constants.loading = false
+            if (response.data.status === 1) {
+                item.collectNum++
+                this.setState({})
+            }
+
+            /* global layer */
+            layer.msg(response.data.message)
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+
     render() {
-        const { questionList, viewPointList, goodcopyList, bootStoreList, jobList } = this.state;
+        const { questionList, viewPointList, goodcopyList, bootStoreList, jobList, recommendBooks } = this.state;
         const settingsBanner = {
             dots: true,
             className: "swiper-container",
@@ -444,7 +658,7 @@ export default class App extends Component {
                                 <a href="javascript:;">主编推荐</a>
                             </li>
                             <li><a href="javascript:;">请 教</a></li>
-                            <li><a href="javascript:;">小专栏</a></li>
+                            {/* <li><a href="javascript:;">小专栏</a></li> */}
                             <li><a href="javascript:;">醒来再读</a></li>
                             <li><a href="javascript:;">吃口文案</a></li>
                             <li><a href="javascript:;">书单上新</a></li>
@@ -454,45 +668,45 @@ export default class App extends Component {
                     <div id="tabCont" className="g-left">
                         <div className="group" index="0">
                             <div className="m-artlist clearfix">
-                                {this.createList(questionList)}
+                                {this.createRecommonList(recommendBooks)}
                             </div>
-                            <a href="javascript:;" className="more-a">点击浏览更多</a>
+                            <a href="javascript:;" className="more-a" onClick={() => this.gotoRouter('/Bookstore')}>点击浏览更多</a>
                         </div>
                         <div className="group" index="1" style={{ display: "none" }}>
                             <div className="m-artlist clearfix">
-                                {this.createList(questionList)}
+                                {this.createList(questionList, `/Question/Article`)}
                             </div>
-                            <a href="javascript:;" className="more-a">点击浏览更多</a>
+                            <a href="javascript:;" className="more-a" onClick={() => this.gotoRouter('/Question')}>点击浏览更多</a>
                         </div>
-                        <div className="group" index="2" style={{ display: "none" }}>
+                        {/* <div className="group" index="2" style={{ display: "none" }}>
                             <div className="m-artlist clearfix">
                                 {this.createList(questionList)}
                             </div>
                             <a href="javascript:;" className="more-a">点击浏览更多</a>
-                        </div>
+                        </div> */}
                         <div className="group" index="2" style={{ display: "none" }}>
                             <div className="m-artlist clearfix">
-                                {this.createList(viewPointList)}
+                                {this.createList(viewPointList, `/Inspiration/Article`)}
                             </div>
-                            <a href="javascript:;" className="more-a">点击浏览更多</a>
+                            <a href="javascript:;" className="more-a" onClick={() => this.gotoRouter('/Inspiration/Viewpoint')}>点击浏览更多</a>
                         </div>
                         <div className="group" index="4" style={{ display: "none" }}>
                             <div className="m-artlist clearfix">
-                                {this.createList(goodcopyList)}
+                                {this.createList(goodcopyList, `/Inspiration/Article`)}
                             </div>
-                            <a href="javascript:;" className="more-a">点击浏览更多</a>
+                            <a href="javascript:;" className="more-a" onClick={() => this.gotoRouter('/GoodCopy')}>点击浏览更多</a>
                         </div>
                         <div className="group" index="5" style={{ display: "none" }}>
                             <div className="m-artlist clearfix">
-                                {this.createList(bootStoreList)}
+                                {this.createList(bootStoreList, `/Bookstore/Bookbuy`)}
                             </div>
-                            <a href="javascript:;" className="more-a">点击浏览更多</a>
+                            <a href="javascript:;" className="more-a" onClick={() => this.gotoRouter('/Bookstore')}>点击浏览更多</a>
                         </div>
                         <div className="group" index="6" style={{ display: "none" }}>
                             <div className="m-artlist clearfix">
-                                {this.createList(jobList)}
+                                {this.createList(jobList, `/Job`)}
                             </div>
-                            <a href="javascript:;" className="more-a">点击浏览更多</a>
+                            <a href="javascript:;" className="more-a" onClick={() => this.gotoRouter('/Job')}>点击浏览更多</a>
                         </div>
                     </div>
                     <div className="g-right">
@@ -502,215 +716,68 @@ export default class App extends Component {
                                 <b>热文排行</b>
                             </div>
                             <ul className="hot-article active">
-                                <li>
-                                    <a href="#" className="thumb-img">
-                                        <span>1</span>
-                                        <img src="images/r1.jpg" />
-                                    </a>
-                                    <h1><a href="#">天猫拾光之旅：双11十年，都藏在这些彩蛋里了！</a></h1>
-                                    <h3>jrainlau</h3>
-                                </li>
-                                <li>
-                                    <a href="#" className="thumb-img">
-                                        <span>2</span>
-                                        <img src="images/r2.jpg" />
-                                    </a>
-                                    <h1><a href="#">《风味人间》的画面，每一帧都写着馋</a></h1>
-                                    <h3>jrainlau</h3>
-                                </li>
-                                <li>
-                                    <a href="#" className="thumb-img">
-                                        <span>3</span>
-                                        <img src="css/images/95x65.png" />
-                                    </a>
-                                    <h1><a href="#">100多年来，广告如何操控你对“颜值”的认知？</a></h1>
-                                    <h3>jrainlau</h3>
-                                </li>
-                                <li>
-                                    <a href="#" className="thumb-img">
-                                        <span>4</span>
-                                        <img src="css/images/95x65.png" />
-                                    </a>
-                                    <h1><a href="#">100多年来，广告如何操控你对“颜值”的认知？</a></h1>
-                                    <h3>jrainlau</h3>
-                                </li>
-                                <li>
-                                    <a href="#" className="thumb-img">
-                                        <span>5</span>
-                                        <img src="css/images/95x65.png" />
-                                    </a>
-                                    <h1><a href="#">100多年来，广告如何操控你对“颜值”的认知？</a></h1>
-                                    <h3>jrainlau</h3>
-                                </li>
-                                <li>
-                                    <a href="#" className="thumb-img">
-                                        <span>6</span>
-                                        <img src="css/images/95x65.png" />
-                                    </a>
-                                    <h1><a href="#">100多年来，广告如何操控你对“颜值”的认知？</a></h1>
-                                    <h3>jrainlau</h3>
-                                </li>
-                                <li>
-                                    <a href="#" className="thumb-img">
-                                        <span>7</span>
-                                        <img src="css/images/95x65.png" />
-                                    </a>
-                                    <h1><a href="#">100多年来，广告如何操控你对“颜值”的认知？</a></h1>
-                                    <h3>jrainlau</h3>
-                                </li>
-                                <li>
-                                    <a href="#" className="thumb-img">
-                                        <span>8</span>
-                                        <img src="css/images/95x65.png" />
-                                    </a>
-                                    <h1><a href="#">100多年来，广告如何操控你对“颜值”的认知？</a></h1>
-                                    <h3>jrainlau</h3>
-                                </li>
-                                <li>
-                                    <a href="#" className="thumb-img">
-                                        <span>9</span>
-                                        <img src="css/images/95x65.png" />
-                                    </a>
-                                    <h1><a href="#">100多年来，广告如何操控你对“颜值”的认知？</a></h1>
-                                    <h3>jrainlau</h3>
-                                </li>
-                                <li>
-                                    <a href="#" className="thumb-img">
-                                        <span>10</span>
-                                        <img src="css/images/95x65.png" />
-                                    </a>
-                                    <h1><a href="#">100多年来，广告如何操控你对“颜值”的认知？</a></h1>
-                                    <h3>jrainlau</h3>
-                                </li>
+                                {this.createHitsArticle()}
                             </ul>
                         </div>
-                        <a href="javascript:;" className="seat-h110"><img src="images/d9.jpg" /></a>
-                        <a href="javascript:;" className="seat-h110"><img src="images/d8.jpg" /></a>
+                        {this.createBannerD()}
                         <div className="m-hot-tabs u-tabs">
-                            <ul className="nav">
-                                <li tabfor=".tab-team">热门团队</li>
+                            <ul className="nav" id="utabs" name="utabs">
+                                <li tabfor=".tab-team" className="active">热门团队</li>
                                 <li>/</li>
                                 <li tabfor=".tab-writer">热门作者</li>
                             </ul>
-                            <div className="tab-team">
-                                <ul className="hot-team clearfix">
-                                    <li>
-                                        <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div className="tab-writer">
-                                <ul className="hot-writer clearfix">
-                                    <li>
-                                        <a href="javascript:;">
-                                            <em><img src="css/images/1x1.png" /></em>
-                                            <span>四郎</span>
-                                            <i className="fa-angle-right"></i>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript:;">
-                                            <em><img src="css/images/1x1.png" /></em>
-                                            <span>萌也</span>
-                                            <i className="fa-angle-right"></i>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript:;">
-                                            <em><img src="css/images/1x1.png" /></em>
-                                            <span>空空如也</span>
-                                            <i className="fa-angle-right"></i>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript:;">
-                                            <em><img src="css/images/1x1.png" /></em>
-                                            <span>kelloy</span>
-                                            <i className="fa-angle-right"></i>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript:;">
-                                            <em><img src="css/images/1x1.png" /></em>
-                                            <span>故乡原景</span>
-                                            <i className="fa-angle-right"></i>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript:;">
-                                            <em><img src="css/images/1x1.png" /></em>
-                                            <span>四郎</span>
-                                            <i className="fa-angle-right"></i>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript:;">
-                                            <em></em>
-                                            <span>四郎</span>
-                                            <i className="fa-angle-right"></i>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript:;">
-                                            <em></em>
-                                            <span>故乡原景</span>
-                                            <i className="fa-angle-right"></i>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript:;">
-                                            <em></em>
-                                            <span>四郎</span>
-                                            <i className="fa-angle-right"></i>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript:;">
-                                            <em></em>
-                                            <span>四郎</span>
-                                            <i className="fa-angle-right"></i>
-                                        </a>
-                                    </li>
-                                </ul>
+                            <div>
+                                <div className="tab-team">
+                                    <ul className="hot-team clearfix">
+                                        <li>
+                                            <a href="javascript:;"><img src="css/images/1x1.png" /></a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:;"><img src="css/images/1x1.png" /></a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:;"><img src="css/images/1x1.png" /></a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:;"><img src="css/images/1x1.png" /></a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:;"><img src="css/images/1x1.png" /></a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:;"><img src="css/images/1x1.png" /></a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:;"><img src="css/images/1x1.png" /></a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:;"><img src="css/images/1x1.png" /></a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:;"><img src="css/images/1x1.png" /></a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:;"><img src="css/images/1x1.png" /></a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:;"><img src="css/images/1x1.png" /></a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:;"><img src="css/images/1x1.png" /></a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:;"><img src="css/images/1x1.png" /></a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:;"><img src="css/images/1x1.png" /></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div className="tab-writer" style={{ display: "none" }}>
+                                    <ul className="hot-writer clearfix">
+                                        {this.createTopAuthor()}
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import { Input, Tabs, Pagination } from 'antd';
 import axios from 'axios'
 import $ from 'jquery'
+import { POST } from '../../service/service'
+import '../../Constants'
+import Loading from '../../common/Loading/Index'
 import Swiper from 'swiper/dist/js/swiper.min.js'
 import 'swiper/dist/css/swiper.min.css'
 
@@ -62,7 +65,7 @@ export default class HotRead extends Component {
                     <a class="thumb-img" href={`/#/Inspiration/Article/${item.id}`}><img src={item.image} />
                     </a>
                     <h1><a href={item.link}>{item.title}</a></h1>
-                    <div className="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleFavorite(index)}><i className="icon-heart"></i><span>{item.favorite}</span></a><a href="javascript:;" onClick={() => this.handleLikes(index)}><i className="icon-thumbs"></i><span>{item.like}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{item.comment}</span></a></div>
+                    <div className="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{item.commentNum}</span></a></div>
 
                 </div>
             )
@@ -73,7 +76,6 @@ export default class HotRead extends Component {
                         {itemDom}
                     </div>
                 )
-                console.log(itemDom, index)
                 itemDom = []
                 return (
                     slide
@@ -91,6 +93,46 @@ export default class HotRead extends Component {
             }
 
         })
+    }
+    handleLike = (item) => {
+        POST({
+            url: "/a/cms/article/like?",
+            opts: {
+                id: item.id
+            }
+        }).then((response) => {
+            global.constants.loading = false
+            if (response.data.status === 1) {
+                item.likeNum++
+                this.setState({})
+            }
+            /* global layer */
+            layer.msg(response.data.message)
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+    handleCollect = (item) => {
+        POST({
+            url: "/a/artuser/articleCollect/collectArticle?",
+            opts: {
+                userId: 1,
+                articleId: item.id
+            }
+        }).then((response) => {
+            global.constants.loading = false
+            if (response.data.status === 1) {
+                item.collectNum++
+                this.setState({})
+            }
+
+            /* global layer */
+            layer.msg(response.data.message)
+        })
+            .catch((error) => {
+                console.log(error)
+            })
     }
     render() {
         return (
