@@ -63,9 +63,9 @@ export default class JobMenu extends Component {
     createChild = (items) => {
         let Lis = items.map((item, index) => {
             if (index === items.length - 1) {
-                return [<a href="javascript:;" onClick={this.gotoRouter}>{item.name}</a>, <i className="fa-angle-right"></i>]
+                return [<a href="javascript:;"  onClick={() => this.props.setSearchTxt(item.name)}>{item.name}</a>, <i className="fa-angle-right"></i>]
             }
-            return <a href="javascript:;" onClick={this.gotoRouter}>{item.name}</a>
+            return <a href="javascript:;"  onClick={() => this.props.setSearchTxt(item.name)}>{item.name}</a>
         })
         return Lis
     }
@@ -80,7 +80,7 @@ export default class JobMenu extends Component {
             return item.childList && item.childList.map((item, index) => {
                 if (item.childList) {
                     return item.childList.map((t, index) => {
-                        return <li><span>{item.name}</span><a href="javascript:;" onClick={this.gotoRouter}>{t.name}</a></li>
+                        return <li><span>{item.name}</span><a href="javascript:;" onClick={() => this.props.setSearchTxt(t.name)}>{t.name}</a></li>
                     })
                 }
 

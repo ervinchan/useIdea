@@ -58,7 +58,7 @@ export default class BookMenu extends Component {
     searchBooks = () => {
         console.log(this.props)
         let searchTxt = $("#bookSearchTxt").val()
-        window.location.href = `/#/Bookstore/search=${searchTxt}`
+        window.location.href = `/#/Bookstore/NewBooks/search=${searchTxt}`
         // this.props.history.replaceState({ tid: $("#bookSearchTxt").val() }, "/Bookstore")
     }
 
@@ -75,15 +75,15 @@ export default class BookMenu extends Component {
                 Lis = this.loopChildren(item, item.children)
             }
             let Li = item.children.length ?
-                <li key={index}><a href={`/#/Bookstore/${item.id}&${item.parentId}`}>{item.name}</a><ul>{Lis}</ul></li>
+                <li key={index}><a href={`/#/Bookstore/NewBooks/${item.id}&${item.parentId}`}>{item.name}</a><ul>{Lis}</ul></li>
                 :
-                <li key={index}><a href={`/#/Bookstore/${item.id}&${item.parentId}`}>{item.name}</a></li>
+                <li key={index}><a href={`/#/Bookstore/NewBooks/${item.id}&${item.parentId}`}>{item.name}</a></li>
             return Li
         })
     }
 
     loopChildren = (parent, items) => {
-        let Lis = items.map((item, index) => <li key={index} ><a href={`/#/Bookstore/${item.id}&${parent.id}`}>{item.name}</a><span>({item.count || 0})</span></li>)
+        let Lis = items.map((item, index) => <li key={index} ><a href={`/#/Bookstore/NewBooks/${item.id}&${parent.id}`}>{item.name}</a><span>({item.count || 0})</span></li>)
         return Lis
     }
 

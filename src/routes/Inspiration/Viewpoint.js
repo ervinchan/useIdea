@@ -72,7 +72,7 @@ export default class Viewpoint extends Component {
         POST({
             url: "/a/cms/category/navigationBar?",
             opts: {
-                categoryId: categoryId || ''
+                id: categoryId || ''
 
             }
         }).then((response) => {
@@ -89,7 +89,7 @@ export default class Viewpoint extends Component {
         POST({
             url: "/a/cms/category/navigationBar?",
             opts: {
-                categoryId: categoryId || ''
+                subscriber: 0
 
             }
         }).then((response) => {
@@ -134,7 +134,7 @@ export default class Viewpoint extends Component {
                             <img src={item.user.photo} />
                         </a>
                         <span class="name">{item.author}</span>
-                        <div class="f-bartool clearfix"><a href="javascript:;"><i class="icon-heart"></i><span>99</span></a><a href="javascript:;"><i class="icon-thumbs"></i><span>36</span></a><a href="javascript:;"><i class="icon-comment"></i><span>51</span></a></div>
+                        <div class="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{item.commentNum}</span></a></div>
 
                     </div>
                 </div>
@@ -175,23 +175,52 @@ export default class Viewpoint extends Component {
                         <span>{item.name}</span>
                     </a>
                     <h1><a href="#">{item.description}</a></h1>
-                    <div class="f-bartool clearfix"><a href="javascript:;"><i class="icon-heart"></i><span>99</span></a><a href="javascript:;"><i class="icon-thumbs"></i><span>36</span></a><a href="javascript:;"><i class="icon-comment"></i><span>51</span></a></div>
+                    <div class="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{item.commentNum}</span></a></div>
 
                 </li>
             )
         })
     }
 
-    handleFavorite = (index) => {
-        const { readList } = this.state;
-        readList[index].favorite++;
-        this.setState(readList);
+    handleLike = (item) => {
+        POST({
+            url: "/a/cms/article/like?",
+            opts: {
+                id: item.id
+            }
+        }).then((response) => {
+            global.constants.loading = false
+            if (response.data.status === 1) {
+                item.likeNum++
+                this.setState({})
+            }
+            /* global layer */
+            layer.msg(response.data.message)
+        })
+            .catch((error) => {
+                console.log(error)
+            })
     }
+    handleCollect = (item) => {
+        POST({
+            url: "/a/artuser/articleCollect/collectArticle?",
+            opts: {
+                userId: 1,
+                articleId: item.id
+            }
+        }).then((response) => {
+            global.constants.loading = false
+            if (response.data.status === 1) {
+                item.collectNum++
+                this.setState({})
+            }
 
-    handleLikes = (index) => {
-        const { readList } = this.state;
-        readList[index].like++;
-        this.setState(readList);
+            /* global layer */
+            layer.msg(response.data.message)
+        })
+            .catch((error) => {
+                console.log(error)
+            })
     }
 
     handlePageChange = (page, pageSize) => {

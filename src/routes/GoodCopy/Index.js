@@ -12,6 +12,9 @@ import WheelBanner from '../../common/wheelBanner/Index'
 import BookMenu from '../../common/bookMenu/Menu'
 import SwiperList from '../../common/swiperList/Index'
 import HotRead from '../../common/hotRead/Index'
+import { POST } from '../../service/service'
+import '../../Constants'
+import Loading from '../../common/Loading/Index'
 import 'swiper/dist/css/swiper.min.css'
 
 import 'antd/lib/pagination/style/index.css';
@@ -45,7 +48,7 @@ export default class GoodCopy extends Component {
     componentDidMount() {
 
         this.getDatas("ce009ff186fa4203ab07bd1678504228");
-        //this.getHotKeywords("ce009ff186fa4203ab07bd1678504228")
+        this.getHotKeywords("ce009ff186fa4203ab07bd1678504228")
     }
 
     getDatas = (categoryId) => {
@@ -83,19 +86,18 @@ export default class GoodCopy extends Component {
     }
 
     getHotKeywords = (categoryId) => {
-        let url = '/zsl/a/cms/article/getHostKeywords?'
-        let opts = {
-            categoryId: categoryId || ''
-        }
-        for (var key in opts) {
-            opts[key] && (url += "&" + key + "=" + opts[key])
-        }
-        axios.post(url, opts)
-            .then((response) => {
+        POST({
+            url: "/a/cms/article/getHostKeywords?",
+            opts: {
+                categoryId: categoryId || ''
+            }
+        }).then((response) => {
+            global.constants.loading = false
+            if (response.data.status === 1) {
                 let HotKeywords = response.data.data
                 this.setState({ HotKeywords })
-
-            })
+            }
+        })
             .catch((error) => {
                 console.log(error)
             })
@@ -127,10 +129,10 @@ export default class GoodCopy extends Component {
         return goodcopyList.list && goodcopyList.list.map((item, index) => {
             return (
                 <li>
-                    <a className="thumb-img" href={`/#/Bookstore/Bookbuy/${item.id}`}><img src={item.imageSrc} /><span>{item.category.name}</span></a>
-                    <h1><a href={`/#/Bookstore/Bookbuy/${item.id}`}>{item.title}</a></h1>
+                    <a className="thumb-img" href={`/#/Inspiration/Article/${item.id}`}><img src={item.imageSrc} /><span>{item.category.name}</span></a>
+                    <h1><a href={`/#/Inspiration/Article/${item.id}`}>{item.title}</a></h1>
                     <div className="alt clearfix">
-                        <a href="#" className="j_name"><img src={item.user.img} className="thumb-img" />{item.author}</a>
+                        <a href={`/#/Inspiration/Article/${item.id}`} className="j_name"><img src={item.user.img} className="thumb-img" />{item.author}</a>
                         <span className="dot"></span>
                         <span>{item.description}</span>
                     </div>
@@ -141,9 +143,9 @@ export default class GoodCopy extends Component {
 
     createTagGroup = () => {
         const { HotKeywords } = this.state
-        return HotKeywords.list && HotKeywords.list.map((item, index) => {
+        return HotKeywords && HotKeywords.slice(0, 12).map((item, index) => {
             return (
-                <a href="javascript:;" onClick={() => this.getKeywordsList(item.name)}>{item.name}</a>
+                <a href="javascript:;" onClick={() => this.getKeywordsList(item.title)}>{item.title}</a>
             )
         })
     }
@@ -182,7 +184,7 @@ export default class GoodCopy extends Component {
                 <div className="wa-search wrapper">
                     <div className="bar">
                         <div className="u-search">
-                            <input type="text" placeholder="搜索与我有关的提问" onChange={this.handleSetKeywords} />
+                            <input type="text" placeholder="搜索文案" onChange={this.handleSetKeywords} />
                             <a href="javascript:;" className="fa-search" onClick={() => this.getKeywordsList(keywords)}></a>
                         </div>
                         <div className="alt">
@@ -220,7 +222,7 @@ export default class GoodCopy extends Component {
                 <HotRead />
                 {/* 底部 */}
                 <Footer />
-
+                <Loading />
             </div>
         );
     }

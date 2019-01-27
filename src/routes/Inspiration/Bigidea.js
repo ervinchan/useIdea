@@ -11,6 +11,9 @@ import Footer from '../../common/footer/Index.js'
 import WheelBanner from '../../common/wheelBanner/Index'
 import BookMenu from '../../common/bookMenu/Menu'
 import HotRead from '../../common/hotRead/Index'
+import { POST } from '../../service/service'
+import '../../Constants'
+import Loading from '../../common/Loading/Index'
 import 'swiper/dist/css/swiper.min.css'
 
 import 'antd/lib/pagination/style/index.css';
@@ -82,6 +85,47 @@ export default class Bigidea extends Component {
             })
     }
 
+    handleLike = (item) => {
+        POST({
+            url: "/a/cms/article/like?",
+            opts: {
+                id: item.id
+            }
+        }).then((response) => {
+            global.constants.loading = false
+            if (response.data.status === 1) {
+                item.likeNum++
+                this.setState({})
+            }
+            /* global layer */
+            layer.msg(response.data.message)
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+    handleCollect = (item) => {
+        POST({
+            url: "/a/artuser/articleCollect/collectArticle?",
+            opts: {
+                userId: 1,
+                articleId: item.id
+            }
+        }).then((response) => {
+            global.constants.loading = false
+            if (response.data.status === 1) {
+                item.collectNum++
+                this.setState({})
+            }
+
+            /* global layer */
+            layer.msg(response.data.message)
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+
     //热门作者
     // getHostAuthor = (categoryId) => {
     //     let url = '/zsl/a/cms/article/getHostAuthor?'
@@ -122,7 +166,7 @@ export default class Bigidea extends Component {
                     <div className="txt">{item.description}</div>
                     <div className="bar">
                         <span>{item.author}</span><span className="dot"></span><span>{Time}</span>
-                        <div className="f-bartool clearfix"><a href="javascript:;"><i className="icon-heart"></i><span>99</span></a><a href="javascript:;"><i className="icon-thumbs"></i><span>36</span></a><a href="javascript:;"><i className="icon-comment"></i><span>51</span></a></div>
+                        <div className="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{item.commentNum}</span></a></div>
 
                     </div>
                 </div>
@@ -278,6 +322,7 @@ export default class Bigidea extends Component {
                 <HotRead />
                 {/* 底部 */}
                 <Footer />
+                <Loading />
             </div>
         );
     }

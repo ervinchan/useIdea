@@ -74,7 +74,7 @@ export default class Reg extends Component {
             email: regEmail,
             password: regPsw,
             loginName: regEmail,
-            isCompany: false
+            isCompany: "false"
         }
         for (var key in opts) {
             opts[key] && (url += "&" + key + "=" + opts[key])
@@ -83,6 +83,8 @@ export default class Reg extends Component {
             .then((response) => {
                 if (response.data.status === 1) {
                     this.props.history.push("/regFinish")
+                } else {
+                    layer.msg(response.data.message)
                 }
             })
             .catch((error) => {

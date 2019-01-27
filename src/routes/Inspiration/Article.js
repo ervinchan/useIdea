@@ -10,11 +10,14 @@ import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
 import WheelBanner from '../../common/wheelBanner/Index'
 import HotRead from '../../common/hotRead/Index'
+import { POST } from '../../service/service'
+import '../../Constants'
+import Loading from '../../common/Loading/Index'
 import 'swiper/dist/css/swiper.min.css'
 
 import 'antd/lib/pagination/style/index.css';
 import '../../static/less/article.less';
-
+import banner from "../../static/images/article/1.jpg"
 const PAGESIZE = 3;
 
 export default class Article extends Component {
@@ -45,7 +48,7 @@ export default class Article extends Component {
         document.body.appendChild(script);
         this.getArticleInfo(aid)
         this.getArticleContent(aid)
-        this.getArticleComment(aid)
+
 
     }
 
@@ -59,7 +62,8 @@ export default class Article extends Component {
         }
         axios.post(url, opts)
             .then((response) => {
-                let articleInfo = response.data.data.list[0]
+                let articleInfo = response.data.data
+                this.getArticleComment(aid, articleInfo.category.id)
                 this.setState({ articleInfo })
             })
             .catch((error) => {
@@ -85,34 +89,23 @@ export default class Article extends Component {
             })
     }
 
-    getArticleComment = (aid) => {
-        let url = '/zsl/a/cms/article/getArticleComment?'
-        let opts = {
-            id: aid
-        }
-        for (var key in opts) {
-            opts[key] && (url += "&" + key + "=" + opts[key])
-        }
-        axios.post(url, opts)
-            .then((response) => {
+    getArticleComment = (aid, cid) => {
+        POST({
+            url: "/a/cms/comment/consultationList?",
+            opts: {
+                categoryId: cid,
+                contentId: aid
+            }
+        }).then((response) => {
+            global.constants.loading = false
+            if (response.data.status === 1) {
                 let articleComment = response.data.data
                 this.setState({ articleComment })
-            })
+            }
+        })
             .catch((error) => {
                 console.log(error)
             })
-    }
-
-    handleFavorite = (index) => {
-        const { readList } = this.state;
-        readList[index].favorite++;
-        this.setState(readList);
-    }
-
-    handleLikes = (index) => {
-        const { readList } = this.state;
-        readList[index].like++;
-        this.setState(readList);
     }
 
     handleNextPage = (page, pageSize) => {
@@ -127,6 +120,77 @@ export default class Article extends Component {
         this.getBooksList(this.props.match.params.tid, this.state.sortType, page)
     }
 
+    handleLike = (item) => {
+        POST({
+            url: "/a/cms/article/like?",
+            opts: {
+                id: item.id
+            }
+        }).then((response) => {
+            global.constants.loading = false
+            if (response.data.status === 1) {
+                item.likeNum++
+                this.setState({})
+            }
+            /* global layer */
+            layer.msg(response.data.message)
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+    handleCollect = (item) => {
+        POST({
+            url: "/a/artuser/articleCollect/collectArticle?",
+            opts: {
+                userId: 1,
+                articleId: item.id
+            }
+        }).then((response) => {
+            global.constants.loading = false
+            if (response.data.status === 1) {
+                item.collectNum++
+                this.setState({})
+            }
+
+            /* global layer */
+            layer.msg(response.data.message)
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+
+    createCommentList = (data) => {
+        return data.map((item, index) => {
+
+            return (
+                <div className="disc-item">
+                    <a href="javascript:;" className="thumb"><img src="images/article/t1.jpg" /></a>
+                    <div className="alt">
+                        <a href="#" className="j_name">{item.name}</a><span className="dot"></span><span>2018-06-19</span>
+                    </div>
+                    <div className="txt">
+                        {item.content}
+                    </div>
+                    <div className="bar">
+                        <a href="#">投诉</a><a href="javascript:;" data-el="reply">回复</a><a href="#" className="thumbs"><i className="icon-thumbs-up"></i>{item.commentNum}</a>
+                    </div>
+                    {
+                        item.childComments &&
+                        <div className="disc-sub">
+                            {this.createCommentList(item.childComments)}
+                        </div>
+                    }
+                </div>
+            )
+        })
+    }
+
+    gotoRouter = (id) => {
+        this.props.history.push(`/ArticleEditor`)
+    }
+
     render() {
         const { articleInfo, articleContent, articleComment } = this.state;
         let Hours = FormatDate.apartHours(articleInfo.updateDate)
@@ -138,7 +202,7 @@ export default class Article extends Component {
                 {/* 轮播banner */}
 
                 <div className="art-thumb">
-                    <img src="images/article/1.jpg" />
+                    <img src={banner} />
                 </div>
                 <div className="wrapper art-wrapper">
                     <div className="art-head">
@@ -148,7 +212,7 @@ export default class Article extends Component {
                             <a href="javascript:;" className="icon-home"></a>
                             <p>
                                 <a href="javascript:;" data-el="weixin">订 阅</a>
-                                <a href="javascript:;">发布创作</a>
+                                <a href="javascript:;" onClick={() => this.gotoRouter()}>发布创作</a>
                             </p>
                         </div>
                     </div>
@@ -169,12 +233,12 @@ export default class Article extends Component {
                     </div>
                     <div className="share-bottom clearfix">
                         <div className="copyright">版权声明：本文版权、观点和立场归投稿作者所有。未经作者授权，不得以任何形式进行刊登、摘录或转载。</div>
-                        <a href="javascript:;" className="thumbs-up"><i className="icon-thumbs-up"></i> 点赞12人</a>
+                        <a href="javascript:;" className="thumbs-up" onClick={() => this.handleLike(articleInfo)}><i className="icon-thumbs-up"></i> 点赞{articleInfo.likeNum}人</a>
                         <div className="sharebox clearfix">
                             <span>好文分享：</span>
-                            <a href="javascript:;" title="分享到新浪微博"><i className="icon-weibo-art"></i></a>
+                            {/* <a href="javascript:;" title="分享到新浪微博"><i className="icon-weibo-art"></i></a>
                             <a href="javascript:;" title="分享到微信"><i className="icon-circle-art"></i></a>
-                            <a href="javascript:;" title="分享到复制网址"><i className="icon-copy-art"></i></a>
+                            <a href="javascript:;" title="分享到复制网址"><i className="icon-copy-art"></i></a> */}
                             <div className="bdsharebuttonbox" data-tag="share_1">
                                 <a className="share-item tsina" data-cmd="tsina"><a className="a-item icon-weibo-art" data-cmd="tsina"></a></a>
                                 <a className="share-item weixin"><a className="a-item icon-circle-art" data-cmd="weixin"></a></a>
@@ -184,8 +248,8 @@ export default class Article extends Component {
                     </div>
 
                     <div className="art-collect">
-                        <a href="javascript:;"><i className="icon-collect-art"></i></a>
-                        <p>106人收藏了文章</p>
+                        <a href="javascript:;" onClick={() => this.handleCollect(articleInfo)}><i className="icon-collect-art"></i></a>
+                        <p>{articleInfo.collectNum}人收藏了文章</p>
                         <div className="user-art">
                             <a href="javascript:;"><img src="images/article/t1.jpg" /></a>
                             <a href="javascript:;"><img src="images/article/t1.jpg" /></a>
@@ -199,7 +263,7 @@ export default class Article extends Component {
                         <img src="images/article/d1.jpg" />
                     </a>
                     <div className="art-discuss">
-                        <h1>刚收到 25 条评论留言</h1>
+                        <h1>刚收到 {articleComment.length ? articleComment.length : 0} 条评论留言</h1>
                         <div className="artfrom">
                             <textarea placeholder="万难尽如人意，或有些许共鸣可取……"></textarea>
                             <a href="javascript:;" className="thumb">
@@ -229,7 +293,8 @@ export default class Article extends Component {
 
                     </div>
                     <div className="art-discuss-list">
-                        <div className="disc-item">
+                        {this.createCommentList(articleComment)}
+                        {/* <div className="disc-item">
                             <a href="javascript:;" className="thumb"><img src="images/article/t1.jpg" /></a>
                             <div className="alt">
                                 <a href="#" className="j_name">步履不停</a><span className="dot"></span><span>2018-06-19</span>
@@ -266,7 +331,7 @@ export default class Article extends Component {
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                     <div className="more-b">
                         <a href="javascript:;">更多留言</a>
@@ -275,6 +340,7 @@ export default class Article extends Component {
                 <HotRead />
                 {/* 底部 */}
                 <Footer />
+                <Loading />
             </div>
         );
     }

@@ -195,10 +195,10 @@ export default class Question extends Component {
             if (item.isNewRecord) {
                 return (
                     <div className="item">
-                        <a href="javascript:;" onClick={() => this.gotoRouter(item.id)} className="thumb-img">
+                        <a href="javascript:;" onClick={() => this.gotoRouter(item.contentId)} className="thumb-img">
                             <img src={item.imageSrc} />
                         </a>
-                        <h1><a href="javascript:;" onClick={() => this.gotoRouter(item.id)}>{item.title}</a></h1>
+                        <h1><a href="javascript:;" onClick={() => this.gotoRouter(item.contentId)}>{item.title}</a></h1>
                         <div className="alt"><span>{Time}</span></div>
                         {item.isNewRecord && <a href="javascript:;" className="sponsor">赞助商提供</a>}
                     </div>
@@ -206,14 +206,14 @@ export default class Question extends Component {
             } else {
                 return (
                     <div class="item">
-                        <a href="javascript:;" class="thumb-img" onClick={() => this.gotoRouter(item.id)}>
+                        <a href="javascript:;" class="thumb-img" onClick={() => this.gotoRouter(item.contentId)}>
                             <img src={item.imageSrc} />
                         </a>
-                        <h1><a href="javascript:;" onClick={() => this.gotoRouter(item.id)}>{item.title}</a></h1>
+                        <h1><a href="javascript:;" onClick={() => this.gotoRouter(item.contentId)}>{item.title}</a></h1>
                         <div class="alt">
                             <span>{Time}</span>
-                            {item.isTop && <span class="icon-top"></span>}
-                            {item.isRecommend && <span class="icon-jian"></span>}
+                            {item.isTop !=="0" && <span class="icon-top"></span>}
+                            {item.isRecommend !== "0" && <span class="icon-jian"></span>}
                         </div>
                         <div class="txt">{item.content}</div>
                         <div class="f-bartool clearfix"><a href="javascript:;" onClick={() => this.gotoRouter(item.id)}><i class="icon-comment"></i><span>{item.commentNum}</span></a></div>

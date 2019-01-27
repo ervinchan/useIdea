@@ -303,7 +303,7 @@ export default class JobList extends Component {
     onSearch = () => {
         const { city, pay, education, experience } = this.state;
         POST({
-            url: "/a/cms/article/getAllArticle?",
+            url: "/a/cms/article/getAllJobArticle?",
             opts: {
                 company: this.state.searchTxt,
                 categoryId: "981892a5c2394fe7b01ce706d917699e",

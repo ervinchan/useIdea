@@ -415,17 +415,17 @@ export default class App extends Component {
 
     }
 
-    createSameBookList = () => {
+    createSameBookList = (router) => {
         const { bootStoreList } = this.state;
 
         return bootStoreList.list && bootStoreList.list.map((item, index) => {
 
             return (
-                <a key={index} className="swiper-slide" href={`/Bookbuy/${item.id}`}>
+                <a href="javascript:;" style={{width: "280px",marginRight: "10px"}} key={index} className="swiper-slide" onClick={() => this.gotoRouter(`${router}/${item.id}`)}>
                     <em><img src={item.img} /> </em>
                     <h1>{item.name}</h1>
                     <h3> {item.author}</h3>
-                    <div className="txt">{item.descri}</div>
+                    <div className="txt">{item.editorRecommend}</div>
                 </a>
             )
         })
@@ -790,7 +790,7 @@ export default class App extends Component {
                     </div>
                     <div className="swiper-container">
                         <div className="swiper-wrapper">
-                            {this.createSameBookList()}
+                            {this.createSameBookList(`/Bookstore/Bookbuy`)}
                         </div>
                         <div className="u-pagination wide"></div>
                     </div>

@@ -264,7 +264,7 @@ export default class Job extends Component {
                 < Header />
                 {/* 轮播banner */}
                 <div className="jb-head wrapper">
-                    <Menu />
+                    <Menu setSearchTxt={this.setSearchTxt} />
 
                     <div className="jb-search">
                         <div className="box">

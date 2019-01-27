@@ -11,6 +11,9 @@ import Footer from '../../common/footer/Index.js'
 import WheelBanner from '../../common/wheelBanner/Index'
 import HotRead from '../../common/hotRead/Index'
 import Editor from 'rc-wang-editor'
+import { POST } from '../../service/service'
+import '../../Constants'
+import Loading from '../../common/Loading/Index'
 import 'swiper/dist/css/swiper.min.css'
 
 import 'antd/lib/pagination/style/index.css';
@@ -25,8 +28,13 @@ export default class QuestionArticle extends Component {
         this.state = {
             sortType: 0,
             curPage: 1,
-            banner: [],
-            toolList: []
+            bannerAList: [],
+            bannerBList: [],
+            toolList: [],
+            questionList: [],
+            commentList: [],
+            articleInfo: {},
+            commentRenderLen: 2
         };
     }
 
@@ -49,42 +57,245 @@ export default class QuestionArticle extends Component {
             $($(this).data("for")).toggleClass("hidden");
         });
 
-        this.getArticleInfo("7a8bbb7d262142cbb7ae5bf884935e81")
+        this.getArticleInfo("4812062598ec4b10bedfb38b59ea3e94")
+        this.getSpecialCol()
+        this.getQuestionList()
+        this.getCommentList()
+        this.getBannerA()
     }
-
-    getArticleInfo = (categoryId) => {
-        let url = '/zsl/a/cms/article/getAllArticle?'
-        let opts = {
-            hits: 1,
-            categoryId: categoryId || ''
-        }
-        for (var key in opts) {
-            opts[key] && (url += "&" + key + "=" + opts[key])
-        }
-        axios.post(url, opts)
-            .then((response) => {
-                if (categoryId) {
-                    let toolList = response.data.data
-                    this.setState({ toolList })
-                } else {
-                    let hotBooks = response.data.data
-                    this.setState({ hotBooks }, () => {
-                        var swiper_read = new Swiper('.m-read-fade .swiper-container', {
-                            effect: 'fade',
-                            pagination: {
-                                el: '.m-read-fade .u-pagination',
-                                bulletclassName: 'bull',
-                                bulletActiveclassName: 'active',
-                                clickable: true
-                            }
-                        });
-                    })
-                }
-
-            })
+    getBannerA = () => {
+        POST({
+            url: "/a/cms/article/adsList?",
+            opts: {
+                categoryId: "981892a5c2394fe7b01ce706d917699e"
+            }
+        }).then((response) => {
+            if (response.data.status === 1) {
+                this.setState({ bannerAList: response.data.data.slice(0, 2) })
+                this.setState({ bannerBList: response.data.data.slice(2) })
+            }
+        })
             .catch((error) => {
                 console.log(error)
             })
+    }
+    createBannerA = () => {
+        const { bannerBList } = this.state
+        return bannerBList.map((item, index) => {
+            return <a href={item.url} class="seat-x315"><img src={item.imageSrc} /></a>
+        })
+    }
+    createBannerB = () => {
+        const { bannerBList } = this.state
+        let bannerList = bannerBList.map((item, index) => {
+            return <a href={item.url} class="swiper-slide seat-x315"><img src={item.imageSrc} /></a>
+        })
+        return (
+            <div class="swiper-container">
+                <div class="swiper-wrapper">
+                    {bannerList}
+
+                </div>
+                <div class="u-pagination wide"></div>
+            </div>
+        )
+    }
+    gotoRouter = (id) => {
+        this.props.history.push(`/Question/Article/${id}`)
+    }
+    getArticleInfo = (categoryId) => {
+
+        POST({
+            url: "/a/cms/article/getAllArticle?",
+            opts: {
+                id: this.props.match.params.qid,
+                categoryId: "4812062598ec4b10bedfb38b59ea3e94"
+            }
+        }).then((response) => {
+            if (response.data.status === 1) {
+                let articleInfo = response.data.data
+                this.setState({ articleInfo })
+            }
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+
+    getCommentList = (categoryId) => {
+
+        POST({
+            url: "/a/cms/comment/consultationList?",
+            opts: {
+                contentId: this.props.match.params.qid,
+                categoryId: "4812062598ec4b10bedfb38b59ea3e94"
+            }
+        }).then((response) => {
+            if (response.data.status === 1) {
+                let commentList = response.data.data
+                this.setState({ commentList })
+            }
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+
+    getQuestionList = () => {
+        POST({
+            url: "/a/cms/comment/consultationList"
+        }).then((response) => {
+            if (response.data.status === 1) {
+                global.constants.loading = false
+                let questionList = response.data.data
+                this.setState({ questionList })
+            }
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+
+    createQuestionList = (data) => {
+        const { questionList } = this.state;
+        return questionList && questionList.slice(0, 10).map((item, index) => {
+            return (
+                <li onClick={() => this.gotoRouter(item.id)}>
+                    <a href="javascript:;">{item.title}</a><span>{item.commentNum}个回答</span>
+                </li>
+            )
+        })
+    }
+
+    createCommentList = (data) => {
+        const { commentList } = this.state;
+        return commentList && commentList.map((item, index) => {
+            let Hours = FormatDate.apartHours(item.createDate)
+            let Time = Hours > 24 ? FormatDate.customFormat(item.createDate, 'yyyy/MM/dd') : `${Hours}小时前`
+            return (
+                <div class="fu_detail hidden" id="item11">
+                    <div class="fu_info">
+                        <a href="javascript:;" class="face">
+                            <img src={item.user.photo} />
+                        </a>
+                        <div class="alt clearfix">
+                            <a href="javascript:;" class="j_name">{item.name}</a>
+                            <span class="dot"></span>
+                            <span>{Time}</span>
+                        </div>
+                        <div class="txt">{item.authorDript || '此家伙很懒...'}</div>
+                    </div>
+                    <div class="fu_txt clearfix">
+                        {item.content}
+                    </div>
+                    <a href="javascript:;" class="jq-hidden" data-for="#item11"> <i class="fa-angle-up"></i></a>
+                    <div class="f-bartool clearfix">
+                        {/* <a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a> */}
+                        <a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a>
+                        <a href="javascript:;" onClick={() => this.handleComment(item)}><i className="icon-comment"></i><span>{item.commentNum}</span></a>
+                        {/* <a href="javascript:;"><i class="icon-thumbs"></i><span>36</span></a>
+                        <a href="javascript:;"><i class="icon-comment"></i><span>51</span></a> */}
+                        <a href="javascript:;"><i class="icon-link"></i><span>链接</span></a>
+                        <a href="javascript:;" class="tousu" onClick={() => this.handleComplaints(item)}>投诉内容</a>
+                    </div>
+                </div>
+            )
+        })
+    }
+
+    //投诉
+    handleComplaints = (item) => {
+        POST({
+            url: "/a/cms/article/complaints?",
+            opts: {
+                id: item.id
+            }
+        }).then((response) => {
+            global.constants.loading = false
+            if (response.data.status === 1) {
+
+            }
+            /* global layer */
+            layer.msg(response.data.message)
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+
+    //评论
+    handleComment = (item) => {
+        POST({
+            url: "/a/cms/article/complaints?",
+            opts: {
+                id: item.id
+            }
+        }).then((response) => {
+            global.constants.loading = false
+            if (response.data.status === 1) {
+
+            }
+            /* global layer */
+            layer.msg(response.data.message)
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+    //热门专栏
+    getSpecialCol = () => {
+
+        POST({
+            url: "/a/cms/category/navigationBar?",
+            opts: {
+                subscriber: 0
+            }
+        }).then((response) => {
+            if (response.data.status === 1) {
+                let specialCol = response.data.data
+                this.setState({ specialCol })
+            }
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+
+    createSpecialCol = () => {
+        const { specialCol } = this.state
+        return specialCol && specialCol.map((item, index) => {
+            if (index === 0 || index === 1) {
+                return (
+                    <li>
+                        <a href="#" className="thumb-img">
+                            <span>{index + 1}</span>
+                            <img src={item.image} />
+                        </a>
+                        <h1><a href="#">{item.name}</a></h1>
+                        <h3>{item.author}</h3>
+                    </li>
+                )
+            } else {
+                return (
+                    <li>
+                        <a href="#" className="thumb-img">
+                            <span>{index + 1}</span>
+                            <img src={item.imageSrc} />
+                        </a>
+                        <h1><a href="#">{item.name}</a></h1>
+                        <h3>{item.author}</h3>
+                        <div className="alt">
+                            {
+                                item.user &&
+                                <img src="css/images/1x1.png" />
+                            }
+                            <span className="dot"></span>
+                            <span>{item.subscriber}人订阅</span>
+                        </div>
+                    </li>
+                )
+            }
+        })
     }
 
     createToolList = () => {
@@ -107,16 +318,45 @@ export default class QuestionArticle extends Component {
         })
     }
 
-    handleFavorite = (index) => {
-        const { readList } = this.state;
-        readList[index].favorite++;
-        this.setState(readList);
+    handleLike = (item) => {
+        POST({
+            url: "/a/cms/article/like?",
+            opts: {
+                id: item.id
+            }
+        }).then((response) => {
+            global.constants.loading = false
+            if (response.data.status === 1) {
+                item.likeNum++
+                this.setState({})
+            }
+            /* global layer */
+            layer.msg(response.data.message)
+        })
+            .catch((error) => {
+                console.log(error)
+            })
     }
+    handleCollect = (item) => {
+        POST({
+            url: "/a/artuser/articleCollect/collectArticle?",
+            opts: {
+                userId: 1,
+                articleId: item.id
+            }
+        }).then((response) => {
+            global.constants.loading = false
+            if (response.data.status === 1) {
+                item.collectNum++
+                this.setState({})
+            }
 
-    handleLikes = (index) => {
-        const { readList } = this.state;
-        readList[index].like++;
-        this.setState(readList);
+            /* global layer */
+            layer.msg(response.data.message)
+        })
+            .catch((error) => {
+                console.log(error)
+            })
     }
 
     handlePageChange = (page, pageSize) => {
@@ -125,8 +365,42 @@ export default class QuestionArticle extends Component {
         this.getBooksList(this.props.match.params.tid, this.state.sortType, page)
     }
 
+    submitComment = () => {
+        POST({
+            url: "/a/artuser/articleCollect/collectArticle?",
+            opts: {
+                content: this.state.EditorVal
+            }
+        }).then((response) => {
+            global.constants.loading = false
+            if (response.data.status === 1) {
+
+            }
+
+            /* global layer */
+            layer.msg(response.data.message)
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+
+    showAllComment = () => {
+        this.setState({ commentRenderLen: this.state.commentList.length })
+    }
+
+    setEditorVal = (val) => {
+        this.setState({ EditorVal: val })
+    }
+
     render() {
-        const { toolList } = this.state;
+        const { toolList, articleInfo, commentList, commentRenderLen } = this.state;
+        let Time = null
+        if (articleInfo) {
+            let Hours = FormatDate.apartHours(articleInfo.createDate)
+            Time = Hours > 24 ? FormatDate.customFormat(articleInfo.createDate, 'yyyy/MM/dd') : `${Hours}小时前`
+        }
+        let commentRenderList = commentList && commentList.slice(0, commentRenderLen)
 
         return (
             <div className="">
@@ -134,36 +408,58 @@ export default class QuestionArticle extends Component {
                 < Header />
                 <div class="wrapper g-qingjiao2">
                     <div class="g-left">
-                        <div class="qj-article">
-                            <h1>带我的创意总监经常提到消费者洞察，请问怎么练习洞察力？</h1>
-                            <div class="alt clearfix">
-                                <a href="#" class="j_name"><img src="css/images/1x1.png" class="thumb-img" />AcadeCityLv6</a>
-                                <span>▪</span>
-                                <span>2018/11/05</span>
-                                <a href="#" class="tag">文案技巧</a>
-                            </div>
-                            <div class="txt clearfix">
-                                <img src="css/images/280x180.png" class="thumb-img" />
-                                <div class="box">
-                                    经常在开会中，听到总监和领导提到用户洞察，一直对这两个词理解不清楚。请问洞察是什么？有没有好的洞察练习的方式？各位前辈有推荐的书没有？有没有好的洞察练习的方式？各位前辈有推荐的书没有。
-                                    <a href="javascript:;">显示全部 <i class="fa-angle-down"></i></a>
+                        {
+                            articleInfo &&
+                            <div class="qj-article">
+                                <h1>{articleInfo.title}</h1>
+                                <div class="alt clearfix">
+                                    <a href="javascript:;" class="j_name"><img src={articleInfo.user && articleInfo.user.photo} class="thumb-img" />{articleInfo.author}</a>
+                                    <span>▪</span>
+                                    <span>{Time}</span>
+                                    <a href="javascript:;" class="tag">文案技巧</a>
                                 </div>
-                            </div>
-                            <div class="f-bartool clearfix"><a href="javascript:;"><i class="icon-heart"></i><span>99</span></a><a href="javascript:;"><i class="icon-thumbs"></i><span>36</span></a><a href="javascript:;"><i class="icon-comment"></i><span>51</span></a></div>
+                                <div class="txt clearfix">
+                                    <img src="css/images/280x180.png" class="thumb-img" />
+                                    <div class="box">
+                                        {articleInfo.description}
+                                        <a href="javascript:;">显示全部 <i class="fa-angle-down"></i></a>
+                                    </div>
+                                </div>
+                                <div class="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(articleInfo)}><i className="icon-heart"></i><span>{articleInfo.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(articleInfo)}><i className="icon-thumbs"></i><span>{articleInfo.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{articleInfo.commentNum}</span></a></div>
 
-                        </div>
+                            </div>
+                        }
+
                         <div class="u-editor">
                             <Editor customConfig={{
                                 "uploadImgShowBase64": true,
-                                "height": 325
-                            }} style={{ height: 325 }} />
+                                "height": 325,
+                                "menus": [
+                                    'head',  // 标题
+                                    'bold',  // 粗体
+                                    'fontSize',  // 字号
+                                    'fontName',  // 字体
+                                    'italic',  // 斜体
+                                    'underline',  // 下划线
+                                    'strikeThrough',  // 删除线
+                                    'foreColor',  // 文字颜色
+                                    'backColor',  // 背景颜色
+                                    'link',  // 插入链接
+                                    'list',  // 列表
+                                    'justify',  // 对齐方式
+                                    'quote',  // 引用
+                                    'image',  // 插入图片
+                                    'undo',  // 撤销
+                                    'redo'  // 重复
+                                ]
+                            }} onChange={this.setEditorVal} style={{ height: 325 }} />
                         </div>
                         <div class="qj-submit">
-                            <a href="#">提 交</a>
+                            <a href="javascript:;" onClick={() => this.submitComment()}>提 交</a>
                         </div>
                         <div class="u-forum">
                             <div class="u-title3">
-                                <b>14条热心回答</b>
+                                <b>{commentList.length}条热心回答</b>
                                 <div class="u-select">
                                     <div class="in_sort" role="note">热度排行</div>
                                     <div data-for=".in_sort" role="menu">
@@ -174,6 +470,7 @@ export default class QuestionArticle extends Component {
                                     </div>
                                 </div>
                             </div>
+                            {this.createCommentList()}
                             <div class="fu_detail">
                                 <div class="fu_info">
                                     <a href="#" class="face">
@@ -220,6 +517,12 @@ export default class QuestionArticle extends Component {
                                     <p>买家少花钱，没有中间商赚差价。言下之意，中间商之存在会让买卖双方吃亏。没有中间商赚差价，买卖方都获益。真相是这样吗？当然是胡扯。这种“讲道理的广告”是反经济学的。什么是中间商呢？小贩、中介、经纪、拉皮条的、二道贩子。在许多人的眼中，商品流经他们手里，就要加些价格，卖主少卖，买家多花钱，中间商赚的是盘剥过路的钱。谴责中间商的声音一直都有。中间商损害买卖双方的利益，增加交易成本吗？事实恰恰相反，中间商促进买卖关系，维持交易稳定，减少交易成本的必要环节.</p>
                                     <p><img src="images/15.jpg" /><br /><img src="images/16.jpg" /><br /><img src="images/1.jpg" /><br /></p>
                                     <p>没有小商小贩，生产者把商品直接卖给消费者，成本会变得奇高。他们无法经营庞大的销售网络，找不到大量的买家，生产规模也就无法扩大，甚至无法进行。中间商帮他们做到这一点。中间商赚的价差再大，也远远小于他们减少销售成本所创造的价值。</p>
+                                    <p>可以理解但是，作为经济学爱好者，我对瓜子二手车平台传递的观念实在不能忍。</p>
+                                    <p>瓜子二手车的广告语是这样：车主多卖钱.</p>
+                                    <p>买家少花钱，没有中间商赚差价。言下之意，中间商之存在会让买卖双方吃亏。没有中间商赚差价，买卖方都获益。真相是这样吗？当然是胡扯。这种“讲道理的广告”是反经济学的。什么是中间商呢？小贩、中介、经纪、拉皮条的、二道贩子。在许多人的眼中，商品流经他们手里，就要加些价格，卖主少卖，买家多花钱，中间商赚的是盘剥过路的钱。谴责中间商的声音一直都有。中间商损害买卖双方的利益，增加交易成本吗？事实恰恰相反，中间商促进买卖关系，维持交易稳定，减少交易成本的必要环节.</p>
+                                    <p><img src="images/15.jpg" /><br /><img src="images/16.jpg" /><br /><img src="images/1.jpg" /><br /></p>
+                                    <p>没有小商小贩，生产者把商品直接卖给消费者，成本会变得奇高。他们无法经营庞大的销售网络，找不到大量的买家，生产规模也就无法扩大，甚至无法进行。中间商帮他们做到这一点。中间商赚的价差再大，也远远小于他们减少销售成本所创造的价值。</p>
+
                                 </div>
                                 <a href="javascript:;" class="jq-hidden" data-for="#item11"> <i class="fa-angle-up"></i></a>
                                 <div class="f-bartool clearfix">
@@ -231,27 +534,28 @@ export default class QuestionArticle extends Component {
                             </div>
 
                         </div>
-                        <a href="javascript:;" class="more-a">查看剩余答案</a>
+                        <a href="javascript:;" class="more-a" onClick={() => this.showAllComment()}>查看剩余答案</a>
 
                     </div>
                     <div class="g-right">
-                        <a href="javascript:;" class="seat-x315"><img src="images/17.jpg" /></a>
-                        <a href="javascript:;" class="seat-x315"><img src="images/d5.jpg" /></a>
+                        {this.createBannerA()}
                         <div class="u-title4">
                             <b>相关问题</b>
                         </div>
                         <div class="qj-corre">
                             <ul>
-                                <li>
+                                {this.createQuestionList()}
+                                {/* <li>
                                     <a href="#">你看过的广告作品中，最有用户身份洞察的有哪些？</a><span>12个回答</span>
                                 </li>
                                 <li>
                                     <a href="#">广告人怎么看待叶茂中做的世界杯广告？</a><span>34个回答</span>
-                                </li>
+                                </li> */}
                             </ul>
                         </div>
                         <div class="slide-seat-315">
-                            <div class="swiper-container">
+                            {this.createBannerB()}
+                            {/* <div class="swiper-container">
                                 <div class="swiper-wrapper">
                                     <a href="javascript:;" class="swiper-slide seat-x315"><img src="images/d5.jpg" /></a>
                                     <a href="javascript:;" class="swiper-slide seat-x315"><img src="css/images/315x190.png" /></a>
@@ -259,13 +563,14 @@ export default class QuestionArticle extends Component {
                                     <a href="javascript:;" class="swiper-slide seat-x315"><img src="css/images/315x190.png" /></a>
                                 </div>
                                 <div class="u-pagination wide"></div>
-                            </div>
+                            </div> */}
                         </div>
                         <div class="u-title4">
                             <b>热门专栏</b>
                         </div>
                         <ul class="hot-article suite active">
-                            <li>
+                            {this.createSpecialCol()}
+                            {/* <li>
                                 <a href="#" class="thumb-img">
                                     <span>1</span>
                                     <img src="images/r1.jpg" />
@@ -296,7 +601,7 @@ export default class QuestionArticle extends Component {
                                     <span class="dot"></span>
                                     <span>473人订阅</span>
                                 </div>
-                            </li>
+                            </li> */}
                         </ul>
                     </div>
                 </div>
