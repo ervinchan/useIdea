@@ -10,6 +10,9 @@ import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
 import WheelBanner from '../../common/wheelBanner/Index'
 import HotRead from '../../common/hotRead/Index'
+import { POST } from '../../service/service'
+import '../../Constants'
+import Loading from '../../common/Loading/Index'
 import 'swiper/dist/css/swiper.min.css'
 
 import 'antd/lib/pagination/style/index.css';
@@ -123,14 +126,104 @@ export default class MyWork extends Component {
         this.setState({ curPage: page })
         this.getBooksList(this.props.match.params.tid, this.state.sortType, page)
     }
+    handleLike = (item) => {
+        POST({
+            url: "/a/cms/article/like?",
+            opts: {
+                id: item.id
+            }
+        }).then((response) => {
+            global.constants.loading = false
+            if (response.data.status === 1) {
+                item.likeNum++
+                this.setState({})
+            }
+            /* global layer */
+            layer.msg(response.data.message)
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+    handleCollect = (item) => {
+        POST({
+            url: "/a/artuser/articleCollect/collectArticle?",
+            opts: {
+                userId: 1,
+                articleId: item.id
+            }
+        }).then((response) => {
+            global.constants.loading = false
+            if (response.data.status === 1) {
+                item.collectNum++
+                this.setState({})
+            }
+
+            /* global layer */
+            layer.msg(response.data.message)
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+    gotoRouter = (router) => {
+        this.props.history.push(router)
+    }
+    createList = () => {
+        const { data } = this.props
+        const categorys = global.constants.categorys
+        return data && data.map((item, index) => {
+            let Hours = FormatDate.apartHours(item.updateDate)
+            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours}小时前`;
+            let router = ``
+            switch (item.category.id) {
+                case categorys[0].id:
+                    router = `/Question/Article/`
+                    break;
+                case categorys[1].id:
+                    
+                case categorys[1].id:
+                    router = `/Bookstore/Bookbuy/`
+                    break;
+                default:
+                    router = `/Inspiration/Article/`
+                    break;
+            }
+            return (
+                <li>
+                    <div class="ue_info">
+                        <a href="javascript:;" class="face" onClick={()=>this.gotoRouter(`${router}${item.id}`)}>
+                            <img src={item.user.photo} />
+                        </a>
+                        <div class="alt clearfix">
+                            <a href="javascript:;" class="j_name">{item.author}</a>
+                            <span class="dot"></span>
+                            <span>{Time}</span>
+                        </div>
+                        <div class="bat">{item.category.name}</div>
+                    </div>
+                    <div class="ue_box">
+                        <a class="thumb-img" href="javascript:;"><img src={item.image} /></a>
+                        <h1><a href="javascript:;" onClick={() => this.gotoRouter(`${router}${item.id}`)}>{item.title}</a></h1>
+                        <div class="txt nowrap">
+                            {item.description}
+                        </div>
+                        <div class="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{item.commentNum}</span></a></div>
+                    </div>
+                </li>
+            )
+        })
+    }
 
     render() {
         const { toolList } = this.state;
 
+
         return (
             <div className="">
                 <ul class="ue-article clearfix">
-                    <li>
+                    {this.createList()}
+                    {/* <li>
                         <div class="ue_info">
                             <a href="#" class="face">
                                 <img src="css/images/1x1.png" />
@@ -192,9 +285,9 @@ export default class MyWork extends Component {
                                 </div>
                             <div class="f-bartool clearfix"><a href="javascript:;"><i class="icon-heart"></i><span>99</span></a><a href="javascript:;"><i class="icon-thumbs"></i><span>36</span></a><a href="javascript:;"><i class="icon-comment"></i><span>51</span></a></div>
                         </div>
-                    </li>
+                    </li> */}
                 </ul>
-                <div class="u-pages">
+                {/* <div class="u-pages">
                     <div class="box clearfix">
                         <a href="javascript:;">Prev</a>
                         <a href="javascript:;"><i class="fa-angle-double-left"></i></a>
@@ -212,7 +305,7 @@ export default class MyWork extends Component {
                         <a href="javascript:;"><i class="fa-angle-double-right"></i></a>
                         <a href="javascript:;">Next</a>
                     </div>
-                </div>
+                </div> */}
             </div>
         );
     }

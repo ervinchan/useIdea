@@ -48,10 +48,12 @@ export default class Bigidea extends Component {
         this.getSpecialCol();
     }
 
-    getBigIdeaDatas = (categoryId) => {
+    getBigIdeaDatas = (categoryId,pageNo) => {
         let url = '/zsl/a/cms/article/getAllArticle?'
         let opts = {
-            categoryId: categoryId || ''
+            categoryId: categoryId || '',
+            pageNo: pageNo || 1,
+            pageSize: global.constants.PAGESIZE,
         }
         for (var key in opts) {
             opts[key] && (url += "&" + key + "=" + opts[key])
@@ -258,7 +260,7 @@ export default class Bigidea extends Component {
     handlePageChange = (page, pageSize) => {
         console.log(page, pageSize)
         this.setState({ curPage: page })
-        this.getBooksList(this.props.match.params.tid, this.state.sortType, page)
+        this.getBigIdeaDatas("b49c9133960c4700b253b7a3283dcbef", page)
     }
 
     render() {

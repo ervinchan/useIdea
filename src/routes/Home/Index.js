@@ -19,7 +19,7 @@ import 'antd/lib/tabs/style/index.less'
 
 const TabPane = Tabs.TabPane;
 const PAGESIZE = 15;
-
+const userInfo = JSON.parse(localStorage.getItem('userInfo'));
 export default class App extends Component {
 
     constructor(props) {
@@ -421,7 +421,7 @@ export default class App extends Component {
         return bootStoreList.list && bootStoreList.list.map((item, index) => {
 
             return (
-                <a href="javascript:;" style={{width: "280px",marginRight: "10px"}} key={index} className="swiper-slide" onClick={() => this.gotoRouter(`${router}/${item.id}`)}>
+                <a href="javascript:;" style={{ width: "280px", marginRight: "10px" }} key={index} className="swiper-slide" onClick={() => this.gotoRouter(`${router}/${item.id}`)}>
                     <em><img src={item.img} /> </em>
                     <h1>{item.name}</h1>
                     <h3> {item.author}</h3>
@@ -482,14 +482,14 @@ export default class App extends Component {
                 [
                     banner,
                     <div class="item user">
-                        <a class="thumb-img" href="javascript:;">
+                        <a class="thumb-img" href="javascript:;" onClick={() => this.gotoRouter(`/Bookstore/Bookbuy/${item.id}`)}>
                             <img src={bookImagUrl} />
                         </a>
-                        <div class="tit"><a href="javascript:;">{item.bookName}</a></div>
+                        <div class="tit"><a href="javascript:;" onClick={() => this.gotoRouter(`/Bookstore/Bookbuy/${item.id}`)}>{item.bookName}</a></div>
                         <div class="txt">{item.authorIntroduce}</div>
                         <div class="bar">
                             <span>{item.author}</span><span>·</span><span>{Time}</span>
-                            <div class="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item.id)}><i class="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item.id)}><i class="icon-thumbs"></i><span>{item.praiseNum}</span></a><a href="javascript:;"><i class="icon-comment"></i><span>0</span></a></div>
+                            <div class="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item)}><i class="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item)}><i class="icon-thumbs"></i><span>{item.praiseNum}</span></a><a href="javascript:;"><i class="icon-comment"></i><span>{item.commentNum}</span></a></div>
 
                         </div>
                     </div>
@@ -539,7 +539,7 @@ export default class App extends Component {
 
             return (
                 <li key={index}>
-                    <a href="javascript:;" onClick={() => this.gotoRouter(router)}>
+                    <a href="javascript:;" onClick={() => this.gotoRouter(`/UserCenter/UserNews/${item.user.id}`)}>
                         <em><img src={item.user.photo} /></em>
                         <span>{item.author}</span>
                         <i className="fa-angle-right"></i>
@@ -572,9 +572,9 @@ export default class App extends Component {
         return hitsArticleList && hitsArticleList.slice(0, 10).map((item, index) => {
 
             return (
-                <li key={index} onClick={() => this.gotoRouter()}>
+                <li key={index} onClick={() => this.gotoRouter(`/Inspiration/Article/${item.id}`)}>
                     <a href="javascript:;" className="thumb-img">
-                        <span>{index}</span>
+                        <span>{index+1}</span>
                         <img src={item.imageSrc} />
                     </a>
                     <h1><a href="javascript:;">{item.title}</a></h1>
@@ -611,7 +611,7 @@ export default class App extends Component {
         POST({
             url: "/a/artuser/articleCollect/collectArticle?",
             opts: {
-                userId: 1,
+                userId: userInfo.id,
                 articleId: item.id
             }
         }).then((response) => {
@@ -786,7 +786,7 @@ export default class App extends Component {
                 <div className="m-fs-book p-txzd wrapper">
                     <div className="u-title2">
                         <h1>同行在读</h1>
-                        <h3><a href="javascript:;" className="book">更多<i className="fa-angle-right"></i></a></h3>
+                        <h3><a href="javascript:;" className="book" onClick={() => this.gotoRouter('/Bookstore')}>更多<i className="fa-angle-right"></i></a></h3>
                     </div>
                     <div className="swiper-container">
                         <div className="swiper-wrapper">

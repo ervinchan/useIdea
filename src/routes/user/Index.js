@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Menu, Icon, Badge, Tabs, List, Avatar, Divider, Button, Card, Popover } from 'antd';
+import { Menu, Icon, Badge, Tabs, Upload } from 'antd';
 import Slider from "react-slick";
 import { StickyContainer, Sticky } from 'react-sticky';
 
@@ -13,6 +13,9 @@ import Footer from '../../common/footer/Index.js'
 import 'swiper/dist/css/swiper.min.css'
 import '../../static/less/u.icenter.less'
 import 'antd/lib/tabs/style/index.less';
+import { POST } from '../../service/service'
+import '../../Constants'
+import Loading from '../../common/Loading/Index'
 import userImg from "../../static/images/user/userTx.jpg"
 import MyWork from './MyWork.js';
 import MyHeart from './MyHeart.js';
@@ -24,8 +27,10 @@ export default class UserCenter extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            questionList: [],
-            activeKey: 'news'
+            listData: [],
+            activeKey: 'news',
+            fileList: [],
+            collectList: []
         };
     }
 
@@ -65,53 +70,75 @@ export default class UserCenter extends Component {
             $(".u-select [role=menu]").hide();
             $(this).next().show();
         });
-    }
-
-    getQuestionList = () => {
-        let url = '/zsl/a/cms/comment/consultationList?'
-        // let opts = {
-        //     categoryId: "ce009ff186fa4203ab07bd1678504228",
-        //     keywords: keyword
-        // }
-        // for (var key in opts) {
-        //     opts[key] && (url += "&" + key + "=" + opts[key])
-        // }
-        axios.post(url)
-            .then((response) => {
-                let questionList = response.data.data
-                this.setState({ questionList })
-
-            })
-            .catch((error) => {
-                console.log(error)
-            })
-    }
-
-    createList = (name) => {
-        const listData = [];
-        const IconText = ({ type, text }) => (
-            <span>
-                <Icon type={type} style={{ marginRight: 8 }} />
-                {text}
-            </span>
-        );
-        return (
-            <div className="item">
-                <a href="javascript:;" className="thumb-img">
-                    <img src="css/images/1x1.png" />
-                </a>
-                <h1><a href="/#/Question/Article">请问大家有没有好用的微信排版工具？</a></h1>
-                <div className="alt"><span>昨天 21:32</span></div>
-                <a href="javascript:;" className="sponsor">赞助商提供</a>
-            </div>
-        )
+        this.getCollectList();
+        this.getMyWork();
     }
     handleTabChange = (key) => {
         console.log(key);
     }
+    handleChangePhoto = () => {
 
+    }
+    gotoRouter = (router) => {
+        this.props.history.push(router)
+    }
+
+    getCollectList = () => {
+        POST({
+            url: "/a/artuser/articleCollect/collectList?",
+            opts: {
+                userId: global.constants.userInfo.id
+            }
+        }).then((response) => {
+            global.constants.loading = false
+            if (response.data.status === 1) {
+                this.setState({ collectList: response.data.data.articles })
+            }
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+    getMyWork = () => {
+        POST({
+            url: "/a/cms/article/latestAction?",
+            opts: {
+                userId: global.constants.userInfo.id
+            }
+        }).then((response) => {
+            global.constants.loading = false
+            if (response.data.status === 1) {
+                this.setState({ listData: response.data.data })
+            }
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
     render() {
-        const tabTit = `来信中心`
+        const { fileList } = this.state;
+        const userInfo = global.constants.userInfo
+        const tabTit = `来信中心`;
+        const props = {
+            onRemove: (file) => {
+                this.setState((state) => {
+                    const index = state.fileList.indexOf(file);
+                    const newFileList = state.fileList.slice();
+                    newFileList.splice(index, 1);
+                    return {
+                        fileList: newFileList,
+                    };
+                });
+            },
+            beforeUpload: (file) => {
+                this.setState(state => ({
+                    fileList: [...state.fileList, file],
+                }));
+                return false;
+            },
+            fileList,
+            showUploadList: false
+        };
         return (
             <div className="">
                 {/* 头部 */}
@@ -119,23 +146,25 @@ export default class UserCenter extends Component {
                 <div className="ue-head">
                     <div className="wrapper">
                         <div className="userTx">
-                            <a href="javascript:;">
-                                <img src={userImg} />
-                                <p><i className="icon-user-img"></i><span>更新个人头像</span></p>
-                            </a>
+                            <Upload className="upload-btn" {...props}>
+                                <a href="javascript:;" onClick={this.handleChangePhoto}>
+                                    <img src={userImg} />
+                                    <p><i className="icon-user-img"></i><span>更新个人头像</span></p>
+                                </a>
+                            </Upload>
                         </div>
                         <div className="nick-name">
-                            <h1><b>布谷云</b></h1>
+                            <h1><b>{userInfo.name}</b></h1>
                         </div>
                         <div className="nick-data">
                             <p>
-                                <span>作品</span><a href="javascript:;">0</a>
-                                <span>关注</span><a href="javascript:;">16</a>
-                                <span>粉丝</span><a href="javascript:;">136</a>
+                                <span>作品</span><a href="javascript:;">{userInfo.attentionNum}</a>
+                                <span>关注</span><a href="javascript:;" onClick={() => this.gotoRouter(`/MyFans/${userInfo.id}`)}>{userInfo.attentionNum}</a>
+                                <span>粉丝</span><a href="javascript:;" onClick={() => this.gotoRouter(`/MyFans/${userInfo.id}`)}>{userInfo.attention2Num}</a>
                             </p>
                         </div>
-                        <div className="address"><i className="icon-address-w"></i>上海  卢湾</div>
-                        <a href="u_myaccount.html" className="add_upload">发表作品/经验</a>
+                        <div className="address"><i className="icon-address-w"></i>{userInfo.city}</div>
+                        <a href="javascript:;" className="add_upload" onClick={() => this.gotoRouter(`/ArticleEditor`)}>发表作品/经验</a>
                     </div>
                 </div>
                 <div class="wrapper g-icenter minpage">
@@ -149,9 +178,9 @@ export default class UserCenter extends Component {
                         <Tabs ref={e => this.tabDom = e} className="clearfix" onChange={this.handleTabChange}>
                             <TabPane tab={["来信中心", <i className="badge">99+</i>]} key="news" className="qj-news"><MyWork /></TabPane>
                             <TabPane tab="我的作品" key="reco"><MyWork data={this.state.listData} /></TabPane>
-                            <TabPane tab="我的心选" key="reply"><MyHeart /></TabPane>
+                            <TabPane tab="我的心选" key="reply"><MyHeart data={this.state.collectList} /></TabPane>
                         </Tabs>
-                        <a href="u_myaccount.html" class="edit">更新个人资料</a>
+                        <a href="javascript:;" class="edit">更新个人资料</a>
                     </div>
 
                 </div>

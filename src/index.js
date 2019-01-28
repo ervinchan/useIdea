@@ -98,15 +98,27 @@ const Reg = Loadable({
     loading: Loading,
 });
 const UserCenter = Loadable({
-    loader: () => import('./routes/user/Index'),
+    loader: () => import('./routes/User/Index'),
     loading: Loading,
 });
 const MyWork = Loadable({
-    loader: () => import('./routes/user/MyWork'),
+    loader: () => import('./routes/User/MyWork'),
     loading: Loading,
 });
 const MyHeart = Loadable({
-    loader: () => import('./routes/user/MyHeart'),
+    loader: () => import('./routes/User/MyHeart'),
+    loading: Loading,
+});
+const MyFans = Loadable({
+    loader: () => import('./routes/User/MyFans'),
+    loading: Loading,
+});
+const UserNews = Loadable({
+    loader: () => import('./routes/User/News'),
+    loading: Loading,
+});
+const UserUpDate = Loadable({
+    loader: () => import('./routes/User/UpDate'),
     loading: Loading,
 });
 const LoginQy = Loadable({
@@ -150,9 +162,12 @@ const App = () => (
 
             <Route exact path="/Login" breadcrumbName="登录" component={Login} />
             <Route exact path="/Reg" breadcrumbName="注册" component={Reg} />
-            <Route exact path="/UserCenter" breadcrumbName="用户中心" component={UserCenter} >
-                <Route path="/MyWork" component={MyWork} />
-            </Route>
+            <Route exact path="/UserCenter/:uid?" breadcrumbName="用户中心" component={UserCenter} />
+            <Route exact path="/MyNews/:uid?" component={MyWork} />
+            <Route exact path="/InfoUpDate/:uid?" component={UserUpDate} />
+            <Route exact path="/MyHeart" component={MyHeart} />
+            <Route exact path="/MyFans/:uid?" component={MyFans} />
+            <Route exact path="/UserNews/:uid?" component={UserNews} />
             <Route exact path="/LoginQy" breadcrumbName="企业登录" component={LoginQy} />
             <Route exact path="/RegQy" breadcrumbName="企业注册" component={RegQy} />
             <Route exact path="/RegInfo" breadcrumbName="企业注册信息" component={RegInfo} />

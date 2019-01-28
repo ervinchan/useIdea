@@ -56,14 +56,14 @@
                     content: '<div class="weixin-box"><h1>文案圈周刊</h1><img src="css/images/weixin.jpg" alt="微信公众号" /><h3>微信扫码关注，记录创作者的洞见</h3><p>联系编辑：zhuquex</p></div>'
                 });
                 break;
-            case ("reply"):
-                var $reply = '<div class="replyfrom"><textarea placeholder="我来补充两句。"></textarea><a href="javascript:;" class="thumb"><img src="css/images/1x1.png" /></a><a href="javascript:;" class="artbtn">留 言</a><a href="javascript:;" class="escbtn" data-el="replyesc">稍后再说</a></div>';
-                if ($(this).parent().nextAll().length > 0) {
-                    $(this).parent().nextAll(".replyfrom").remove();
-                } else {
-                    $(this).parent().after($reply);
-                }
-                break;
+            // case ("reply"):
+            //     var $reply = '<div class="replyfrom"><textarea placeholder="我来补充两句。"></textarea><a href="javascript:;" class="thumb"><img src="css/images/1x1.png" /></a><a href="javascript:;" class="artbtn">留 言</a><a href="javascript:;" class="escbtn" data-el="replyesc">稍后再说</a></div>';
+            //     if ($(this).parent().nextAll().length > 0) {
+            //         $(this).parent().nextAll(".replyfrom").remove();
+            //     } else {
+            //         $(this).parent().after($reply);
+            //     }
+            //     break;
             case ("replyesc"):
                 $(this).parents(".replyfrom").remove();
                 break;

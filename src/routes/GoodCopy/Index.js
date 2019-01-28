@@ -51,10 +51,11 @@ export default class GoodCopy extends Component {
         this.getHotKeywords("ce009ff186fa4203ab07bd1678504228")
     }
 
-    getDatas = (categoryId) => {
+    getDatas = (categoryId, page) => {
         let url = '/zsl/a/cms/article/getAllArticle?'
         let opts = {
-            categoryId: categoryId || ''
+            categoryId: categoryId || '',
+            pageNo: page
         }
         for (var key in opts) {
             opts[key] && (url += "&" + key + "=" + opts[key])
@@ -145,7 +146,7 @@ export default class GoodCopy extends Component {
         const { HotKeywords } = this.state
         return HotKeywords && HotKeywords.slice(0, 12).map((item, index) => {
             return (
-                <a href="javascript:;" onClick={() => this.getKeywordsList(item.title)}>{item.title}</a>
+                <a href="javascript:;" onClick={() => this.handleSearch(item.title)}>{item.title}</a>
             )
         })
     }
@@ -165,11 +166,31 @@ export default class GoodCopy extends Component {
     handlePageChange = (page, pageSize) => {
         console.log(page, pageSize)
         this.setState({ curPage: page })
-        this.getBooksList(this.props.match.params.tid, this.state.sortType, page)
+        this.getDatas(this.props.match.params.tid, page)
     }
 
     handleSetKeywords = (e) => {
         this.setState({ keywords: e.target.value })
+    }
+
+    handleSearch = (k) => {
+        const { keywords } = this.state;
+        POST({
+            url: "/a/cms/article/getAllArticle?",
+            opts: {
+                title: k || keywords,
+                categoryId: "ce009ff186fa4203ab07bd1678504228"
+            }
+        }).then((response) => {
+            /*global layer */
+            global.constants.loading = false
+            this.setState({ goodcopyList: response.data.data })
+
+        })
+            .catch((error) => {
+                global.constants.loading = false
+                console.log(error)
+            })
     }
 
     render() {
@@ -185,7 +206,7 @@ export default class GoodCopy extends Component {
                     <div className="bar">
                         <div className="u-search">
                             <input type="text" placeholder="搜索文案" onChange={this.handleSetKeywords} />
-                            <a href="javascript:;" className="fa-search" onClick={() => this.getKeywordsList(keywords)}></a>
+                            <a href="javascript:;" className="fa-search" onClick={() => this.handleSearch()}></a>
                         </div>
                         <div className="alt">
                             * 若暂未收录，你也可上传喜欢的经典文案

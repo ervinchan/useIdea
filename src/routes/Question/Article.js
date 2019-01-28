@@ -18,6 +18,7 @@ import 'swiper/dist/css/swiper.min.css'
 
 import 'antd/lib/pagination/style/index.css';
 import '../../static/less/question.less'
+//import { userInfo } from 'os';
 
 const PAGESIZE = 3;
 
@@ -34,7 +35,8 @@ export default class QuestionArticle extends Component {
             questionList: [],
             commentList: [],
             articleInfo: {},
-            commentRenderLen: 2
+            commentRenderLen: 2,
+            userInfo: global.constants.userInfo
         };
     }
 
@@ -100,8 +102,8 @@ export default class QuestionArticle extends Component {
             </div>
         )
     }
-    gotoRouter = (id) => {
-        this.props.history.push(`/Question/Article/${id}`)
+    gotoRouter = (router) => {
+        this.props.history.push(router)
     }
     getArticleInfo = (categoryId) => {
 
@@ -158,9 +160,9 @@ export default class QuestionArticle extends Component {
 
     createQuestionList = (data) => {
         const { questionList } = this.state;
-        return questionList && questionList.slice(0, 10).map((item, index) => {
+        return questionList.list && questionList.list.slice(0, 10).map((item, index) => {
             return (
-                <li onClick={() => this.gotoRouter(item.id)}>
+                <li onClick={() => this.gotoRouter(`/Question/Article/${item.id}`)}>
                     <a href="javascript:;">{item.title}</a><span>{item.commentNum}个回答</span>
                 </li>
             )
@@ -169,7 +171,7 @@ export default class QuestionArticle extends Component {
 
     createCommentList = (data) => {
         const { commentList } = this.state;
-        return commentList && commentList.map((item, index) => {
+        return commentList.list && commentList.list.map((item, index) => {
             let Hours = FormatDate.apartHours(item.createDate)
             let Time = Hours > 24 ? FormatDate.customFormat(item.createDate, 'yyyy/MM/dd') : `${Hours}小时前`
             return (
@@ -266,12 +268,12 @@ export default class QuestionArticle extends Component {
         return specialCol && specialCol.map((item, index) => {
             if (index === 0 || index === 1) {
                 return (
-                    <li>
-                        <a href="#" className="thumb-img">
+                    <li onClick={()=>this.gotoRouter(item.href)}>
+                        <a href="javascript:;" className="thumb-img">
                             <span>{index + 1}</span>
                             <img src={item.image} />
                         </a>
-                        <h1><a href="#">{item.name}</a></h1>
+                        <h1><a href="javascript:;">{item.name}</a></h1>
                         <h3>{item.author}</h3>
                     </li>
                 )
@@ -280,7 +282,7 @@ export default class QuestionArticle extends Component {
                     <li>
                         <a href="#" className="thumb-img">
                             <span>{index + 1}</span>
-                            <img src={item.imageSrc} />
+                            <img src={item.image} />
                         </a>
                         <h1><a href="#">{item.name}</a></h1>
                         <h3>{item.author}</h3>
@@ -366,9 +368,16 @@ export default class QuestionArticle extends Component {
     }
 
     submitComment = () => {
+        const { userInfo, articleInfo } = this.state;
         POST({
-            url: "/a/artuser/articleCollect/collectArticle?",
+            url: "/f/comment?",
             opts: {
+                title: articleInfo.title,
+                categoryId: "4812062598ec4b10bedfb38b59ea3e94",
+                contentId: this.props.match.params.qid,
+                replyId: '',
+                name: userInfo.id,
+                isValidate: "0",
                 content: this.state.EditorVal
             }
         }).then((response) => {
@@ -400,7 +409,7 @@ export default class QuestionArticle extends Component {
             let Hours = FormatDate.apartHours(articleInfo.createDate)
             Time = Hours > 24 ? FormatDate.customFormat(articleInfo.createDate, 'yyyy/MM/dd') : `${Hours}小时前`
         }
-        let commentRenderList = commentList && commentList.slice(0, commentRenderLen)
+        let commentRenderList = commentList.list && commentList.list.slice(0, commentRenderLen)
 
         return (
             <div className="">
@@ -432,7 +441,7 @@ export default class QuestionArticle extends Component {
 
                         <div class="u-editor">
                             <Editor customConfig={{
-                                "uploadImgShowBase64": true,
+                                // "uploadImgShowBase64": true,
                                 "height": 325,
                                 "menus": [
                                     'head',  // 标题
@@ -459,8 +468,8 @@ export default class QuestionArticle extends Component {
                         </div>
                         <div class="u-forum">
                             <div class="u-title3">
-                                <b>{commentList.length}条热心回答</b>
-                                <div class="u-select">
+                                <b>{commentList.count || 0}条热心回答</b>
+                                {/* <div class="u-select">
                                     <div class="in_sort" role="note">热度排行</div>
                                     <div data-for=".in_sort" role="menu">
                                         <ul>
@@ -468,10 +477,10 @@ export default class QuestionArticle extends Component {
                                             <li>热度排序</li>
                                         </ul>
                                     </div>
-                                </div>
+                                </div> */}
                             </div>
                             {this.createCommentList()}
-                            <div class="fu_detail">
+                            {/* <div class="fu_detail">
                                 <div class="fu_info">
                                     <a href="#" class="face">
                                         <img src="css/images/1x1.png" />
@@ -531,7 +540,7 @@ export default class QuestionArticle extends Component {
                                     <a href="javascript:;"><i class="icon-link"></i><span>链接</span></a>
                                     <a href="javascript:;" class="tousu">投诉内容</a>
                                 </div>
-                            </div>
+                            </div> */}
 
                         </div>
                         <a href="javascript:;" class="more-a" onClick={() => this.showAllComment()}>查看剩余答案</a>

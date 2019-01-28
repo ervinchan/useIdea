@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Tabs, Button, Upload } from 'antd';
+import { Tabs, Button, Upload, Pagination } from 'antd';
 import Slider from "react-slick";
 import { StickyContainer, Sticky } from 'react-sticky';
 
@@ -36,7 +36,13 @@ export default class Question extends Component {
             activeKey: 'news',
             questionTit: "",
             questionTxt: "",
-            fileList: []
+            fileList: [],
+            categoryList: [],
+            addCategoryId: "",
+            addCategoryName: "",
+            userInfo: global.constants.userInfo,
+            curPage: 1,
+            searchTxt: ""
         };
     }
 
@@ -82,6 +88,21 @@ export default class Question extends Component {
         this.getBannerA();
         this.getBannerB();
         this.getRecommendBooks();
+        this.getCategory()
+    }
+
+    getCategory = () => {
+        POST({
+            url: "/a/cms/article/findClassifying?",
+
+        }).then((response) => {
+            if (response.data.status === 1) {
+                this.setState({ categoryList: response.data.data })
+            }
+        })
+            .catch((error) => {
+                console.log(error)
+            })
     }
 
     getBannerA = () => {
@@ -141,9 +162,14 @@ export default class Question extends Component {
         )
     }
 
-    getQuestionList = () => {
+    getQuestionList = (pageNo) => {
         POST({
-            url: "/a/cms/comment/consultationList"
+            url: "/a/cms/comment/consultationList?",
+            opts: {
+                pageNo: pageNo || 1,
+                pageSize: global.constants.PAGESIZE,
+                categoryId: "4812062598ec4b10bedfb38b59ea3e94"
+            }
         }).then((response) => {
             if (response.data.status === 1) {
                 global.constants.loading = false
@@ -159,7 +185,8 @@ export default class Question extends Component {
         POST({
             url: "/a/cms/comment/consultationList?",
             opts: {
-                isRecommend: 1
+                isRecommend: 1,
+                categoryId: "4812062598ec4b10bedfb38b59ea3e94"
             }
         }).then((response) => {
             if (response.data.status === 1) {
@@ -175,7 +202,8 @@ export default class Question extends Component {
         POST({
             url: "/a/cms/comment/consultationList?",
             opts: {
-                parentContentId: 1
+                parentContentId: 1,
+                categoryId: "4812062598ec4b10bedfb38b59ea3e94"
             }
         }).then((response) => {
             if (response.data.status === 1) {
@@ -189,7 +217,7 @@ export default class Question extends Component {
     }
 
     createQuestionList = (data) => {
-        let items = data.map((item, index) => {
+        let items = data.list && data.list.map((item, index) => {
             let Hours = FormatDate.apartHours(item.createDate)
             let Time = Hours > 24 ? FormatDate.customFormat(item.createDate, 'yyyy/MM/dd') : `${Hours}小时前`;
             if (item.isNewRecord) {
@@ -212,11 +240,11 @@ export default class Question extends Component {
                         <h1><a href="javascript:;" onClick={() => this.gotoRouter(item.contentId)}>{item.title}</a></h1>
                         <div class="alt">
                             <span>{Time}</span>
-                            {item.isTop !=="0" && <span class="icon-top"></span>}
+                            {item.isTop !== "0" && <span class="icon-top"></span>}
                             {item.isRecommend !== "0" && <span class="icon-jian"></span>}
                         </div>
-                        <div class="txt">{item.content}</div>
-                        <div class="f-bartool clearfix"><a href="javascript:;" onClick={() => this.gotoRouter(item.id)}><i class="icon-comment"></i><span>{item.commentNum}</span></a></div>
+                        <div class="txt" dangerouslySetInnerHTML={{ __html: item.content }}></div>
+                        <div class="f-bartool clearfix"><a href="javascript:;" onClick={() => this.gotoRouter(item.contentId)}><i class="icon-comment"></i><span>{item.commentNum}</span></a></div>
                     </div>
                 )
             }
@@ -267,41 +295,22 @@ export default class Question extends Component {
         this.setState({ questionTit: e.target.value })
     }
     submitQuestion = () => {
-        const { questionTit, questionTxt, fileList } = this.state;
+        const { questionTit, questionTxt, fileList, addCategoryId, userInfo } = this.state;
         var oMyForm = new FormData();
-        oMyForm.append("userId", 1);
+        oMyForm.append("userId", userInfo.id);
         oMyForm.append("categoryId", "4812062598ec4b10bedfb38b59ea3e94");
+        oMyForm.append("classifying", addCategoryId);
         oMyForm.append("title", questionTit);
         oMyForm.append("content", questionTxt);
         fileList.forEach((file) => {
-            oMyForm.append('image', file);
+            oMyForm.append('homeImage', file);
         });
-        // axios({
-        //     url: "/zsl/a/cms/article/consultationSave?",
-        //     method: "post",
-        //     data: oMyForm,
-        //     processData: false,// 告诉axios不要去处理发送的数据(重要参数)
-        //     contentType: false,   // 告诉axios不要去设置Content-Type请求头
-        // }).then((response) => {
-        //     /*global layer */
-        //     global.constants.loading = false
-        //     layer.msg(response.data.message)
-        // })
-        //     .catch((error) => {
-        //         global.constants.loading = false
-        //         console.log(error)
-        //     })
-        POST({
-            url: "/a/cms/article/consultationSave?",
-            opts: {
-                userId: 1,
-                categoryId: "4812062598ec4b10bedfb38b59ea3e94",
-                title: questionTit,
-                content: questionTxt,
-                image:fileList[0]
-            },
-            processData: false,
+        axios({
+            url: "/zsl/a/cms/article/consultationSave?",
+            method: "post",
             data: oMyForm,
+            processData: false,// 告诉axios不要去处理发送的数据(重要参数)
+            contentType: false,   // 告诉axios不要去设置Content-Type请求头
         }).then((response) => {
             /*global layer */
             global.constants.loading = false
@@ -311,14 +320,66 @@ export default class Question extends Component {
                 global.constants.loading = false
                 console.log(error)
             })
+        // POST({
+        //     url: "/a/cms/article/consultationSave?",
+        //     opts: {
+        //         userId: 1,
+        //         categoryId: "4812062598ec4b10bedfb38b59ea3e94",
+        //         title: questionTit,
+        //         content: questionTxt,
+        //         homeImage: fileList[0]
+        //     },
+        //     // processData: false,
+        //     // data: oMyForm,
+        // }).then((response) => {
+        //     /*global layer */
+        //     global.constants.loading = false
+        //     layer.msg(response.data.message)
+        // })
+        //     .catch((error) => {
+        //         global.constants.loading = false
+        //         console.log(error)
+        //     })
     }
     createCategory = () => {
-
+        const { categoryList } = this.state
+        return categoryList.map((item, index) => {
+            return <li onClick={() => this.setCategoryId(item)}>{item.classifying}</li>
+        })
+    }
+    setCategoryId = (item) => {
+        this.setState({ addCategoryId: item.id, addCategoryName: item.classifying })
+    }
+    handlePageChange = (page, pageSize) => {
+        this.setState({ curPage: page })
+        this.getQuestionList(page)
     }
 
+    handleSearch = () => {
+        const { searchTxt } = this.state;
+        POST({
+            url: "/a/cms/article/getAllArticle?",
+            opts: {
+                title: searchTxt,
+                categoryId: "4812062598ec4b10bedfb38b59ea3e94"
+            }
+        }).then((response) => {
+            /*global layer */
+            global.constants.loading = false
+            this.setState({ questionList: response.data.data })
+
+        })
+            .catch((error) => {
+                global.constants.loading = false
+                console.log(error)
+            })
+    }
+    handleChangeSearchTxt = (e) => {
+        this.setState({ searchTxt: e.target.value })
+    }
     render() {
 
-        const { questionList, recoList, replyList, questionTit, questionTxt, fileList } = this.state;
+        const { questionList, recoList, replyList, questionTit, questionTxt, fileList, addCategoryName } = this.state;
         const props = {
             onRemove: (file) => {
                 this.setState((state) => {
@@ -374,11 +435,11 @@ export default class Question extends Component {
                             </Upload>
                             {/* <a href="javascript:;" className="tl-img"><i className="icon-img"></i>图片</a> */}
                             <div className="u-select">
-                                <div className="in_fenlei" role="note">选择分类</div>
+                                <div className="in_fenlei" role="note">{addCategoryName || "选择分类"}</div>
                                 <div data-for=".in_fenlei" role="menu">
                                     <ul>
                                         {this.createCategory()}
-                                        <li>文案进阶</li>
+                                        {/* <li>文案进阶</li>
                                         <li>设计审美</li>
                                         <li>写作经验</li>
                                         <li>新媒体运营</li>
@@ -386,7 +447,7 @@ export default class Question extends Component {
                                         <li>案例剖析</li>
                                         <li>运营增长</li>
                                         <li>社群管理</li>
-                                        <li>其他类型</li>
+                                        <li>其他类型</li> */}
                                     </ul>
                                 </div>
                             </div>
@@ -410,30 +471,31 @@ export default class Question extends Component {
                                 <TabPane tab="消灭0回复" key="reply" className="qj-news">{this.createQuestionList(replyList)}</TabPane>
                             </Tabs>
                             <div className="u-search">
-                                <input type="text" placeholder="搜索与我有关的提问" />
-                                <a href="javascript:;" className="fa-search"></a>
+                                <input type="text" placeholder="搜索与我有关的提问" onChange={this.handleChangeSearchTxt} />
+                                <a href="javascript:;" className="fa-search" onClick={this.handleSearch}></a>
                             </div>
                         </div>
                         {/* <!--J进度条--> */}
-                        <div className="u-pages">
-                            <div className="box clearfix">
-                                <a href="javascript:;">Prev</a>
-                                <a href="javascript:;"><i className="fa-angle-double-left"></i></a>
-                                <a href="javascript:;">1</a>
-                                <b>2</b>
-                                <a href="javascript:;">3</a>
-                                <a href="javascript:;">4</a>
-                                <a href="javascript:;">5</a>
-                                <a href="javascript:;">6</a>
-                                <a href="javascript:;">7</a>
-                                <a href="javascript:;">8</a>
-                                <a href="javascript:;">9</a>
-                                <a href="javascript:;">10</a>
-                                <span>…</span>
-                                <a href="javascript:;"><i className="fa-angle-double-right"></i></a>
-                                <a href="javascript:;">Next</a>
-                            </div>
-                        </div>
+                        {
+                            questionList.count > global.constants.PAGESIZE && (
+                                <Pagination className="u-pages" current={this.state.curPage} onChange={this.handlePageChange} total={questionList && questionList.count} pageSize={global.constants.PAGESIZE} itemRender={(page, type, originalElement) => {
+                                    switch (type) {
+                                        case 'prev':
+                                            return [<a href="javascript:;">{type}</a>,
+                                            <a href="javascript:;" ><i className="fa-angle-double-left"></i></a>]
+                                        case 'next':
+                                            return [
+                                                <a href="javascript:;" ><i className="fa-angle-double-right"></i></a>,
+                                                <a href="javascript:;">{type}</a>
+                                            ]
+                                        default:
+                                            return <a href="javascript:;">{page}</a>;
+
+                                    }
+                                }} />
+                            )
+                        }
+
                         {/* <!--/J进度条--> */}
                     </div>
                 </div>

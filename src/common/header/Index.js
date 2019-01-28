@@ -97,10 +97,10 @@ export default class Header extends Component {
         var userInfo = JSON.parse(localStorage.getItem('userInfo'));
         if (userInfo) {
             switch (userInfo.isCompany) {
-                case true:
+                case "true":
                     this.setState({ roleNames: "企业用户" })
                     break;
-                case false:
+                case "false":
                     this.setState({ roleNames: "个人用户" })
                     break;
                 default:
@@ -108,7 +108,7 @@ export default class Header extends Component {
                     break;
             }
         }
-        this.setState({ userInfo: localStorage.getItem("userInfo") })
+        this.setState({ userInfo: userInfo })
     }
 
     getNavData = () => {
@@ -178,11 +178,12 @@ export default class Header extends Component {
 
     logOut = () => {
         localStorage.clear()
-        this.props.history.push("/Login")
+        window.location.href = "/#/Login"
+        //this.props.history.push("/Login")
     }
 
     render() {
-        const { Nav, roleNames } = this.state
+        const { Nav, roleNames, userInfo } = this.state
         return (
             <div className="m-head">
                 <div className="wrapper">
@@ -191,7 +192,7 @@ export default class Header extends Component {
                     </a>
                     <div className="f-item user">
                         <a href="javascript:;" className="icon-user">
-                            <i className="badge">42</i>
+                            {userInfo && userInfo.attentionNum !== "0" && <i className="badge">{userInfo.attentionNum}</i>}
                         </a>
 
                         <div className="fm-userinfo" style={{ display: roleNames === "游客" ? '' : 'none' }}>
@@ -207,58 +208,66 @@ export default class Header extends Component {
                                 <a href="/#/LoginQy"><Icon type="reconciliation" style={{ fontSize: '26px' }} />企业登录</a>
                             </div>
                         </div>
-                        <div className="fm-userinfo" style={{ display: roleNames === "个人用户" ? '' : 'none' }}>
-                            <div className="info">
-                                <a href="javascript:;" className="thumb">
-                                    <img src="css/images/1x1.png" />
-                                </a>
-                                <h1><a href="#">Sophie</a></h1>
-                                <h3><a href="#">完善个人资料</a></h3>
+                        {
+                            userInfo &&
+                            <div className="fm-userinfo" style={{ display: roleNames === "个人用户" ? '' : 'none' }}>
+                                <div className="info">
+                                    <a href={`/#/UserCenter/${userInfo.id}`} className="thumb">
+                                        <img src={userInfo.photo} />
+                                    </a>
+                                    <h1><a href={`/#/UserCenter/${userInfo.id}`}>{userInfo.name}</a></h1>
+                                    <h3><a href={`/#/InfoUpDate/${userInfo.id}`}>完善个人资料</a></h3>
+                                </div>
+                                <ul className="nav clearfix">
+                                    <li>
+                                        <a href={`/#/ArticleEditor`}>发表文章</a>
+                                    </li>
+                                    <li>
+                                        <a href={`/#/UserCenter/${userInfo.id}`}>我的首页</a>
+                                    </li>
+                                    <li>
+                                        <a href={`/#/UserCenter/${userInfo.id}`}>我的订阅</a>
+                                    </li>
+                                    <li>
+                                        <a href={`/#/UserCenter/${userInfo.id}`}>来 信{userInfo.attentionNum !== "0" && <i className="badge">{userInfo.attentionNum}</i>}</a>
+                                    </li>
+                                    <li className="esc">
+                                        <a href="javascript:;" onClick={this.logOut}><span className="icon-exit"></span><span>登 出</span></a>
+                                    </li>
+                                </ul>
                             </div>
-                            <ul className="nav clearfix">
-                                <li>
-                                    <a href="#">发表文章</a>
-                                </li>
-                                <li>
-                                    <a href="#">我的首页</a>
-                                </li>
-                                <li>
-                                    <a href="#">我的订阅</a>
-                                </li>
-                                <li>
-                                    <a href="#">来 信<i className="badge">42</i></a>
-                                </li>
-                                <li className="esc">
-                                    <a href="javascript:;" onClick={this.logOut}><span className="icon-exit"></span><span>登 出</span></a>
-                                </li>
-                            </ul>
-                        </div>
-                        <div className="fm-userinfo" style={{ display: roleNames === "企业用户" ? '' : 'none' }}>
-                            <div className="info">
-                                <a href="javascript:;" className="thumb qy">
-                                    <img src="css/images/1x1.png" />
-                                </a>
-                                <h1><a href="#">VML 上海</a></h1>
-                                <h3><a href="#">修改企业资料</a></h3>
+                        }
+                        {
+                            userInfo &&
+                            <div className="fm-userinfo" style={{ display: roleNames === "企业用户" ? '' : 'none' }}>
+                                <div className="info">
+                                    <a href="javascript:;" className="thumb qy">
+                                        <img src="css/images/1x1.png" />
+                                    </a>
+                                    <h1><a href="#">VML 上海</a></h1>
+                                    <h3><a href="#">修改企业资料</a></h3>
+                                </div>
+                                <ul className="nav clearfix">
+                                    <li>
+                                        <a href="#">发布项目</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">发布岗位</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">广告投放管理</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">来 信<i className="badge">42</i></a>
+                                    </li>
+                                    <li className="esc">
+                                        <a href="javascript:;" onClick={this.logOut}><span className="icon-exit"></span><span>登 出</span></a>
+                                    </li>
+                                </ul>
                             </div>
-                            <ul className="nav clearfix">
-                                <li>
-                                    <a href="#">发布项目</a>
-                                </li>
-                                <li>
-                                    <a href="#">发布岗位</a>
-                                </li>
-                                <li>
-                                    <a href="#">广告投放管理</a>
-                                </li>
-                                <li>
-                                    <a href="#">来 信<i className="badge">42</i></a>
-                                </li>
-                                <li className="esc">
-                                    <a href="javascript:;" onClick={this.logOut}><span className="icon-exit"></span><span>登 出</span></a>
-                                </li>
-                            </ul>
-                        </div>
+                        }
+
+
                     </div>
                     <div className="f-item search">
                         <a href="javascript:;" className="icon-search"></a>

@@ -149,9 +149,9 @@ export default class Bookstore extends Component {
             return (
                 <li>
                     <a className="thumb-img" href={`/#/Bookstore/Bookbuy/${item.id}`}><img src={item.imageSrc} /></a>
-                    <h1><a href="#">{item.title}</a></h1>
+                    <h1><a href={`/#/Bookstore/Bookbuy/${item.id}`}>{item.title}</a></h1>
                     <div className="alt clearfix">
-                        <a href="#" className="j_name"><img src={item.user.img} className="thumb-img" />{item.author}</a>
+                        <a href={`/#/Bookstore/Bookbuy/${item.id}`} className="j_name"><img src={item.user.img} className="thumb-img" />{item.author}</a>
                         <span className="dot"></span>
                         <span>{item.description}</span>
                     </div>
