@@ -60,12 +60,12 @@ $(function () {
                 });
                 break;
             case ("reply"):
-                var $reply = '<div class="replyfrom"><textarea placeholder="我来补充两句。"></textarea><a href="javascript:;" class="thumb"><img src="/@2018/css/images/1x1.png" /></a><a href="javascript:;" class="artbtn">留 言</a><a href="javascript:;" class="escbtn" data-el="replyesc">稍后再说</a></div>';
-                if ($(this).parent().nextAll().length > 0) {
-                    $(this).parent().nextAll(".replyfrom").remove();
-                } else {
-                    $(this).parent().after($reply);
-                }
+                // var $reply = '<div class="replyfrom"><textarea placeholder="我来补充两句。"></textarea><a href="javascript:;" class="thumb"><img src="/@2018/css/images/1x1.png" /></a><a href="javascript:;" class="artbtn">留 言</a><a href="javascript:;" class="escbtn" data-el="replyesc">稍后再说</a></div>';
+                // if ($(this).parent().nextAll().length > 0) {
+                //     $(this).parent().nextAll(".replyfrom").remove();
+                // } else {
+                //     $(this).parent().after($reply);
+                // }
                 break;
             case ("replyesc"):
                 $(this).parents(".replyfrom").remove();

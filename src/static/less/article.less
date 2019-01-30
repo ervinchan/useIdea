@@ -750,10 +750,24 @@
         font-size: 23px;
     }
     .u-editor {
-        min-height: 600px;
+        height: 600px;
+        .w-e-toolbar {
+            padding: 5px;
+            border: none !important;
+        }
+        #editorContainer {
+            height: calc(100% - 35px);
+        }
         .w-e-text-container {
             height: 100% !important;
+            border: none !important;
             /*!important是重点，因为原div是行内样式设置的高度300px*/
+        }
+    }
+    .w-e-panel-tab-title {
+        .w-e-item {
+            width: 150px;
+            text-align: center;
         }
     }
 }

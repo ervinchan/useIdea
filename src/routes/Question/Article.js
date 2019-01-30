@@ -10,7 +10,8 @@ import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
 import WheelBanner from '../../common/wheelBanner/Index'
 import HotRead from '../../common/hotRead/Index'
-import Editor from 'rc-wang-editor'
+//import Editor from 'rc-wang-editor'
+import ed from 'wangeditor'
 import { POST } from '../../service/service'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
@@ -23,7 +24,7 @@ import '../../static/less/question.less'
 const PAGESIZE = 3;
 
 export default class QuestionArticle extends Component {
-
+    editor = new ed('#editorContainer')
     constructor(props) {
         super(props);
         this.state = {
@@ -58,6 +59,26 @@ export default class QuestionArticle extends Component {
         $(".jq-hidden").on("click", function (e) {
             $($(this).data("for")).toggleClass("hidden");
         });
+        this.editor.customConfig.menus = [
+            'head',  // 标题
+            'bold',  // 粗体
+            'fontSize',  // 字号
+            'fontName',  // 字体
+            'italic',  // 斜体
+            'underline',  // 下划线
+            'strikeThrough',  // 删除线
+            'foreColor',  // 文字颜色
+            'backColor',  // 背景颜色
+            'link',  // 插入链接
+            'list',  // 列表
+            'justify',  // 对齐方式
+            'quote',  // 引用
+            'image',  // 插入图片
+            'undo',  // 撤销
+            'redo'  // 重复
+        ]
+        this.editor.customConfig.onchange = this.setEditorVal
+        this.editor.create()
 
         this.getArticleInfo("4812062598ec4b10bedfb38b59ea3e94")
         this.getSpecialCol()
@@ -187,8 +208,8 @@ export default class QuestionArticle extends Component {
                         </div>
                         <div class="txt">{item.authorDript || '此家伙很懒...'}</div>
                     </div>
-                    <div class="fu_txt clearfix">
-                        {item.content}
+                    <div class="fu_txt clearfix" dangerouslySetInnerHTML={{ __html: item.content }}>
+                        
                     </div>
                     <a href="javascript:;" class="jq-hidden" data-for="#item11"> <i class="fa-angle-up"></i></a>
                     <div class="f-bartool clearfix">
@@ -268,7 +289,7 @@ export default class QuestionArticle extends Component {
         return specialCol && specialCol.map((item, index) => {
             if (index === 0 || index === 1) {
                 return (
-                    <li onClick={()=>this.gotoRouter(item.href)}>
+                    <li onClick={() => this.gotoRouter(item.href)}>
                         <a href="javascript:;" className="thumb-img">
                             <span>{index + 1}</span>
                             <img src={item.image} />
@@ -440,7 +461,8 @@ export default class QuestionArticle extends Component {
                         }
 
                         <div class="u-editor">
-                            <Editor customConfig={{
+                            <div id="editorContainer" ref="editorElem" />
+                            {/* <Editor customConfig={{
                                 // "uploadImgShowBase64": true,
                                 "height": 325,
                                 "menus": [
@@ -461,7 +483,7 @@ export default class QuestionArticle extends Component {
                                     'undo',  // 撤销
                                     'redo'  // 重复
                                 ]
-                            }} onChange={this.setEditorVal} style={{ height: 325 }} />
+                            }} onChange={this.setEditorVal} style={{ height: 325 }} /> */}
                         </div>
                         <div class="qj-submit">
                             <a href="javascript:;" onClick={() => this.submitComment()}>提 交</a>

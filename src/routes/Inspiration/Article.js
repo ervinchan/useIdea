@@ -210,19 +210,21 @@ export default class Article extends Component {
     }
 
     createCommentList = (data) => {
+        const userInfo = global.constants.userInfo;
         return data.list && data.list.map((item, index) => {
-
+            let Hours = FormatDate.apartHours(item.createDate)
+            let Time = Hours > 24 ? FormatDate.customFormat(item.createDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`;
             return (
                 <div className="disc-item">
                     <a href="javascript:;" className="thumb"><img src={item.user.photo} /></a>
                     <div className="alt">
-                        <a href="javascript:;" className="j_name" onClick={() => this.gotoRouter(`/UserCenter/UserNews${item.user.id}`)}>{item.name}</a><span className="dot"></span><span>2018-06-19</span>
+                        <a href="javascript:;" className="j_name" onClick={() => this.gotoRouter(`/UserCenter/UserNews${item.user.id}`)}>{item.name}</a><span className="dot"></span><span>{Time}</span>
                     </div>
                     <div className="txt">
                         {item.content}
                     </div>
                     <div className="bar">
-                        <a href="#">投诉</a><a href="javascript:;" data-el="reply" onClick={() => this.handleReply(item)}>回复</a><a href="javascript:;" className="thumbs" onClick={() => this.handleLike(item)}><i className="icon-thumbs-up"></i>{item.commentNum}</a>
+                        <a href="javascript:;">投诉</a><a href="javascript:;" onClick={() => this.handleReply(item)}>回复</a><a href="javascript:;" className="thumbs" onClick={() => this.handleLike(item)}><i className="icon-thumbs-up"></i>{item.commentNum}</a>
                     </div>
                     {
                         item.childComments &&
@@ -230,7 +232,7 @@ export default class Article extends Component {
                             {this.createCommentList(item.childComments)}
                         </div>
                     }
-                    {/* <div class="replyfrom" style={{ display: (item.id === this.state.replyId ? "" : "none") }}><textarea placeholder="我来补充两句。"></textarea><a href="javascript:;" class="thumb"><img src="css/images/1x1.png" /></a><a href="javascript:;" class="artbtn" onClick={() => this.submitComment(item.id)}>留 言</a><a href="javascript:;" class="escbtn" data-el="replyesc">稍后再说</a></div> */}
+                    <div class="replyfrom" style={{ display: (item.id === this.state.replyId ? "" : "none") }}><textarea placeholder="我来补充两句。"></textarea><a href="javascript:;" class="thumb"><img src={userInfo.photo} /></a><a href="javascript:;" class="artbtn" onClick={() => this.submitComment(item.id)}>留 言</a><a href="javascript:;" class="escbtn" data-el="replyesc">稍后再说</a></div>
                 </div>
             )
         })
@@ -275,7 +277,7 @@ export default class Article extends Component {
                 title: articleInfo.title,
                 categoryId: articleInfo.category.id,
                 contentId: this.props.match.params.aid,
-                replyId: pid,
+                replyId: pid || '',
                 name: global.constants.userInfo.name,
                 isValidate: "0",
                 content: commentTxt
@@ -296,6 +298,7 @@ export default class Article extends Component {
 
     render() {
         const { articleInfo, articleContent, articleComment, isFans } = this.state;
+        const userInfo = global.constants.userInfo;
         let Hours = FormatDate.apartHours(articleInfo.updateDate)
         let Time = Hours > 24 ? FormatDate.customFormat(articleInfo.updateDate, 'yyyy/MM/dd') : `${Hours}小时前`;
         return (
@@ -363,7 +366,7 @@ export default class Article extends Component {
                             <a href="javascript:;"><i className="icon-more-3"></i></a>
                         </div> */}
                     </div>
-                    <a href="#" className="seat-x100 darken seat-art">
+                    <a href="javascript:;" className="seat-x100 darken seat-art">
                         <img src="images/article/d1.jpg" />
                     </a>
                     <div className="art-discuss">
@@ -371,9 +374,9 @@ export default class Article extends Component {
                         <div className="artfrom">
                             <textarea placeholder="万难尽如人意，或有些许共鸣可取……" onChange={this.handleChangeCommentTxt}></textarea>
                             <a href="javascript:;" className="thumb">
-                                <img src={articleInfo.user && articleInfo.user.photo} />
+                                <img src={userInfo.photo} />
                             </a>
-                            <a href="javascript:;" className="artbtn" onClick={this.submitComment}>留 言</a>
+                            <a href="javascript:;" className="artbtn" onClick={() => this.submitComment()}>留 言</a>
                         </div>
                         <div className="author">
                             <h1>本文作者</h1>
