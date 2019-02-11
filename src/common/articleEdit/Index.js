@@ -30,7 +30,8 @@ export default class ActicleEditor extends Component {
             fileList: [],
             brand: "",
             categoryList: [],
-            coverImg: coverImg
+            coverImg: coverImg,
+            uploadImg: null
         };
     }
 
@@ -48,6 +49,7 @@ export default class ActicleEditor extends Component {
             $(".u-select [role=menu]").hide();
             $(this).next().show();
         });
+        let that = this
         //this.editor.customConfig.uploadImgShowBase64 = true;
         this.editor.customConfig.uploadImgMaxSize = 3 * 1024 * 1024
         this.editor.customConfig.menus = [
@@ -69,6 +71,11 @@ export default class ActicleEditor extends Component {
             'redo'  // 重复
         ]
         this.editor.customConfig.onchange = this.setEditorVal
+        this.editor.customConfig.uploadImgServer = '/zsl/a/cms/article/uploadArticleSave'
+        this.editor.customConfig.uploadImgParams = {
+            userId: global.constants.userInfo.id,
+            categoryId: "ce009ff186fa4203ab07bd1678504228"
+        }
         this.editor.create()
         // this.getDatas("ce009ff186fa4203ab07bd1678504228")
         this.getHotKeywords()
@@ -77,7 +84,7 @@ export default class ActicleEditor extends Component {
 
     getCategory = () => {
         POST({
-            url: "/a/cms/article/findClassifying?",
+            url: "/a/cms/category/updateArticleClassify?",
 
         }).then((response) => {
             if (response.data.status === 1) {
@@ -91,11 +98,11 @@ export default class ActicleEditor extends Component {
     createCategory = () => {
         const { categoryList } = this.state
         return categoryList.map((item, index) => {
-            return <li key={index} onClick={() => this.setCategoryId(item)}>{item.classifying}</li>
+            return <li key={index} onClick={() => this.setCategoryId(item)}>{item.name}</li>
         })
     }
     setCategoryId = (item) => {
-        this.setState({ addCategoryId: item.id, addCategoryName: item.classifying })
+        this.setState({ addCategoryId: item.id, addCategoryName: item.name })
     }
 
     // getDatas = (categoryId) => {
@@ -137,7 +144,7 @@ export default class ActicleEditor extends Component {
     //     return toolList.list && toolList.list.map((item, index) => {
     //         return (
     //             <li>
-    //                 <a className="thumb-img" href={`/#/Bookstore/Bookbuy/${item.id}`}><img src={item.imageSrc} /><span>{item.category.name}</span></a>
+    //                 <a className="thumb-img" href={`/#/Bookstore/Bookbuy/${item.id}`}><img src={item.image} /><span>{item.category.name}</span></a>
     //                 <h1><a href={`/#/Bookstore/Bookbuy/${item.id}`}>{item.title}</a></h1>
     //                 <div className="alt clearfix">
     //                     <a href="#" className="j_name"><img src={item.user.img} className="thumb-img" />{item.author}</a>
@@ -213,9 +220,14 @@ export default class ActicleEditor extends Component {
     }
 
     submitArticle = () => {
+
+        /*global layer */
         const { articleTit, articleDescript, EditorVal, keywords, brand, fileList, addCategoryId } = this.state
         if (!articleTit) {
             layer.msg("请填写标题");
+            return false;
+        } else if (!articleDescript) {
+            layer.msg("请输入推荐语");
             return false;
         } else if (!EditorVal) {
             layer.msg("请输入文章内容");
@@ -223,13 +235,21 @@ export default class ActicleEditor extends Component {
         } else if (!addCategoryId) {
             layer.msg("请选择文章栏目");
             return false;
+        } else if (!fileList[0]) {
+            layer.msg("请添加封面图片");
+            return false;
+        } else if (!keywords[0]) {
+            layer.msg("请添加关键词");
+            return false;
         }
+        let g = global.constants;
+        g.loading = true;
         var that = this
         var oMyForm = new FormData();
         this.editor.change && this.editor.change()
-        oMyForm.append("userId", global.constants.userInfo.id);
-        oMyForm.append("categoryId", "ce009ff186fa4203ab07bd1678504228");
-        oMyForm.append("classifying", addCategoryId);
+        oMyForm.append("userId", g.userInfo.id);
+        oMyForm.append("categoryId", addCategoryId);
+        //oMyForm.append("classifying", addCategoryId);
         oMyForm.append("title", articleTit || "");
         oMyForm.append("content", EditorVal || "");
         oMyForm.append("brand", brand || "");
@@ -245,14 +265,14 @@ export default class ActicleEditor extends Component {
             processData: false,// 告诉axios不要去处理发送的数据(重要参数)
             contentType: false,   // 告诉axios不要去设置Content-Type请求头
         }).then((response) => {
-            /*global layer */
-            global.constants.loading = false
-            layer.msg(response.data.message, () => {
-                that.setState({})
+            g.loading = false
+            layer.alert(response.data.message, () => {
+                this.props.history.push(`/`)
+                layer.closeAll()
             })
         })
             .catch((error) => {
-                global.constants.loading = false
+                g.loading = false
                 console.log(error)
             })
     }

@@ -130,7 +130,7 @@ export default class GoodCopy extends Component {
         return goodcopyList.list && goodcopyList.list.map((item, index) => {
             return (
                 <li>
-                    <a className="thumb-img" href={`/#/Inspiration/Article/${item.id}`}><img src={item.imageSrc} /><span>{item.category.name}</span></a>
+                    <a className="thumb-img" href={`/#/Inspiration/Article/${item.id}`}><img src={item.image} /><span>{item.category.name}</span></a>
                     <h1><a href={`/#/Inspiration/Article/${item.id}`}>{item.title}</a></h1>
                     <div className="alt clearfix">
                         <a href={`/#/Inspiration/Article/${item.id}`} className="j_name"><img src={item.user.img} className="thumb-img" />{item.author}</a>
@@ -166,7 +166,7 @@ export default class GoodCopy extends Component {
     handlePageChange = (page, pageSize) => {
         console.log(page, pageSize)
         this.setState({ curPage: page })
-        this.getDatas(this.props.match.params.tid, page)
+        this.getDatas("ce009ff186fa4203ab07bd1678504228", page)
     }
 
     handleSetKeywords = (e) => {

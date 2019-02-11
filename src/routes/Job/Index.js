@@ -142,11 +142,11 @@ export default class Job extends Component {
         const { jobList } = this.state;
         return jobList.list && jobList.list.map((item, index) => {
             let Hours = FormatDate.apartHours(item.updateDate)
-            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours}小时前`
+            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`
             return (
                 <li>
                     <a className="thumb-img" href="javascript:;" onClick={this.gotoRouter(item.id)}>
-                        <img src={item.imageSrc} />
+                        <img src={item.image} />
                     </a>
                     <h1><a href="javascript:;" onClick={this.gotoRouter(item.id)}>{item.title}</a></h1>
                     <h3>{Time}</h3>
@@ -161,7 +161,7 @@ export default class Job extends Component {
         const { hotCompanyList } = this.state;
         return hotCompanyList.map((item, index) => {
             let Hours = FormatDate.apartHours(item.updateDate)
-            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours}小时前`
+            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`
             return (
                 <li>
                     <div className="infos">
@@ -225,9 +225,9 @@ export default class Job extends Component {
         let top5 = []
         adsList && adsList.map((item, index) => {
             if (index < 3) {
-                top3.push(<li><a href={item.url}><img src={item.imageSrc} /></a></li>)
+                top3.push(<li><a href={item.url}><img src={item.image} /></a></li>)
             } else if (index >= 3 && index < 5) {
-                top5.push(<li><a href={item.url}><img src={item.imageSrc} /></a></li>)
+                top5.push(<li><a href={item.url}><img src={item.image} /></a></li>)
             }
         })
 

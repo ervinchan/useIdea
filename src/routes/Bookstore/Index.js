@@ -168,7 +168,7 @@ export default class Bookstore extends Component {
         const { news } = this.state
         return news.map((item, index) => {
             let Hours = FormatDate.apartHours(item.updateDate)
-            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours}小时前`
+            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`
             return (
                 <li key={index}><span>{Time}</span><a href={item.href}>{item.content}</a></li>
             )

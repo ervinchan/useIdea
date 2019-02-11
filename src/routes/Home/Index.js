@@ -12,7 +12,8 @@ import { POST } from '../../service/service'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
 import HotRead from '../../common/hotRead/Index'
-import 'swiper/dist/css/swiper.min.css'
+import 'swiper/dist/css/swiper.min.css';
+import '../../static/less/question.less'
 import '../../static/less/index.less';
 import 'antd/lib/tabs/style/index.less'
 
@@ -54,30 +55,7 @@ export default class App extends Component {
                 item.show();
                 item.siblings().hide();
             })
-            var swiper_banner = new Swiper('.f-banner .swiper-container', {
-                slidesPerView: 'auto',
-                loop: true,
-                speed: 1000,
-                autoplay: {
-                    delay: 3000,
-                    disableOnInteraction: false,
-                    waitForTransition: false
-                },
-                pagination: {
-                    el: '.swiper-pagination',
-                    clickable: true,
-                },
-                navigation: {
-                    nextEl: '.f-banner .u-next',
-                    prevEl: '.f-banner .u-prev'
-                },
-                pagination: {
-                    el: '.f-banner .u-pagination',
-                    bulletClass: 'bull',
-                    bulletActiveClass: 'active',
-                    clickable: true
-                }
-            });
+            
 
             var swiper_read = new Swiper('.m-read .swiper-container', {
                 slidesPerView: 4,
@@ -138,10 +116,7 @@ export default class App extends Component {
                 $(this).parents("[role=menu]").hide();
             });
 
-            //全部显示
-            $(".jq-hidden").on("click", function (e) {
-                $($(this).data("for")).toggleClass("hidden");
-            });
+            
 
             $(".m-menu-shu .menu>li>a").on("click", function (e) {
                 $(this).next().slideToggle(300);
@@ -199,7 +174,33 @@ export default class App extends Component {
             }
         }).then((response) => {
             if (response.data.status === 1) {
-                this.setState({ bannerAList: response.data.data })
+                global.constants.loading = false
+                this.setState({ bannerAList: response.data.data },()=>{
+                    var swiper_banner = new Swiper('.f-banner .swiper-container', {
+                        slidesPerView: 'auto',
+                        loop: true,
+                        speed: 1000,
+                        autoplay: {
+                            delay: 3000,
+                            disableOnInteraction: false,
+                            waitForTransition: false
+                        },
+                        pagination: {
+                            el: '.swiper-pagination',
+                            clickable: true,
+                        },
+                        navigation: {
+                            nextEl: '.f-banner .u-next',
+                            prevEl: '.f-banner .u-prev'
+                        },
+                        pagination: {
+                            el: '.f-banner .u-pagination',
+                            bulletClass: 'bull',
+                            bulletActiveClass: 'active',
+                            clickable: true
+                        }
+                    });
+                })
             }
         })
             .catch((error) => {
@@ -257,14 +258,14 @@ export default class App extends Component {
     createBannerA = () => {
         const { bannerAList } = this.state
         let bannerList = bannerAList.map((item, index) => {
-            return <a className="swiper-slide" href={item.url}><img alt={item.title} src={item.imageSrc} /><div className="txt"><span>{item.descript}</span><h1>{item.title}</h1></div></a>
+            return <a className="swiper-slide" href={item.url}><img alt={item.title} src={item.image} /><div className="txt"><span>{item.descript}</span><h1>{item.title}</h1></div></a>
         })
         return (
             <div className="f-banner">
                 <div className="swiper-box">
                     <div className="swiper-container">
                         <div className="swiper-wrapper">
-                            {bannerList}
+                            {[bannerList,bannerList]}
                         </div>
                     </div>
                 </div>
@@ -283,7 +284,7 @@ export default class App extends Component {
     createBannerB = () => {
         const { bannerBList } = this.state
         let bannerList = bannerBList.map((item, index) => {
-            return <li><a href={item.url} className="darken scale"><img src={item.imageSrc} /></a></li>
+            return <li><a href={item.url} className="darken scale"><img src={item.image} /></a></li>
         })
         return (
             <div className="m-seat-x4 wrapper">
@@ -296,14 +297,14 @@ export default class App extends Component {
     createBannerC = () => {
         const { bannerCList } = this.state
         return bannerCList.slice(0, 3).map((item, index) => {
-            return <a href={item.url} className="seat-h110 lighten"><img src={item.imageSrc} /></a>
+            return <a href={item.url} className="seat-h110 lighten"><img src={item.image} /></a>
         })
     }
     createBannerD = () => {
         const { bannerCList } = this.state
         let bannerDList = bannerCList.slice(3, 5)
         return bannerDList.map((item, index) => {
-            return <a href={item.url} className="seat-h110 lighten"><img src={item.imageSrc} /></a>
+            return <a href={item.url} className="seat-h110 lighten"><img src={item.image} /></a>
         })
     }
 
@@ -316,7 +317,7 @@ export default class App extends Component {
                 pageSize: PAGESIZE
             }
         }).then((response) => {
-            global.constants.loading = false
+            
             let viewPointList = response.data.data
             this.setState({ viewPointList })
         })
@@ -333,7 +334,6 @@ export default class App extends Component {
                 pageSize: PAGESIZE
             }
         }).then((response) => {
-            global.constants.loading = false
             let goodcopyList = response.data.data
             this.setState({ goodcopyList })
         })
@@ -350,7 +350,6 @@ export default class App extends Component {
                 pageSize: PAGESIZE
             }
         }).then((response) => {
-            global.constants.loading = false
             let bootStoreList = response.data.data
             this.setState({ bootStoreList })
         })
@@ -367,7 +366,6 @@ export default class App extends Component {
                 pageSize: PAGESIZE
             }
         }).then((response) => {
-            global.constants.loading = false
             let jobList = response.data.data
             this.setState({ jobList })
         })
@@ -379,10 +377,10 @@ export default class App extends Component {
     createList = (data, router) => {
         return data.list && data.list.map((item, index) => {
             let Hours = FormatDate.apartHours(item.updateDate)
-            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours}小时前`
+            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`
             return (
                 // <div className="item">
-                //     <a className="thumb-img" href="javascript:;"><img src={item.imageSrc} />
+                //     <a className="thumb-img" href="javascript:;"><img src={item.image} />
                 //     </a>
                 //     <div className="tit"><a href="javascript:;">{item.title}</a></div>
                 //     <div className="txt">
@@ -400,7 +398,7 @@ export default class App extends Component {
                 // </div>
                 <div class="item user" onClick={() => this.gotoRouter(`${router}/${item.id}`)}>
                     <a class="thumb-img" href="javascript:;">
-                        <img src={item.imageSrc} />
+                        <img src={item.image} />
                     </a>
                     <div class="tit"><a href="javascript:;">{item.title || item.bookName}</a></div>
                     <div class="txt">{item.description}</div>
@@ -461,7 +459,7 @@ export default class App extends Component {
         const { recommendBooks, bannerEList } = this.state
         return recommendBooks && recommendBooks.list && recommendBooks.list.map((item, index) => {
             let Hours = FormatDate.apartHours(item.updateDate)
-            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours}小时前`
+            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`
             let bookImagUrl = item.bookImagUrl.split('|')[1]
             let banner = ''
             if ((index + 1) % 5 === 0) {
@@ -470,7 +468,7 @@ export default class App extends Component {
                 if (bannerItem) {
                     banner = (
                         <a href={bannerItem.url} class="seat-push">
-                            <img src={bannerItem.imageSrc} />
+                            <img src={bannerItem.image} />
                             <span class="badge">推荐</span>
                             <p class="txt">{bannerItem.title}</p>
                         </a>
@@ -507,7 +505,6 @@ export default class App extends Component {
             }
         }).then((response) => {
             if (response.data.status === 1) {
-                global.constants.loading = false
                 let questionList = response.data.data
                 this.setState({ questionList })
             }
@@ -522,7 +519,6 @@ export default class App extends Component {
             url: "/a/cms/article/getHostAuthor"
         }).then((response) => {
             if (response.data.status === 1) {
-                global.constants.loading = false
                 let topAuthorList = response.data.data
                 this.setState({ topAuthorList })
             }
@@ -539,7 +535,7 @@ export default class App extends Component {
 
             return (
                 <li key={index}>
-                    <a href="javascript:;" onClick={() => this.gotoRouter(`/UserCenter/UserNews/${item.user.id}`)}>
+                    <a href="javascript:;" onClick={() => this.gotoRouter(`/UserNews/${item.user.id}`)}>
                         <em><img src={item.user.photo} /></em>
                         <span>{item.author}</span>
                         <i className="fa-angle-right"></i>
@@ -557,7 +553,6 @@ export default class App extends Component {
             }
         }).then((response) => {
             if (response.data.status === 1) {
-                global.constants.loading = false
                 let hitsArticleList = response.data.data
                 this.setState({ hitsArticleList })
             }
@@ -575,7 +570,7 @@ export default class App extends Component {
                 <li key={index} onClick={() => this.gotoRouter(`/Inspiration/Article/${item.id}`)}>
                     <a href="javascript:;" className="thumb-img">
                         <span>{index+1}</span>
-                        <img src={item.imageSrc} />
+                        <img src={item.image} />
                     </a>
                     <h1><a href="javascript:;">{item.title}</a></h1>
                     <h3>{item.author}</h3>
@@ -711,6 +706,9 @@ export default class App extends Component {
                     </div>
                     <div className="g-right">
                         {this.createBannerC()}
+                        <a href="javascript:;" class="seat-h190 lighten"><img src="images/d5.jpg" /></a>
+                        <a href="javascript:;" class="seat-h190 lighten"><img src="images/d5.jpg" /></a>
+                        <a href="javascript:;" class="seat-h190 lighten"><img src="images/d5.jpg" /></a>
                         <div className="m-r-hot">
                             <div className="u-title">
                                 <b>热文排行</b>

@@ -120,10 +120,10 @@ export default class Viewpoint extends Component {
         const { viewPointList } = this.state
         return viewPointList.list && viewPointList.list.map((item, index) => {
             let Hours = FormatDate.apartHours(item.updateDate)
-            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours}小时前`
+            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`
             return (
                 <div class="item">
-                    <a class="thumb-img" href={`/#/Inspiration/Article/${item.id}`}><img src="{item.imageSrc} " /></a>
+                    <a class="thumb-img" href={`/#/Inspiration/Article/${item.id}`}><img src="{item.image} " /></a>
                     <div class="tit"><a href={`/#/Inspiration/Article/${item.id}`}>{item.title}</a></div>
                     <div class="txt">
                         <span>{Time}</span><br />
@@ -154,7 +154,7 @@ export default class Viewpoint extends Component {
         return authorList && authorList.map((item, index) => {
             return (
                 <li>
-                    <a href="javascript:;" onClick={this.gotoUserCenter}>
+                    <a href="javascript:;" onClick={()=>this.gotoRouter(`/UserNews/${item.user && item.user.id}`)}>
                         <em><img src={item.user.photo} /></em>
                         <span>{item.author}</span>
                         <i class="fa-angle-right"></i>
@@ -162,6 +162,9 @@ export default class Viewpoint extends Component {
                 </li>
             )
         })
+    }
+    gotoRouter = (router)=>{
+        this.props.history.push(router)
     }
 
     createRecommendList = () => {

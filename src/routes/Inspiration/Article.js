@@ -31,7 +31,8 @@ export default class Article extends Component {
             articleContent: {},
             articleComment: [],
             collectUserList: [],
-            isFans: 0
+            isFans: 0,
+            replyContent: ""
         };
     }
 
@@ -139,7 +140,7 @@ export default class Article extends Component {
     createCollectUsers = () => {
         const { collectUserList } = this.state
         let users = collectUserList && collectUserList.map((item, index) => {
-            return <a href="javascript:;" onClick={() => this.gotoRouter(`/UserCenter/UserNews/${item.id}`)}><img src={item.imageSrc} /></a>
+            return <a href="javascript:;" onClick={() => this.gotoRouter(`/UserNews/${item.id}`)}><img src={item.image} /></a>
 
         })
         return (
@@ -205,11 +206,9 @@ export default class Article extends Component {
                 console.log(error)
             })
     }
-    handleReply = (item) => {
-        this.setState({ replyId: item.id })
-    }
 
     createCommentList = (data) => {
+        const { replyContent } = this.state;
         const userInfo = global.constants.userInfo;
         return data.list && data.list.map((item, index) => {
             let Hours = FormatDate.apartHours(item.createDate)
@@ -218,7 +217,7 @@ export default class Article extends Component {
                 <div className="disc-item">
                     <a href="javascript:;" className="thumb"><img src={item.user.photo} /></a>
                     <div className="alt">
-                        <a href="javascript:;" className="j_name" onClick={() => this.gotoRouter(`/UserCenter/UserNews${item.user.id}`)}>{item.name}</a><span className="dot"></span><span>{Time}</span>
+                        <a href="javascript:;" className="j_name" onClick={() => this.gotoRouter(`/UserNews${item.user.id}`)}>{item.name}</a><span className="dot"></span><span>{Time}</span>
                     </div>
                     <div className="txt">
                         {item.content}
@@ -226,16 +225,58 @@ export default class Article extends Component {
                     <div className="bar">
                         <a href="javascript:;">投诉</a><a href="javascript:;" onClick={() => this.handleReply(item)}>回复</a><a href="javascript:;" className="thumbs" onClick={() => this.handleLike(item)}><i className="icon-thumbs-up"></i>{item.commentNum}</a>
                     </div>
+                    <div class="replyfrom" style={{ display: (item.id === this.state.replyId ? "" : "none") }}><textarea placeholder="我来补充两句。" onChange={this.handleChangeReply} /><a href="javascript:;" class="thumb"><img src={userInfo.photo} /></a><a href="javascript:;" class="artbtn" onClick={() => this.submitComment(item.id, replyContent)}>留 言</a><a href="javascript:;" class="escbtn" data-el="replyesc">稍后再说</a></div>
                     {
                         item.childComments &&
                         <div className="disc-sub">
-                            {this.createCommentList(item.childComments)}
+                            {this.createChildCommentList(item.childComments)}
                         </div>
                     }
-                    <div class="replyfrom" style={{ display: (item.id === this.state.replyId ? "" : "none") }}><textarea placeholder="我来补充两句。"></textarea><a href="javascript:;" class="thumb"><img src={userInfo.photo} /></a><a href="javascript:;" class="artbtn" onClick={() => this.submitComment(item.id)}>留 言</a><a href="javascript:;" class="escbtn" data-el="replyesc">稍后再说</a></div>
+
                 </div>
             )
         })
+    }
+
+    createChildCommentList = (data) => {
+        const { replyContent } = this.state;
+        const userInfo = global.constants.userInfo;
+        return data && data.map((item, index) => {
+            let Hours = FormatDate.apartHours(item.createDate)
+            let Time = Hours > 24 ? FormatDate.customFormat(item.createDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`;
+            return (
+                <div className="disc-item">
+                    <a href="javascript:;" className="thumb"><img src={item.user.photo} /></a>
+                    <div className="alt">
+                        <a href="javascript:;" className="j_name" onClick={() => this.gotoRouter(`/UserNews${item.user.id}`)}>{item.name}</a><span className="dot"></span><span>{Time}</span>
+                    </div>
+                    <div className="txt">
+                        {item.content}
+                    </div>
+                    <div className="bar">
+                        <a href="javascript:;">投诉</a><a href="javascript:;" onClick={() => this.handleReply(item)}>回复</a><a href="javascript:;" className="thumbs" onClick={() => this.handleLike(item)}><i className="icon-thumbs-up"></i>{item.commentNum}</a>
+                    </div>
+                    <div class="replyfrom" style={{ display: (item.id === this.state.replyId ? "" : "none") }}><textarea placeholder="我来补充两句。" onChange={this.handleChangeReply} /><a href="javascript:;" class="thumb"><img src={userInfo.photo} /></a><a href="javascript:;" class="artbtn" onClick={() => this.submitComment(item.id, replyContent)}>留 言</a><a href="javascript:;" class="escbtn" onClick={this.cancleReply}>稍后再说</a></div>
+                    {
+                        item.childComments &&
+                        <div className="disc-sub">
+                            {this.createChildCommentList(item.childComments)}
+                        </div>
+                    }
+
+                </div>
+            )
+        })
+    }
+    cancleReply = (item) => {
+        this.setState({ replyId: '' })
+    }
+
+    handleReply = (item) => {
+        this.setState({ replyId: item.id })
+    }
+    handleChangeReply = (e) => {
+        this.setState({ replyContent: e.target.value })
     }
 
     gotoRouter = (router) => {
@@ -269,7 +310,7 @@ export default class Article extends Component {
         this.setState({ commentTxt: e.target.value })
     }
 
-    submitComment = (pid) => {
+    submitComment = (pid, content) => {
         const { articleInfo, commentTxt } = this.state;
         POST({
             url: "/f/comment?",
@@ -280,7 +321,7 @@ export default class Article extends Component {
                 replyId: pid || '',
                 name: global.constants.userInfo.name,
                 isValidate: "0",
-                content: commentTxt
+                content: content
             }
         }).then((response) => {
             global.constants.loading = false
@@ -297,10 +338,10 @@ export default class Article extends Component {
     }
 
     render() {
-        const { articleInfo, articleContent, articleComment, isFans } = this.state;
+        const { articleInfo, articleContent, articleComment, isFans, commentTxt } = this.state;
         const userInfo = global.constants.userInfo;
         let Hours = FormatDate.apartHours(articleInfo.updateDate)
-        let Time = Hours > 24 ? FormatDate.customFormat(articleInfo.updateDate, 'yyyy/MM/dd') : `${Hours}小时前`;
+        let Time = Hours > 24 ? FormatDate.customFormat(articleInfo.updateDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`;
         return (
             <div className="">
                 {/* 头部 */}
@@ -308,7 +349,7 @@ export default class Article extends Component {
                 {/* 轮播banner */}
 
                 <div className="art-thumb">
-                    <img src={banner} />
+                    <img src={articleInfo.image} />
                 </div>
                 <div className="wrapper art-wrapper">
                     <div className="art-head">
@@ -376,13 +417,13 @@ export default class Article extends Component {
                             <a href="javascript:;" className="thumb">
                                 <img src={userInfo.photo} />
                             </a>
-                            <a href="javascript:;" className="artbtn" onClick={() => this.submitComment()}>留 言</a>
+                            <a href="javascript:;" className="artbtn" onClick={() => this.submitComment("", commentTxt)}>留 言</a>
                         </div>
                         <div className="author">
                             <h1>本文作者</h1>
                             <div className="box">
-                                <a href="javascript:;" className="thumb">
-                                    <img src="images/article/t1.jpg" />
+                                <a href="javascript:;" className="thumb" onClick={() => this.gotoRouter(`/UserNews/${articleInfo.user && articleInfo.user.id}`)}>
+                                    <img src={articleInfo.user && articleInfo.user.photo} />
                                 </a>
                                 <h2>{articleInfo.user && articleInfo.user.name}</h2>
                                 <div className="bar">
@@ -399,7 +440,7 @@ export default class Article extends Component {
                                     {/* {
                                         isFans && <a href="javascript:;" onClick={() => this.handleSubFans(global.constants.userInfo && global.constants.userInfo.id)}>取消关注</a>
                                     } */}
-                                    <a href="javascript:;" onClick={() => this.gotoRouter(`/UserCenter/UserNews/${articleInfo.user.id}`)}>主 页</a>
+                                    <a href="javascript:;" onClick={() => this.gotoRouter(`/UserNews/${articleInfo.user.id}`)}>主 页</a>
                                 </div>
                             </div>
                         </div>

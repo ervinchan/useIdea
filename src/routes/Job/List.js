@@ -242,7 +242,7 @@ export default class JobList extends Component {
         const { hotCompanyList } = this.state;
         return hotCompanyList && hotCompanyList.map((item, index) => {
             let Hours = FormatDate.apartHours(item.updateDate)
-            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours}小时前`
+            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`
             return (
                 <li>
                     <div className="infos">
@@ -281,11 +281,11 @@ export default class JobList extends Component {
         const { jobList } = this.state;
         return jobList.list && jobList.list.map((item, index) => {
             let Hours = FormatDate.apartHours(item.updateDate)
-            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours}小时前`
+            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`
             return (
                 <li>
                     <a className="thumb-img" href="javascript:;" onClick={this.gotoRouter(item.id)}>
-                        <img src={item.imageSrc} />
+                        <img src={item.image} />
                     </a>
                     <h1><a href="javascript:;" onClick={this.gotoRouter(item.id)}>{item.title}</a></h1>
                     <h3>{Time}</h3>

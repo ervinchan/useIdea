@@ -15,7 +15,8 @@ export default class Header extends Component {
             Nav: [],
             ActiveId: "",
             title: '响创意 记录创造者的洞见',
-            roleNames: '游客'
+            roleNames: '游客',
+            searchTxt:""
         }
         const router = new HashRouter()
 
@@ -182,8 +183,31 @@ export default class Header extends Component {
         //this.props.history.push("/Login")
     }
 
+    // handleSearch = () => {
+    //     const { searchTxt } = this.state;
+    //     POST({
+    //         url: "/a/cms/article/getAllArticle?",
+    //         opts: {
+    //             title: searchTxt,
+    //             categoryId: "4812062598ec4b10bedfb38b59ea3e94"
+    //         }
+    //     }).then((response) => {
+    //         /*global layer */
+    //         global.constants.loading = false
+    //         this.setState({ questionList: response.data.data })
+
+    //     })
+    //         .catch((error) => {
+    //             global.constants.loading = false
+    //             console.log(error)
+    //         })
+    // }
+    handleChangeSearchTxt = (e) => {
+        this.setState({ searchTxt: e.target.value })
+    }
+
     render() {
-        const { Nav, roleNames, userInfo } = this.state
+        const { Nav, roleNames, userInfo, searchTxt} = this.state
         return (
             <div className="m-head">
                 <div className="wrapper">
@@ -300,8 +324,8 @@ export default class Header extends Component {
                 <div className="search-wrap">
                     <div className="wrapper">
                         <div className="u-search">
-                            <input type="text" placeholder="搜索与我有关的提问" />
-                            <a href="javascript:;" className="fa-search"></a>
+                            <input type="text" placeholder="搜索与我有关的提问" onChange={this.handleChangeSearchTxt}/>
+                            <a href={`/#/Question/${searchTxt}`} className="fa-search" ></a>
                         </div>
                     </div>
                 </div>

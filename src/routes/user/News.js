@@ -30,16 +30,16 @@ export default class UserCenter extends Component {
 
     componentDidMount() {
         var that = this
-
-        this.getNews()
-        this.getNewsArticles()
+        const userId = this.props.match.params.uid
+        this.getNews(userId)
+        this.getNewsArticles(userId)
     }
 
-    getNews = () => {
+    getNews = (userId) => {
         POST({
             url: "/a/cms/article/latestAction?",
             opts: {
-                userId: global.constants.userInfo.id
+                userId: userId
             }
         }).then((response) => {
             global.constants.loading = false
@@ -51,11 +51,11 @@ export default class UserCenter extends Component {
                 console.log(error)
             })
     }
-    getNewsArticles = () => {
+    getNewsArticles = (userId) => {
         POST({
             url: "/a/cms/article/getAllArticle?",
             opts: {
-                userId: global.constants.userInfo.id
+                userId: userId
             }
         }).then((response) => {
             global.constants.loading = false
@@ -99,20 +99,20 @@ export default class UserCenter extends Component {
                             </p>
                         </div>
                         <div className="address"><i className="icon-address-w"></i>{userInfo.city}</div>
-                        <a href="javascript:;" className="add_upload" onClick={() => this.gotoRouter(`/ArticleEditor`)}>发表作品/经验</a>
+                        {/* <a href="javascript:;" className="add_upload" onClick={() => this.gotoRouter(`/ArticleEditor`)}>发表作品/经验</a> */}
                     </div>
                 </div>
                 <div class="wrapper g-icenter minpage">
                     <div class="ue-tabnav">
                         <Tabs ref={e => this.tabDom = e} className="clearfix" onChange={this.handleTabChange}>
                             <TabPane tab="最新动态" key="news" className="qj-news">
-                                <MyWork data={this.state.news} />
+                                <MyWork data={this.state.news} history={this.props.history} />
                             </TabPane>
                             <TabPane tab="最新文章" key="reco">
-                                <MyWork data={this.state.newsArticles && this.state.newsArticles.list} />
+                                <MyWork data={this.state.newsArticles && this.state.newsArticles.list} history={this.props.history} />
                             </TabPane>
                         </Tabs>
-                        <a href="javascript:;" class="edit">更新个人资料</a>
+                        {/* <a href="javascript:;" class="edit">更新个人资料</a> */}
                     </div>
 
                 </div>

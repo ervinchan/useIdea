@@ -71,7 +71,7 @@ export default class Interview extends Component {
             return (
                 <li>
                     <div class="item">
-                        <a class="thumb-img" href={`/#/Inspiration/Article/${item.id}`}><img src="{item.imageSrc} " /></a>
+                        <a class="thumb-img" href={`/#/Inspiration/Article/${item.id}`}><img src="{item.image} " /></a>
                         <div class="tag">{item.category.name}</div>
                         <h1><a href={`/#/Inspiration/Article/${item.id}`}>{item.title}</a></h1>
                         <div class="author">{item.author}</div>

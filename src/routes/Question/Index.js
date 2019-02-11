@@ -19,6 +19,7 @@ import '../../static/less/question.less'
 
 import banner from '../../static/images/jingjiao/banner.jpg'
 import 'antd/lib/tabs/style/index.less';
+import 'antd/lib/upload/style/index.less';
 
 const TabPane = Tabs.TabPane;
 
@@ -45,7 +46,9 @@ export default class Question extends Component {
             searchTxt: ""
         };
     }
-
+    componentWillReceiveProps(nextProps) {
+        console.log(nextProps)
+    }
     componentDidMount() {
         var that = this
         var swiper_qj_banner = new Swiper('.qj-banner .swiper-container', {
@@ -82,7 +85,7 @@ export default class Question extends Component {
             $(".u-select [role=menu]").hide();
             $(this).next().show();
         });
-        this.getQuestionList();
+        this.props.match.params.txt ? this.handleSearch() : this.getQuestionList()
         this.getRecoList();
         this.getReplyList();
         this.getBannerA();
@@ -155,7 +158,7 @@ export default class Question extends Component {
     createBannerB = () => {
         const { bannerBList } = this.state
         let bannerList = bannerBList.map((item, index) => {
-            return <a href={item.url} className="seat-h100"><img src={item.imageSrc} /></a>
+            return <a href={item.url} className="seat-h100"><img src={item.image} /></a>
         })
         return (
             bannerList
@@ -219,12 +222,12 @@ export default class Question extends Component {
     createQuestionList = (data) => {
         let items = data.list && data.list.map((item, index) => {
             let Hours = FormatDate.apartHours(item.createDate)
-            let Time = Hours > 24 ? FormatDate.customFormat(item.createDate, 'yyyy/MM/dd') : `${Hours}小时前`;
+            let Time = Hours > 24 ? FormatDate.customFormat(item.createDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`;
             if (item.isNewRecord) {
                 return (
                     <div className="item">
                         <a href="javascript:;" onClick={() => this.gotoRouter(item.contentId)} className="thumb-img">
-                            <img src={item.imageSrc} />
+                            <img src={item.image} />
                         </a>
                         <h1><a href="javascript:;" onClick={() => this.gotoRouter(item.contentId)}>{item.title}</a></h1>
                         <div className="alt"><span>{Time}</span></div>
@@ -235,7 +238,7 @@ export default class Question extends Component {
                 return (
                     <div class="item">
                         <a href="javascript:;" class="thumb-img" onClick={() => this.gotoRouter(item.contentId)}>
-                            <img src={item.imageSrc} />
+                            <img src={item.image} />
                         </a>
                         <h1><a href="javascript:;" onClick={() => this.gotoRouter(item.contentId)}>{item.title}</a></h1>
                         <div class="alt">
@@ -314,7 +317,10 @@ export default class Question extends Component {
         }).then((response) => {
             /*global layer */
             global.constants.loading = false
-            layer.msg(response.data.message)
+            layer.alert(response.data.message, () => {
+                window.location.reload()
+            })
+
         })
             .catch((error) => {
                 global.constants.loading = false
@@ -360,7 +366,7 @@ export default class Question extends Component {
         POST({
             url: "/a/cms/article/getAllArticle?",
             opts: {
-                title: searchTxt,
+                title: searchTxt || this.props.match.params.txt,
                 categoryId: "4812062598ec4b10bedfb38b59ea3e94"
             }
         }).then((response) => {
@@ -393,7 +399,8 @@ export default class Question extends Component {
             },
             beforeUpload: (file) => {
                 this.setState(state => ({
-                    fileList: [...state.fileList, file],
+                    //fileList: [...state.fileList, file],
+                    fileList: [file]
                 }));
                 return false;
             },
@@ -431,7 +438,7 @@ export default class Question extends Component {
                         </div>
                         <div className="fm-qj-tool clearfix">
                             <Upload className="upload-btn" {...props}>
-                                <a href="javascript:;" className="tl-img"><i className="icon-img"></i>图片</a>
+                                <a href="javascript:;" className="tl-img"><i className="icon-img"></i>{(fileList.length && fileList[0].name) || '图片'}</a>
                             </Upload>
                             {/* <a href="javascript:;" className="tl-img"><i className="icon-img"></i>图片</a> */}
                             <div className="u-select">

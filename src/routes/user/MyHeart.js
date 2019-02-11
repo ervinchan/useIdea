@@ -92,7 +92,7 @@ export default class MyHeart extends Component {
             return (
                 <li>
                     <div className="item">
-                        <a className="thumb-img" href={`/#/Bookstore/Bookbuy/${item.id}`}><img src={item.imageSrc} /></a>
+                        <a className="thumb-img" href={`/#/Bookstore/Bookbuy/${item.id}`}><img src={item.image} /></a>
                         <div className="tag">{item.category.name}</div>
                         <h1><a href={`/#/Bookstore/Bookbuy/${item.id}`}>{item.title}</a></h1>
                         <div className="alt clearfix">
@@ -128,7 +128,7 @@ export default class MyHeart extends Component {
         const categorys = global.constants.categorys
         return data && data.map((item, index) => {
             let Hours = FormatDate.apartHours(item.updateDate)
-            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours}小时前`;
+            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`;
             let router = ``
             switch (item.category.id) {
                 case categorys[0].id:

@@ -120,7 +120,7 @@ export default class Bookstore extends Component {
         return (
             firstReadTimeHotBooks[0] &&
             <div className="fs-tuijian">
-                <a className="thumb-img" href={`/#/Bookstore/Bookbuy/${firstReadTimeHotBooks[0].id}`}><img src={firstReadTimeHotBooks[0].imageSrc} /></a>
+                <a className="thumb-img" href={`/#/Bookstore/Bookbuy/${firstReadTimeHotBooks[0].id}`}><img src={firstReadTimeHotBooks[0].image} /></a>
                 <h1><a href="javascript:;">{firstReadTimeHotBooks[0].title}</a></h1>
                 <div className="txt">
                     {firstReadTimeHotBooks[0].description}
@@ -148,7 +148,7 @@ export default class Bookstore extends Component {
         return readTimeHotList && readTimeHotList.map((item, index) => {
             return (
                 <li>
-                    <a className="thumb-img" href={`/#/Bookstore/Bookbuy/${item.id}`}><img src={item.imageSrc} /></a>
+                    <a className="thumb-img" href={`/#/Bookstore/Bookbuy/${item.id}`}><img src={item.image} /></a>
                     <h1><a href={`/#/Bookstore/Bookbuy/${item.id}`}>{item.title}</a></h1>
                     <div className="alt clearfix">
                         <a href={`/#/Bookstore/Bookbuy/${item.id}`} className="j_name"><img src={item.user.img} className="thumb-img" />{item.author}</a>
@@ -167,7 +167,7 @@ export default class Bookstore extends Component {
         let Books = recommendBooks && recommendBooks.list && recommendBooks.list.map((item, index) => {
             let bookImagUrl = item.bookImagUrl.split('|')[1]
             let Hours = FormatDate.apartHours(item.updateDate)
-            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours}小时前`
+            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`
             return (
                 // <li key={index}>
                 //     <a className="swiper-slide" href={`/#/Bookstore/Bookbuy/${item.id}`}>

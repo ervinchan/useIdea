@@ -37,7 +37,8 @@ export default class QuestionArticle extends Component {
             commentList: [],
             articleInfo: {},
             commentRenderLen: 2,
-            userInfo: global.constants.userInfo
+            userInfo: global.constants.userInfo,
+            replyId: ''
         };
     }
 
@@ -105,13 +106,13 @@ export default class QuestionArticle extends Component {
     createBannerA = () => {
         const { bannerBList } = this.state
         return bannerBList.map((item, index) => {
-            return <a href={item.url} class="seat-x315"><img src={item.imageSrc} /></a>
+            return <a href={item.url} class="seat-x315"><img src={item.image} /></a>
         })
     }
     createBannerB = () => {
         const { bannerBList } = this.state
         let bannerList = bannerBList.map((item, index) => {
-            return <a href={item.url} class="swiper-slide seat-x315"><img src={item.imageSrc} /></a>
+            return <a href={item.url} class="swiper-slide seat-x315"><img src={item.image} /></a>
         })
         return (
             <div class="swiper-container">
@@ -190,11 +191,46 @@ export default class QuestionArticle extends Component {
         })
     }
 
+    // createCommentList = (data) => {
+    //     const { commentList } = this.state;
+    //     return commentList.list && commentList.list.map((item, index) => {
+    //         let Hours = FormatDate.apartHours(item.createDate)
+    //         let Time = Hours > 24 ? FormatDate.customFormat(item.createDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`
+    //         return (
+    //             <div class="fu_detail hidden" id="item11">
+    //                 <div class="fu_info">
+    //                     <a href="javascript:;" class="face">
+    //                         <img src={item.user.photo} />
+    //                     </a>
+    //                     <div class="alt clearfix">
+    //                         <a href="javascript:;" class="j_name">{item.name}</a>
+    //                         <span class="dot"></span>
+    //                         <span>{Time}</span>
+    //                     </div>
+    //                     <div class="txt">{item.authorDript || '此家伙很懒...'}</div>
+    //                 </div>
+    //                 <div class="fu_txt clearfix" dangerouslySetInnerHTML={{ __html: item.content }}>
+
+    //                 </div>
+    //                 <a href="javascript:;" class="jq-hidden" data-for="#item11"> <i class="fa-angle-up"></i></a>
+    //                 <div class="f-bartool clearfix">
+    //                     {/* <a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a> */}
+    //                     <a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a>
+    //                     <a href="javascript:;" onClick={() => this.handleComment(item)}><i className="icon-comment"></i><span>{item.commentNum}</span></a>
+    //                     {/* <a href="javascript:;"><i class="icon-thumbs"></i><span>36</span></a>
+    //                     <a href="javascript:;"><i class="icon-comment"></i><span>51</span></a> */}
+    //                     <a href="javascript:;"><i class="icon-link"></i><span>链接</span></a>
+    //                     <a href="javascript:;" class="tousu" onClick={() => this.handleComplaints(item)}>投诉内容</a>
+    //                 </div>
+    //             </div>
+    //         )
+    //     })
+    // }
     createCommentList = (data) => {
-        const { commentList } = this.state;
-        return commentList.list && commentList.list.map((item, index) => {
+        const userInfo = global.constants.userInfo;
+        return data.list && data.list.map((item, index) => {
             let Hours = FormatDate.apartHours(item.createDate)
-            let Time = Hours > 24 ? FormatDate.customFormat(item.createDate, 'yyyy/MM/dd') : `${Hours}小时前`
+            let Time = Hours > 24 ? FormatDate.customFormat(item.createDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`;
             return (
                 <div class="fu_detail hidden" id="item11">
                     <div class="fu_info">
@@ -209,19 +245,45 @@ export default class QuestionArticle extends Component {
                         <div class="txt">{item.authorDript || '此家伙很懒...'}</div>
                     </div>
                     <div class="fu_txt clearfix" dangerouslySetInnerHTML={{ __html: item.content }}>
-                        
+
                     </div>
                     <a href="javascript:;" class="jq-hidden" data-for="#item11"> <i class="fa-angle-up"></i></a>
                     <div class="f-bartool clearfix">
                         {/* <a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a> */}
                         <a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a>
-                        <a href="javascript:;" onClick={() => this.handleComment(item)}><i className="icon-comment"></i><span>{item.commentNum}</span></a>
+                        <a href="javascript:;" /*onClick={() => this.handleReply(item)}*/><i className="icon-comment"></i><span>{item.commentNum}</span></a>
                         {/* <a href="javascript:;"><i class="icon-thumbs"></i><span>36</span></a>
                         <a href="javascript:;"><i class="icon-comment"></i><span>51</span></a> */}
                         <a href="javascript:;"><i class="icon-link"></i><span>链接</span></a>
                         <a href="javascript:;" class="tousu" onClick={() => this.handleComplaints(item)}>投诉内容</a>
                     </div>
+                    {
+                        item.childComments &&
+                        <div className="disc-sub">
+                            {this.createCommentList(item.childComments)}
+                        </div>
+                    }
+                    <div class="replyfrom" style={{ display: (item.id === this.state.replyId ? "" : "none") }}><textarea placeholder="我来补充两句。"></textarea><a href="javascript:;" class="thumb"><img src={userInfo.photo} /></a><a href="javascript:;" class="artbtn" onClick={() => this.submitComment(item.id)}>留 言</a><a href="javascript:;" class="escbtn" data-el="replyesc">稍后再说</a></div>
                 </div>
+                // <div className="disc-item">
+                //     <a href="javascript:;" className="thumb"><img src={item.user.photo} /></a>
+                //     <div className="alt">
+                //         <a href="javascript:;" className="j_name" onClick={() => this.gotoRouter(`/UserNews${item.user.id}`)}>{item.name}</a><span className="dot"></span><span>{Time}</span>
+                //     </div>
+                //     <div className="txt">
+                //         {item.content}
+                //     </div>
+                //     <div className="bar">
+                //         <a href="javascript:;">投诉</a><a href="javascript:;" onClick={() => this.handleReply(item)}>回复</a><a href="javascript:;" className="thumbs" onClick={() => this.handleLike(item)}><i className="icon-thumbs-up"></i>{item.commentNum}</a>
+                //     </div>
+                //     {
+                //         item.childComments &&
+                //         <div className="disc-sub">
+                //             {this.createCommentList(item.childComments)}
+                //         </div>
+                //     }
+                //     <div class="replyfrom" style={{ display: (item.id === this.state.replyId ? "" : "none") }}><textarea placeholder="我来补充两句。"></textarea><a href="javascript:;" class="thumb"><img src={userInfo.photo} /></a><a href="javascript:;" class="artbtn" onClick={() => this.submitComment(item.id)}>留 言</a><a href="javascript:;" class="escbtn" data-el="replyesc">稍后再说</a></div>
+                // </div>
             )
         })
     }
@@ -247,23 +309,26 @@ export default class QuestionArticle extends Component {
     }
 
     //评论
-    handleComment = (item) => {
-        POST({
-            url: "/a/cms/article/complaints?",
-            opts: {
-                id: item.id
-            }
-        }).then((response) => {
-            global.constants.loading = false
-            if (response.data.status === 1) {
+    // handleComment = (item) => {
+    //     POST({
+    //         url: "/a/cms/article/complaints?",
+    //         opts: {
+    //             id: item.id
+    //         }
+    //     }).then((response) => {
+    //         global.constants.loading = false
+    //         if (response.data.status === 1) {
 
-            }
-            /* global layer */
-            layer.msg(response.data.message)
-        })
-            .catch((error) => {
-                console.log(error)
-            })
+    //         }
+    //         /* global layer */
+    //         layer.msg(response.data.message)
+    //     })
+    //         .catch((error) => {
+    //             console.log(error)
+    //         })
+    // }
+    handleReply = (item) => {
+        this.setState({ replyId: item.id })
     }
     //热门专栏
     getSpecialCol = () => {
@@ -327,7 +392,7 @@ export default class QuestionArticle extends Component {
             return (
                 <li>
                     <div className="item">
-                        <a className="thumb-img" href={`/#/Bookstore/Bookbuy/${item.id}`}><img src={item.imageSrc} /></a>
+                        <a className="thumb-img" href={`/#/Bookstore/Bookbuy/${item.id}`}><img src={item.image} /></a>
                         <div className="tag">{item.category.name}</div>
                         <h1><a href={`/#/Bookstore/Bookbuy/${item.id}`}>{item.title}</a></h1>
                         <div className="alt clearfix">
@@ -428,7 +493,7 @@ export default class QuestionArticle extends Component {
         let Time = null
         if (articleInfo) {
             let Hours = FormatDate.apartHours(articleInfo.createDate)
-            Time = Hours > 24 ? FormatDate.customFormat(articleInfo.createDate, 'yyyy/MM/dd') : `${Hours}小时前`
+            Time = Hours > 24 ? FormatDate.customFormat(articleInfo.createDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`
         }
         let commentRenderList = commentList.list && commentList.list.slice(0, commentRenderLen)
 
@@ -449,9 +514,9 @@ export default class QuestionArticle extends Component {
                                     <a href="javascript:;" class="tag">文案技巧</a>
                                 </div>
                                 <div class="txt clearfix">
-                                    <img src="css/images/280x180.png" class="thumb-img" />
+                                    <img src={articleInfo.image} class="thumb-img" />
                                     <div class="box">
-                                        {articleInfo.description}
+                                        {articleInfo.articleData && articleInfo.articleData.content}
                                         <a href="javascript:;">显示全部 <i class="fa-angle-down"></i></a>
                                     </div>
                                 </div>
@@ -501,7 +566,7 @@ export default class QuestionArticle extends Component {
                                     </div>
                                 </div> */}
                             </div>
-                            {this.createCommentList()}
+                            {this.createCommentList(commentList)}
                             {/* <div class="fu_detail">
                                 <div class="fu_info">
                                     <a href="#" class="face">

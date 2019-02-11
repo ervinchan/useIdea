@@ -177,8 +177,8 @@ export default class UserCenter extends Component {
                         </ul> */}
                         <Tabs ref={e => this.tabDom = e} className="clearfix" onChange={this.handleTabChange}>
                             <TabPane tab={["来信中心", <i className="badge">99+</i>]} key="news" className="qj-news"><MyWork /></TabPane>
-                            <TabPane tab="我的作品" key="reco"><MyWork data={this.state.listData} /></TabPane>
-                            <TabPane tab="我的心选" key="reply"><MyHeart data={this.state.collectList} /></TabPane>
+                            <TabPane tab="我的作品" key="reco"><MyWork data={this.state.listData} history = {this.props.history}/></TabPane>
+                            <TabPane tab="我的心选" key="reply"><MyHeart data={this.state.collectList} history = {this.props.history}/></TabPane>
                         </Tabs>
                         <a href="javascript:;" class="edit">更新个人资料</a>
                     </div>

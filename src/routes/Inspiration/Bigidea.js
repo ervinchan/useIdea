@@ -158,11 +158,11 @@ export default class Bigidea extends Component {
         const { BigIdeaDatas } = this.state
         return BigIdeaDatas.list && BigIdeaDatas.list.map((item, index) => {
             let Hours = FormatDate.apartHours(item.updateDate)
-            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours}小时前`
+            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`
             return (
                 <div className="item user">
                     <a className="thumb-img" href={`/#/Inspiration/Article/${item.id}`}>
-                        <img src={item.imageSrc} />
+                        <img src={item.image} />
                     </a>
                     <div className="tit"><a href={`/#/Inspiration/Article/${item.id}`}>{item.title}</a></div>
                     <div className="txt">{item.description}</div>
@@ -198,7 +198,7 @@ export default class Bigidea extends Component {
         return authorList && authorList.map((item, index) => {
             return (
                 <li>
-                    <a href="javascript:;" onClick={this.gotoUserCenter}>
+                    <a href="javascript:;" onClick={()=>this.gotoRouter(`/UserNews/${item.user && item.user.id}`)}>
                         <em><img src={item.userImg} /></em>
                         <span>{item.name}</span>
                         <i className="fa-angle-right"></i>
@@ -207,7 +207,9 @@ export default class Bigidea extends Component {
             )
         })
     }
-
+    gotoRouter = (router)=>{
+        this.props.history.push(router)
+    }
     createSpecialCol = () => {
         const { specialCol } = this.state
         return specialCol && specialCol.map((item, index) => {
@@ -227,7 +229,7 @@ export default class Bigidea extends Component {
                     <li>
                         <a href="#" className="thumb-img">
                             <span>{index + 1}</span>
-                            <img src={item.imageSrc} />
+                            <img src={item.image} />
                         </a>
                         <h1><a href="#">{item.name}</a></h1>
                         <h3>{item.author}</h3>

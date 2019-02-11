@@ -144,7 +144,7 @@ const App = () => (
         <Switch>
             <Redirect from='/refresh' to='/' />
             <Route exact path="/" breadcrumbName="首页" component={Home} />
-            <Route exact path="/Question" breadcrumbName="请教" component={Question} />
+            <Route exact path="/Question/:txt?" breadcrumbName="请教" component={Question} />
             <Route exact path="/Question/Article/:qid?" breadcrumbName="请教" component={QuestionArticle} />
             <Route exact path="/Bookstore" breadcrumbName="蜗牛翻书" component={Bookstore} />
             <Route exact path="/Bookstore/NewBooks/:tid?" breadcrumbName="书单上新" component={Bookstore} />
