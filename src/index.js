@@ -7,6 +7,7 @@ import { Spin } from 'antd';
 import { HashRouter as Router, Route, Switch, Redirect } from 'react-router-dom'
 import Loadable from 'react-loadable';
 import Loading from './common/Loading/Index'
+import Service from './service/api.js'
 import './service/interceptors.js';
 import './static/less/reset.less';
 import './index.less';
@@ -18,6 +19,13 @@ import './static/less/module.less';
 import * as serviceWorker from './serviceWorker';
 
 //const Loading = () => <div className="positionC"><Spin tip="加载中..." /></div>;
+
+Service.GetADPosList().then((response) => {
+    global.constants.loading = false
+    if (response.data.status === 1) {
+        sessionStorage.setItem("AD", JSON.stringify(response.data.data))
+    }
+})
 
 const Home = Loadable({
     loader: () => import('./routes/Home/Index'),
@@ -138,6 +146,51 @@ const RegFinish = Loadable({
     loading: Loading,
 });
 
+const newMessage = Loadable({
+    loader: () => import('./routes/User/newMessage'),
+    loading: Loading,
+});
+const QyWork = Loadable({
+    loader: () => import('./routes/qy/Work'),
+    loading: Loading,
+});
+const QyJob = Loadable({
+    loader: () => import('./routes/qy/Job'),
+    loading: Loading,
+});
+const QyInfo = Loadable({
+    loader: () => import('./routes/qy/Info'),
+    loading: Loading,
+});
+const QyAd = Loadable({
+    loader: () => import('./routes/qy/Ad'),
+    loading: Loading,
+});
+const QyHome = Loadable({
+    loader: () => import('./routes/qy/Index'),
+    loading: Loading,
+});
+const QyJobAdd = Loadable({
+    loader: () => import('./routes/qy/JobAdd'),
+    loading: Loading,
+});
+const Qyspace = Loadable({
+    loader: () => import('./routes/qy/Space'),
+    loading: Loading,
+});
+const QyspaceArticle = Loadable({
+    loader: () => import('./routes/qy/SpaceArticle'),
+    loading: Loading,
+});
+const QyspaceJobList = Loadable({
+    loader: () => import('./routes/qy/SpaceJobList'),
+    loading: Loading,
+});
+const QyspaceJobInfo = Loadable({
+    loader: () => import('./routes/qy/SpaceJobInfo'),
+    loading: Loading,
+});
+
 
 const App = () => (
     <Router>
@@ -149,7 +202,7 @@ const App = () => (
             <Route exact path="/Bookstore" breadcrumbName="蜗牛翻书" component={Bookstore} />
             <Route exact path="/Bookstore/NewBooks/:tid?" breadcrumbName="书单上新" component={Bookstore} />
             <Route exact path="/Bookstore/Bookbuy/:id" breadcrumbName="书单详情" component={Bookbuy} />
-            <Route exact path="/Bookstore/ReadingTime" breadcrumbName="阅读场景" component={ReadingTime} />
+            <Route exact path="/ReadingTime" breadcrumbName="阅读场景" component={ReadingTime} />
             <Route exact path="/Inspiration" breadcrumbName="见识灵感" component={Bigidea} />
             <Route exact path="/Inspiration/Interview/:tid?" breadcrumbName="专访幕后" component={Interview} />
             <Route exact path="/Inspiration/Viewpoint" breadcrumbName="醒来再读" component={Viewpoint} />
@@ -172,6 +225,18 @@ const App = () => (
             <Route exact path="/RegQy" breadcrumbName="企业注册" component={RegQy} />
             <Route exact path="/RegInfo" breadcrumbName="企业注册信息" component={RegInfo} />
             <Route exact path="/RegFinish" breadcrumbName="注册成功" component={RegFinish} />
+
+            {/* <Route exact path="/newMessage/:uid?" component={newMessage} />
+            <Route exact path="/QyWork/:uid?" component={QyWork} /> */}
+            <Route exact path="/QyJob/:uid?" component={QyJob} />
+            <Route exact path="/QyInfo/:uid?" component={QyInfo} />
+            <Route exact path="/QyAd/:uid?" component={QyAd} />
+            <Route exact path="/QyHome/:uid?" component={QyHome} />
+            <Route exact path="/QyJobAdd/:uid?" component={QyJobAdd} />
+            <Route exact path="/Qyspace/:uid?" component={Qyspace} />
+            {/* <Route exact path="/QyspaceArticle/:uid?" component={QyspaceArticle} /> */}
+            {/* <Route exact path="/QyspaceJobList/:uid?" component={QyspaceJobList} /> */}
+            <Route exact path="/QyspaceJobInfo/:id?" component={QyspaceJobInfo} />
         </Switch>
     </Router>
 );

@@ -1,22 +1,19 @@
 import React, { Component } from 'react';
 import { Input, Tabs, Pagination } from 'antd';
-import axios from 'axios'
 import $ from 'jquery'
 import Swiper from 'swiper/dist/js/swiper.min.js'
 import FormatDate from '../../static/js/utils/formatDate.js'
 import Utils from '../../static/js/utils/utils.js'
-
+import Service from '../../service/api.js'
 import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
 import WheelBanner from '../../common/wheelBanner/Index'
 import BookMenu from '../../common/bookMenu/Menu'
 import HotRead from '../../common/hotRead/Index'
-import SwiperList from '../../common/swiperList/Index'
 import 'swiper/dist/css/swiper.min.css'
 
 import 'antd/lib/pagination/style/index.css';
 import '../../static/less/bookstore.less';
-import { list } from 'postcss';
 
 const PAGESIZE = 3;
 
@@ -43,7 +40,7 @@ export default class Bookstore extends Component {
     componentDidMount() {
         this.getRecommendBooks();
         let locationState = this.props.location.state
-        this.getHotBooks(locationState.navId);
+        this.getHotBooks("dc1b3e874dcd4f808be1d90b68a85c3d");
     }
 
     handleFavorite = (index) => {
@@ -66,8 +63,9 @@ export default class Bookstore extends Component {
 
     //主编荐书
     getRecommendBooks = () => {
-        let url = '/zsl/a/book/bookManager/bookSoft?isRecommend=1'
-        axios.post(url)
+        Service.GetBooks({
+            isRecommend: 1
+        })
             .then((response) => {
                 let recommendBooks = response.data.data
                 this.setState({ recommendBooks })
@@ -79,15 +77,10 @@ export default class Bookstore extends Component {
 
     //获取阅读场景数据
     getHotBooks = (categoryId) => {
-        let url = '/zsl/a/cms/article/getAllArticle?'
-        let opts = {
+        Service.GetAllArticle({
             hits: 1,
             categoryId: categoryId || ''
-        }
-        for (var key in opts) {
-            opts[key] && (url += "&" + key + "=" + opts[key])
-        }
-        axios.post(url, opts)
+        })
             .then((response) => {
                 if (categoryId) {
                     let readTimeHotBooks = response.data.data
@@ -151,7 +144,7 @@ export default class Bookstore extends Component {
                     <a className="thumb-img" href={`/#/Bookstore/Bookbuy/${item.id}`}><img src={item.image} /></a>
                     <h1><a href={`/#/Bookstore/Bookbuy/${item.id}`}>{item.title}</a></h1>
                     <div className="alt clearfix">
-                        <a href={`/#/Bookstore/Bookbuy/${item.id}`} className="j_name"><img src={item.user.img} className="thumb-img" />{item.author}</a>
+                        <a href={`/#/Bookstore/Bookbuy/${item.id}`} className="j_name"><img src={item.user.img} className="thumb-img" />{item.user.name}</a>
                         <span className="dot"></span>
                         <span>{item.description}</span>
                     </div>
@@ -166,14 +159,13 @@ export default class Bookstore extends Component {
         const { recommendBooks, banner, readList } = this.state;
         let Books = recommendBooks && recommendBooks.list && recommendBooks.list.map((item, index) => {
             let bookImagUrl = item.bookImagUrl.split('|')[1]
-            let Hours = FormatDate.apartHours(item.updateDate)
-            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`
+            let Time = FormatDate.formatTime(item.updateDate)
             return (
                 // <li key={index}>
                 //     <a className="swiper-slide" href={`/#/Bookstore/Bookbuy/${item.id}`}>
                 //         <em><img src={bookImagUrl} /></em>
                 //         <h1>{item.bookName}</h1>
-                //         <h3> {item.author}</h3>
+                //         <h3> {item.user.name}</h3>
                 //         <div className="txt">{item.authorIntroduce}</div>
                 //     </a>
                 // </li>
@@ -186,7 +178,7 @@ export default class Bookstore extends Component {
                     <h1><a href="#">{item.bookName}</a></h1>
                     <div className="txt">{item.authorIntroduce}</div>
                     <div className="bar">
-                        <span>{item.author}</span><span>·</span><span>{Time}</span>
+                        <span>{item.user.name}</span><span>·</span><span>{Time}</span>
                     </div>
                 </li>
             )
@@ -197,7 +189,7 @@ export default class Bookstore extends Component {
                 {/* 头部 */}
                 < Header />
                 {/* 轮播banner */}
-                <WheelBanner />
+                <WheelBanner categoryId={"dc1b3e874dcd4f808be1d90b68a85c3d"} />
 
                 <div className="g-fanshu wrapper">
                     <div className="g-left">

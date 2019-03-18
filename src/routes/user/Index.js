@@ -5,15 +5,13 @@ import { StickyContainer, Sticky } from 'react-sticky';
 
 //import $ from 'jquery'
 import Swiper from 'swiper/dist/js/swiper.min.js'
-import axios from 'axios'
 
 import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
-
+import Service from '../../service/api.js'
 import 'swiper/dist/css/swiper.min.css'
 import '../../static/less/u.icenter.less'
 import 'antd/lib/tabs/style/index.less';
-import { POST } from '../../service/service'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
 import userImg from "../../static/images/user/userTx.jpg"
@@ -84,11 +82,8 @@ export default class UserCenter extends Component {
     }
 
     getCollectList = () => {
-        POST({
-            url: "/a/artuser/articleCollect/collectList?",
-            opts: {
-                userId: global.constants.userInfo.id
-            }
+        Service.GetCollectList({
+            userId: JSON.parse(sessionStorage.getItem("userInfo")).id
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -100,11 +95,8 @@ export default class UserCenter extends Component {
             })
     }
     getMyWork = () => {
-        POST({
-            url: "/a/cms/article/latestAction?",
-            opts: {
-                userId: global.constants.userInfo.id
-            }
+        Service.GetLatestAction({
+            userId: JSON.parse(sessionStorage.getItem("userInfo")).id
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -117,7 +109,7 @@ export default class UserCenter extends Component {
     }
     render() {
         const { fileList } = this.state;
-        const userInfo = global.constants.userInfo
+        const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
         const tabTit = `来信中心`;
         const props = {
             onRemove: (file) => {
@@ -168,7 +160,7 @@ export default class UserCenter extends Component {
                     </div>
                 </div>
                 <div class="wrapper g-icenter minpage">
-                    <div class="ue-tabnav">
+                    <div class="uc-tabnav">
                         {/* <ul class="clearfix">
                             <li><a href="u_mylaixin.html">来信中心<i class="badge">99+</i> </a></li>
                             <li class="active"><a href="u_mywork.html">我的作品</a></li>
@@ -177,10 +169,10 @@ export default class UserCenter extends Component {
                         </ul> */}
                         <Tabs ref={e => this.tabDom = e} className="clearfix" onChange={this.handleTabChange}>
                             <TabPane tab={["来信中心", <i className="badge">99+</i>]} key="news" className="qj-news"><MyWork /></TabPane>
-                            <TabPane tab="我的作品" key="reco"><MyWork data={this.state.listData} history = {this.props.history}/></TabPane>
-                            <TabPane tab="我的心选" key="reply"><MyHeart data={this.state.collectList} history = {this.props.history}/></TabPane>
+                            <TabPane tab="我的作品" key="reco"><MyWork data={this.state.listData} history={this.props.history} /></TabPane>
+                            <TabPane tab="我的心选" key="reply"><MyHeart data={this.state.collectList} history={this.props.history} /></TabPane>
                         </Tabs>
-                        <a href="javascript:;" class="edit">更新个人资料</a>
+                        <a href="javascript:;" class="edit" onClick={() => this.gotoRouter(`/InfoUpDate/${userInfo.id}`)}>更新个人资料</a>
                     </div>
 
                 </div>

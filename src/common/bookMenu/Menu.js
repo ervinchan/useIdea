@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Input, Tabs } from 'antd';
 import Slider from "react-slick";
 import { StickyContainer, Sticky } from 'react-sticky';
-import axios from 'axios';
+import Service from '../../service/api.js'
 import $ from 'jquery'
 
 export default class BookMenu extends Component {
@@ -16,7 +16,7 @@ export default class BookMenu extends Component {
 
     componentDidMount() {
         let that = this
-        axios.post('/zsl/a/classificationtree/classificationtree/findClassification')
+        Service.GetBooksMenu()
             .then((response) => {
                 let booksMenu = response.data.data
                 this.setState({ booksMenu })

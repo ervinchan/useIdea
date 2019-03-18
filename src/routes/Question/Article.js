@@ -1,18 +1,16 @@
 import React, { Component } from 'react';
 import { Input, Tabs, Pagination } from 'antd';
-import axios from 'axios'
 import $ from 'jquery'
 import Swiper from 'swiper/dist/js/swiper.min.js'
 import FormatDate from '../../static/js/utils/formatDate.js'
-import Utils from '../../static/js/utils/utils.js'
 
 import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
-import WheelBanner from '../../common/wheelBanner/Index'
 import HotRead from '../../common/hotRead/Index'
+import Service from '../../service/api.js'
+import Utils from '../../static/js/utils/utils.js'
 //import Editor from 'rc-wang-editor'
 import ed from 'wangeditor'
-import { POST } from '../../service/service'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
 import 'swiper/dist/css/swiper.min.css'
@@ -21,6 +19,7 @@ import 'antd/lib/pagination/style/index.css';
 import '../../static/less/question.less'
 //import { userInfo } from 'os';
 
+import defaultPhoto from "../../static/images/user/default.png"
 const PAGESIZE = 3;
 
 export default class QuestionArticle extends Component {
@@ -37,7 +36,7 @@ export default class QuestionArticle extends Component {
             commentList: [],
             articleInfo: {},
             commentRenderLen: 2,
-            userInfo: global.constants.userInfo,
+            userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
             replyId: ''
         };
     }
@@ -85,23 +84,18 @@ export default class QuestionArticle extends Component {
         this.getSpecialCol()
         this.getQuestionList()
         this.getCommentList()
-        this.getBannerA()
     }
+
     getBannerA = () => {
-        POST({
-            url: "/a/cms/article/adsList?",
-            opts: {
-                categoryId: "981892a5c2394fe7b01ce706d917699e"
-            }
+        Service.GetADList({
+            categoryId: "4812062598ec4b10bedfb38b59ea3e94",
+            id: "588e4f30e9634523b34b5c913bfa4cd2"
         }).then((response) => {
             if (response.data.status === 1) {
-                this.setState({ bannerAList: response.data.data.slice(0, 2) })
-                this.setState({ bannerBList: response.data.data.slice(2) })
+                this.setState({ bannerAList: response.data.data.slice(0, 1) })
+                this.setState({ bannerBList: response.data.data.slice(1, 4) })
             }
         })
-            .catch((error) => {
-                console.log(error)
-            })
     }
     createBannerA = () => {
         const { bannerBList } = this.state
@@ -129,46 +123,32 @@ export default class QuestionArticle extends Component {
     }
     getArticleInfo = (categoryId) => {
 
-        POST({
-            url: "/a/cms/article/getAllArticle?",
-            opts: {
-                id: this.props.match.params.qid,
-                categoryId: "4812062598ec4b10bedfb38b59ea3e94"
-            }
+        Service.GetAllArticle({
+            id: this.props.match.params.qid,
+            categoryId: "4812062598ec4b10bedfb38b59ea3e94"
         }).then((response) => {
             if (response.data.status === 1) {
                 let articleInfo = response.data.data
                 this.setState({ articleInfo })
             }
         })
-            .catch((error) => {
-                console.log(error)
-            })
     }
 
     getCommentList = (categoryId) => {
 
-        POST({
-            url: "/a/cms/comment/consultationList?",
-            opts: {
-                contentId: this.props.match.params.qid,
-                categoryId: "4812062598ec4b10bedfb38b59ea3e94"
-            }
+        Service.GetCommentList({
+            contentId: this.props.match.params.qid,
+            categoryId: "4812062598ec4b10bedfb38b59ea3e94"
         }).then((response) => {
             if (response.data.status === 1) {
                 let commentList = response.data.data
                 this.setState({ commentList })
             }
         })
-            .catch((error) => {
-                console.log(error)
-            })
     }
 
     getQuestionList = () => {
-        POST({
-            url: "/a/cms/comment/consultationList"
-        }).then((response) => {
+        Service.GetQuestion().then((response) => {
             if (response.data.status === 1) {
                 global.constants.loading = false
                 let questionList = response.data.data
@@ -200,7 +180,7 @@ export default class QuestionArticle extends Component {
     //             <div class="fu_detail hidden" id="item11">
     //                 <div class="fu_info">
     //                     <a href="javascript:;" class="face">
-    //                         <img src={item.user.photo} />
+    //                         <img src={item.user.photo  || defaultPhoto} />
     //                     </a>
     //                     <div class="alt clearfix">
     //                         <a href="javascript:;" class="j_name">{item.name}</a>
@@ -227,15 +207,14 @@ export default class QuestionArticle extends Component {
     //     })
     // }
     createCommentList = (data) => {
-        const userInfo = global.constants.userInfo;
+        const userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
         return data.list && data.list.map((item, index) => {
-            let Hours = FormatDate.apartHours(item.createDate)
-            let Time = Hours > 24 ? FormatDate.customFormat(item.createDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`;
+            let Time = FormatDate.formatTime(item.createDate)
             return (
                 <div class="fu_detail hidden" id="item11">
                     <div class="fu_info">
                         <a href="javascript:;" class="face">
-                            <img src={item.user.photo} />
+                            <img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
                         </a>
                         <div class="alt clearfix">
                             <a href="javascript:;" class="j_name">{item.name}</a>
@@ -263,10 +242,10 @@ export default class QuestionArticle extends Component {
                             {this.createCommentList(item.childComments)}
                         </div>
                     }
-                    <div class="replyfrom" style={{ display: (item.id === this.state.replyId ? "" : "none") }}><textarea placeholder="我来补充两句。"></textarea><a href="javascript:;" class="thumb"><img src={userInfo.photo} /></a><a href="javascript:;" class="artbtn" onClick={() => this.submitComment(item.id)}>留 言</a><a href="javascript:;" class="escbtn" data-el="replyesc">稍后再说</a></div>
+                    <div class="replyfrom" style={{ display: (item.id === this.state.replyId ? "" : "none") }}><textarea placeholder="我来补充两句。"></textarea><a href="javascript:;" class="thumb"><img src={userInfo.photo || defaultPhoto} onError={Utils.setDefaultPhoto} /></a><a href="javascript:;" class="artbtn" onClick={() => this.submitComment(item.id)}>留 言</a><a href="javascript:;" class="escbtn" data-el="replyesc">稍后再说</a></div>
                 </div>
                 // <div className="disc-item">
-                //     <a href="javascript:;" className="thumb"><img src={item.user.photo} /></a>
+                //     <a href="javascript:;" className="thumb"><img src={item.user.photo  || defaultPhoto} /></a>
                 //     <div className="alt">
                 //         <a href="javascript:;" className="j_name" onClick={() => this.gotoRouter(`/UserNews${item.user.id}`)}>{item.name}</a><span className="dot"></span><span>{Time}</span>
                 //     </div>
@@ -282,7 +261,7 @@ export default class QuestionArticle extends Component {
                 //             {this.createCommentList(item.childComments)}
                 //         </div>
                 //     }
-                //     <div class="replyfrom" style={{ display: (item.id === this.state.replyId ? "" : "none") }}><textarea placeholder="我来补充两句。"></textarea><a href="javascript:;" class="thumb"><img src={userInfo.photo} /></a><a href="javascript:;" class="artbtn" onClick={() => this.submitComment(item.id)}>留 言</a><a href="javascript:;" class="escbtn" data-el="replyesc">稍后再说</a></div>
+                //     <div class="replyfrom" style={{ display: (item.id === this.state.replyId ? "" : "none") }}><textarea placeholder="我来补充两句。"></textarea><a href="javascript:;" class="thumb"><img src={userInfo.photo  || defaultPhoto} /></a><a href="javascript:;" class="artbtn" onClick={() => this.submitComment(item.id)}>留 言</a><a href="javascript:;" class="escbtn" data-el="replyesc">稍后再说</a></div>
                 // </div>
             )
         })
@@ -290,11 +269,8 @@ export default class QuestionArticle extends Component {
 
     //投诉
     handleComplaints = (item) => {
-        POST({
-            url: "/a/cms/article/complaints?",
-            opts: {
-                id: item.id
-            }
+        Service.Complaints({
+            id: item.id
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -303,9 +279,6 @@ export default class QuestionArticle extends Component {
             /* global layer */
             layer.msg(response.data.message)
         })
-            .catch((error) => {
-                console.log(error)
-            })
     }
 
     //评论
@@ -333,20 +306,14 @@ export default class QuestionArticle extends Component {
     //热门专栏
     getSpecialCol = () => {
 
-        POST({
-            url: "/a/cms/category/navigationBar?",
-            opts: {
-                subscriber: 0
-            }
+        Service.GetNav({
+            subscriber: 0
         }).then((response) => {
             if (response.data.status === 1) {
                 let specialCol = response.data.data
                 this.setState({ specialCol })
             }
         })
-            .catch((error) => {
-                console.log(error)
-            })
     }
 
     createSpecialCol = () => {
@@ -360,7 +327,7 @@ export default class QuestionArticle extends Component {
                             <img src={item.image} />
                         </a>
                         <h1><a href="javascript:;">{item.name}</a></h1>
-                        <h3>{item.author}</h3>
+                        <h3>{item.user.name}</h3>
                     </li>
                 )
             } else {
@@ -371,7 +338,7 @@ export default class QuestionArticle extends Component {
                             <img src={item.image} />
                         </a>
                         <h1><a href="#">{item.name}</a></h1>
-                        <h3>{item.author}</h3>
+                        <h3>{item.user.name}</h3>
                         <div className="alt">
                             {
                                 item.user &&
@@ -396,7 +363,7 @@ export default class QuestionArticle extends Component {
                         <div className="tag">{item.category.name}</div>
                         <h1><a href={`/#/Bookstore/Bookbuy/${item.id}`}>{item.title}</a></h1>
                         <div className="alt clearfix">
-                            <a href="#" className="j_name"><img src={item.user.img} className="thumb-img" />{item.author}</a>
+                            <a href="#" className="j_name"><img src={item.user.img} className="thumb-img" />{item.user.name}</a>
                             <span className="dot"></span>
                             <span>{item.description}</span>
                         </div>
@@ -407,11 +374,8 @@ export default class QuestionArticle extends Component {
     }
 
     handleLike = (item) => {
-        POST({
-            url: "/a/cms/article/like?",
-            opts: {
-                id: item.id
-            }
+        Service.AddLike({
+            id: item.id
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -421,17 +385,11 @@ export default class QuestionArticle extends Component {
             /* global layer */
             layer.msg(response.data.message)
         })
-            .catch((error) => {
-                console.log(error)
-            })
     }
     handleCollect = (item) => {
-        POST({
-            url: "/a/artuser/articleCollect/collectArticle?",
-            opts: {
-                userId: 1,
-                articleId: item.id
-            }
+        Service.AddCollect({
+            userId: 1,
+            articleId: item.id
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -442,9 +400,6 @@ export default class QuestionArticle extends Component {
             /* global layer */
             layer.msg(response.data.message)
         })
-            .catch((error) => {
-                console.log(error)
-            })
     }
 
     handlePageChange = (page, pageSize) => {
@@ -455,17 +410,14 @@ export default class QuestionArticle extends Component {
 
     submitComment = () => {
         const { userInfo, articleInfo } = this.state;
-        POST({
-            url: "/f/comment?",
-            opts: {
-                title: articleInfo.title,
-                categoryId: "4812062598ec4b10bedfb38b59ea3e94",
-                contentId: this.props.match.params.qid,
-                replyId: '',
-                name: userInfo.id,
-                isValidate: "0",
-                content: this.state.EditorVal
-            }
+        Service.SubmitComment({
+            title: articleInfo.title,
+            categoryId: "4812062598ec4b10bedfb38b59ea3e94",
+            contentId: this.props.match.params.qid,
+            replyId: '',
+            name: userInfo.id,
+            isValidate: "0",
+            content: this.state.EditorVal
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -490,11 +442,7 @@ export default class QuestionArticle extends Component {
 
     render() {
         const { toolList, articleInfo, commentList, commentRenderLen } = this.state;
-        let Time = null
-        if (articleInfo) {
-            let Hours = FormatDate.apartHours(articleInfo.createDate)
-            Time = Hours > 24 ? FormatDate.customFormat(articleInfo.createDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`
-        }
+        let Time = articleInfo ? FormatDate.formatTime(articleInfo.createDate) : null;
         let commentRenderList = commentList.list && commentList.list.slice(0, commentRenderLen)
 
         return (
@@ -508,7 +456,7 @@ export default class QuestionArticle extends Component {
                             <div class="qj-article">
                                 <h1>{articleInfo.title}</h1>
                                 <div class="alt clearfix">
-                                    <a href="javascript:;" class="j_name"><img src={articleInfo.user && articleInfo.user.photo} class="thumb-img" />{articleInfo.author}</a>
+                                    <a href="javascript:;" class="j_name"><img src={articleInfo.user && (articleInfo.user.photo || defaultPhoto)} class="thumb-img" />{articleInfo.user.name}</a>
                                     <span>▪</span>
                                     <span>{Time}</span>
                                     <a href="javascript:;" class="tag">文案技巧</a>
@@ -635,6 +583,7 @@ export default class QuestionArticle extends Component {
                     </div>
                     <div class="g-right">
                         {this.createBannerA()}
+                        {this.createBannerC()}
                         <div class="u-title4">
                             <b>相关问题</b>
                         </div>

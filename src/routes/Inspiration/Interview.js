@@ -1,21 +1,16 @@
 import React, { Component } from 'react';
 import { Input, Tabs, Pagination } from 'antd';
-import axios from 'axios'
-import $ from 'jquery'
-import Swiper from 'swiper/dist/js/swiper.min.js'
 import FormatDate from '../../static/js/utils/formatDate.js'
 import Utils from '../../static/js/utils/utils.js'
-
+import Service from '../../service/api.js'
 import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
 import WheelBanner from '../../common/wheelBanner/Index'
-import BookMenu from '../../common/bookMenu/Menu'
 import HotRead from '../../common/hotRead/Index'
 import 'swiper/dist/css/swiper.min.css'
 
 import 'antd/lib/pagination/style/index.css';
 import '../../static/less/bigidea.less';
-import { list } from 'postcss';
 
 const PAGESIZE = 3;
 
@@ -42,14 +37,9 @@ export default class Interview extends Component {
     }
 
     getInterViews = (categoryId) => {
-        let url = '/zsl/a/cms/article/getAllArticle?'
-        let opts = {
+        Service.GetAllArticle({
             categoryId: categoryId || ''
-        }
-        for (var key in opts) {
-            opts[key] && (url += "&" + key + "=" + opts[key])
-        }
-        axios.post(url, opts)
+        })
             .then((response) => {
                 if (categoryId) {
                     let inrerviewList = response.data.data
@@ -71,10 +61,10 @@ export default class Interview extends Component {
             return (
                 <li>
                     <div class="item">
-                        <a class="thumb-img" href={`/#/Inspiration/Article/${item.id}`}><img src="{item.image} " /></a>
+                        <a class="thumb-img" href={`/#/Inspiration/Article/${item.id}`}><img src={item.image} /></a>
                         <div class="tag">{item.category.name}</div>
                         <h1><a href={`/#/Inspiration/Article/${item.id}`}>{item.title}</a></h1>
-                        <div class="author">{item.author}</div>
+                        <div class="author">{item.user.name}</div>
                         <a class="more" href={`/#/Inspiration/Article/${item.id}`}>MORE<i class="fa-angle-right"></i></a>
                     </div>
                 </li>
@@ -82,17 +72,6 @@ export default class Interview extends Component {
         })
     }
 
-    handleFavorite = (index) => {
-        const { readList } = this.state;
-        readList[index].favorite++;
-        this.setState(readList);
-    }
-
-    handleLikes = (index) => {
-        const { readList } = this.state;
-        readList[index].like++;
-        this.setState(readList);
-    }
 
     handlePageChange = (page, pageSize) => {
         console.log(page, pageSize)
@@ -108,7 +87,7 @@ export default class Interview extends Component {
                 {/* 头部 */}
                 < Header />
                 {/* 轮播banner */}
-                <WheelBanner />
+                <WheelBanner categoryId={"299c0a633b87429aa72c66656121427c"} />
 
                 <div class="u-title2 wrapper">
                     <h1 class="font-28 pt20">幕后创造者</h1>

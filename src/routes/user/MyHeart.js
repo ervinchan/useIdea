@@ -1,20 +1,16 @@
 import React, { Component } from 'react';
 import { Input, Tabs, Pagination } from 'antd';
-import axios from 'axios'
 import $ from 'jquery'
 import Swiper from 'swiper/dist/js/swiper.min.js'
 import FormatDate from '../../static/js/utils/formatDate.js'
 import Utils from '../../static/js/utils/utils.js'
-
-import Header from '../../common/header/Index.js'
-import Footer from '../../common/footer/Index.js'
-import WheelBanner from '../../common/wheelBanner/Index'
-import HotRead from '../../common/hotRead/Index'
+import Service from '../../service/api.js'
 import 'swiper/dist/css/swiper.min.css'
 
 import 'antd/lib/pagination/style/index.css';
 import '../../static/less/question.less'
 
+import defaultPhoto from "../../static/images/user/default.png"
 const PAGESIZE = 3;
 
 export default class MyHeart extends Component {
@@ -52,35 +48,29 @@ export default class MyHeart extends Component {
     }
 
     getArticleInfo = (categoryId) => {
-        let url = '/zsl/a/cms/article/getAllArticle?'
-        let opts = {
+        Service.GetAllArticle({
             hits: 1,
             categoryId: categoryId || ''
-        }
-        for (var key in opts) {
-            opts[key] && (url += "&" + key + "=" + opts[key])
-        }
-        axios.post(url, opts)
-            .then((response) => {
-                if (categoryId) {
-                    let toolList = response.data.data
-                    this.setState({ toolList })
-                } else {
-                    let hotBooks = response.data.data
-                    this.setState({ hotBooks }, () => {
-                        var swiper_read = new Swiper('.m-read-fade .swiper-container', {
-                            effect: 'fade',
-                            pagination: {
-                                el: '.m-read-fade .u-pagination',
-                                bulletclassName: 'bull',
-                                bulletActiveclassName: 'active',
-                                clickable: true
-                            }
-                        });
-                    })
-                }
+        }).then((response) => {
+            if (categoryId) {
+                let toolList = response.data.data
+                this.setState({ toolList })
+            } else {
+                let hotBooks = response.data.data
+                this.setState({ hotBooks }, () => {
+                    var swiper_read = new Swiper('.m-read-fade .swiper-container', {
+                        effect: 'fade',
+                        pagination: {
+                            el: '.m-read-fade .u-pagination',
+                            bulletclassName: 'bull',
+                            bulletActiveclassName: 'active',
+                            clickable: true
+                        }
+                    });
+                })
+            }
 
-            })
+        })
             .catch((error) => {
                 console.log(error)
             })
@@ -96,7 +86,7 @@ export default class MyHeart extends Component {
                         <div className="tag">{item.category.name}</div>
                         <h1><a href={`/#/Bookstore/Bookbuy/${item.id}`}>{item.title}</a></h1>
                         <div className="alt clearfix">
-                            <a href="#" className="j_name"><img src={item.user.img} className="thumb-img" />{item.author}</a>
+                            <a href="#" className="j_name"><img src={item.user.img} className="thumb-img" />{item.user.name}</a>
                             <span className="dot"></span>
                             <span>{item.description}</span>
                         </div>
@@ -127,8 +117,7 @@ export default class MyHeart extends Component {
         const { data } = this.props
         const categorys = global.constants.categorys
         return data && data.map((item, index) => {
-            let Hours = FormatDate.apartHours(item.updateDate)
-            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`;
+            let Time = FormatDate.formatTime(item.updateDate)
             let router = ``
             switch (item.category.id) {
                 case categorys[0].id:
@@ -147,10 +136,10 @@ export default class MyHeart extends Component {
                 <li>
                     <div class="ue_info">
                         <a href="javascript:;" class="face" onClick={() => this.gotoRouter(`${router}${item.id}`)}>
-                            <img src={item.user.photo} />
+                            <img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
                         </a>
                         <div class="alt clearfix">
-                            <a href="javascript:;" class="j_name">{item.author}</a>
+                            <a href="javascript:;" class="j_name">{item.user.name}</a>
                             <span class="dot"></span>
                             <span>{Time}</span>
                         </div>

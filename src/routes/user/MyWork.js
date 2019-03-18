@@ -4,20 +4,15 @@ import axios from 'axios'
 import $ from 'jquery'
 import Swiper from 'swiper/dist/js/swiper.min.js'
 import FormatDate from '../../static/js/utils/formatDate.js'
-import Utils from '../../static/js/utils/utils.js'
-
-import Header from '../../common/header/Index.js'
-import Footer from '../../common/footer/Index.js'
-import WheelBanner from '../../common/wheelBanner/Index'
-import HotRead from '../../common/hotRead/Index'
-import { POST } from '../../service/service'
+import Service from '../../service/api.js'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
 import 'swiper/dist/css/swiper.min.css'
-
+import Utils from '../../static/js/utils/utils.js'
 import 'antd/lib/pagination/style/index.css';
 import '../../static/less/question.less'
 
+import defaultPhoto from "../../static/images/user/default.png"
 const PAGESIZE = 3;
 
 export default class MyWork extends Component {
@@ -99,7 +94,7 @@ export default class MyWork extends Component {
                         <div className="tag">{item.category.name}</div>
                         <h1><a href={`/#/Bookstore/Bookbuy/${item.id}`}>{item.title}</a></h1>
                         <div className="alt clearfix">
-                            <a href="#" className="j_name"><img src={item.user.img} className="thumb-img" />{item.author}</a>
+                            <a href="#" className="j_name"><img src={item.user.img} className="thumb-img" />{item.user.name}</a>
                             <span className="dot"></span>
                             <span>{item.description}</span>
                         </div>
@@ -127,11 +122,8 @@ export default class MyWork extends Component {
         this.getBooksList(this.props.match.params.tid, this.state.sortType, page)
     }
     handleLike = (item) => {
-        POST({
-            url: "/a/cms/article/like?",
-            opts: {
-                id: item.id
-            }
+        Service.AddLike({
+            id: item.id
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -141,17 +133,11 @@ export default class MyWork extends Component {
             /* global layer */
             layer.msg(response.data.message)
         })
-            .catch((error) => {
-                console.log(error)
-            })
     }
     handleCollect = (item) => {
-        POST({
-            url: "/a/artuser/articleCollect/collectArticle?",
-            opts: {
-                userId: 1,
-                articleId: item.id
-            }
+        Service.AddCollect({
+            userId: 1,
+            articleId: item.id
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -162,9 +148,6 @@ export default class MyWork extends Component {
             /* global layer */
             layer.msg(response.data.message)
         })
-            .catch((error) => {
-                console.log(error)
-            })
     }
     gotoRouter = (router) => {
         this.props.history.push(router)
@@ -173,15 +156,14 @@ export default class MyWork extends Component {
         const { data } = this.props
         const categorys = global.constants.categorys
         return data && data.map((item, index) => {
-            let Hours = FormatDate.apartHours(item.updateDate)
-            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`;
+            let Time = FormatDate.formatTime(item.updateDate)
             let router = ``
             switch (item.category.id) {
                 case categorys[0].id:
                     router = `/Question/Article/`
                     break;
                 case categorys[1].id:
-                    
+
                 case categorys[1].id:
                     router = `/Bookstore/Bookbuy/`
                     break;
@@ -192,11 +174,11 @@ export default class MyWork extends Component {
             return (
                 <li>
                     <div class="ue_info">
-                        <a href="javascript:;" class="face" onClick={()=>this.gotoRouter(`${router}${item.id}`)}>
-                            <img src={item.user.photo} />
+                        <a href="javascript:;" class="face" onClick={() => this.gotoRouter(`${router}${item.id}`)}>
+                            <img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
                         </a>
                         <div class="alt clearfix">
-                            <a href="javascript:;" class="j_name">{item.author}</a>
+                            <a href="javascript:;" class="j_name">{item.user.name}</a>
                             <span class="dot"></span>
                             <span>{Time}</span>
                         </div>

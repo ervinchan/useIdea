@@ -1,6 +1,6 @@
 global.constants = {
     loading: false,
-    userInfo: JSON.parse(localStorage.getItem("userInfo")) || {},
+    userInfo: JSON.parse(sessionStorage.getItem("userInfo")) || {},
     PAGESIZE: 15,
     categorys: [
         { id: '4812062598ec4b10bedfb38b59ea3e94', name: '请教' },
@@ -12,5 +12,15 @@ global.constants = {
         { id: '7a8bbb7d262142cbb7ae5bf884935e81', name: '工具包' },
         { id: 'ce009ff186fa4203ab07bd1678504228', name: '口吃文案' },
         { id: '981892a5c2394fe7b01ce706d917699e', name: '招聘' }
-    ]
+    ],
+    categoryUrl: {
+        "请教": "/Question",
+        "吃口文案": "/GoodCopy",
+        "见识灵感": "/Inspiration",
+        "醒来再读": "/Inspiration/Viewpoint",
+        "专访幕后": "/Inspiration/Interview",
+        "工具包": "/Inspiration/Tool",
+        "阅读场景": "/ReadingTime",
+        "书单上新": "/Bookstore/NewBooks"
+    }
 };

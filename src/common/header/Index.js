@@ -4,9 +4,9 @@ import { Icon } from 'antd'
 import $ from 'jquery'
 import axios from 'axios'
 import Utils from '../../static/js/utils/utils.js'
-
+import Service from '../../service/api.js'
 import LOGO from "../../static/images/m-logo.png"
-
+import defaultPhoto from "../../static/images/user/default.png"
 export default class Header extends Component {
 
     constructor(props) {
@@ -16,7 +16,7 @@ export default class Header extends Component {
             ActiveId: "",
             title: '响创意 记录创造者的洞见',
             roleNames: '游客',
-            searchTxt:""
+            searchTxt: ""
         }
         const router = new HashRouter()
 
@@ -95,7 +95,8 @@ export default class Header extends Component {
             e = window.event || e;
             e.stopPropagation();
         });
-        var userInfo = JSON.parse(localStorage.getItem('userInfo'));
+
+        var userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
         if (userInfo) {
             switch (userInfo.isCompany) {
                 case "true":
@@ -113,13 +114,10 @@ export default class Header extends Component {
     }
 
     getNavData = () => {
-        axios.post('/zsl/a/cms/category/navigationBar')
+        Service.GetNav()
             .then((response) => {
                 let Nav = response.data.data
                 this.setState({ Nav: Nav })
-            })
-            .catch((error) => {
-                console.log(error)
             })
     }
     createNav = (nav) => {
@@ -178,7 +176,7 @@ export default class Header extends Component {
     }
 
     logOut = () => {
-        localStorage.clear()
+        sessionStorage.clear()
         window.location.href = "/#/Login"
         //this.props.history.push("/Login")
     }
@@ -207,7 +205,7 @@ export default class Header extends Component {
     }
 
     render() {
-        const { Nav, roleNames, userInfo, searchTxt} = this.state
+        const { Nav, roleNames, userInfo, searchTxt } = this.state
         return (
             <div className="m-head">
                 <div className="wrapper">
@@ -222,7 +220,7 @@ export default class Header extends Component {
                         <div className="fm-userinfo" style={{ display: roleNames === "游客" ? '' : 'none' }}>
                             <div className="info">
                                 <a href="javascript:;" className="thumb">
-                                    <img src="css/images/1x1.png" />
+                                    <img src={defaultPhoto} />
                                 </a>
                                 <h1><a href="/#/Login">未登录</a></h1>
                                 <h3><a href="/#/Reg">新用户请先注册</a></h3>
@@ -237,7 +235,7 @@ export default class Header extends Component {
                             <div className="fm-userinfo" style={{ display: roleNames === "个人用户" ? '' : 'none' }}>
                                 <div className="info">
                                     <a href={`/#/UserCenter/${userInfo.id}`} className="thumb">
-                                        <img src={userInfo.photo} />
+                                        <img src={userInfo.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
                                     </a>
                                     <h1><a href={`/#/UserCenter/${userInfo.id}`}>{userInfo.name}</a></h1>
                                     <h3><a href={`/#/InfoUpDate/${userInfo.id}`}>完善个人资料</a></h3>
@@ -266,7 +264,7 @@ export default class Header extends Component {
                             <div className="fm-userinfo" style={{ display: roleNames === "企业用户" ? '' : 'none' }}>
                                 <div className="info">
                                     <a href="javascript:;" className="thumb qy">
-                                        <img src="css/images/1x1.png" />
+                                        <img src={userInfo.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
                                     </a>
                                     <h1><a href="#">VML 上海</a></h1>
                                     <h3><a href="#">修改企业资料</a></h3>
@@ -324,7 +322,7 @@ export default class Header extends Component {
                 <div className="search-wrap">
                     <div className="wrapper">
                         <div className="u-search">
-                            <input type="text" placeholder="搜索与我有关的提问" onChange={this.handleChangeSearchTxt}/>
+                            <input type="text" placeholder="搜索与我有关的提问" onChange={this.handleChangeSearchTxt} />
                             <a href={`/#/Question/${searchTxt}`} className="fa-search" ></a>
                         </div>
                     </div>

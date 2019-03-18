@@ -4,52 +4,65 @@ import $ from 'jquery'
 import axios from 'axios'
 import Utils from '../../static/js/utils/utils.js'
 import Swiper from 'swiper/dist/js/swiper.min.js'
-
+import Service from '../../service/api.js'
 
 export default class WheelBanner extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            banner: []
+            banner: [],
+            bannerBList: []
         }
     }
 
     componentDidMount() {
         this.getBanner()
+        this.getBannerB()
     }
 
     getBanner = () => {
-        let url = "/zsl/a/cms/article/adsList"
-        axios.post(url)
-            .then((response) => {
-                let banner = response.data.data
-                this.setState({ banner }, () => {
-                    var swiper_wheel = new Swiper('.u-wheel .swiper-container', {
-                        loop: true,
-                        effect: 'fade',
-                        autoplay: {
-                            delay: 2000
-                        },
-                        pagination: {
-                            el: '.u-wheel .u-pagination',
-                            bulletClass: 'bull',
-                            bulletActiveClass: 'active',
-                            clickable: true
-                        }
-                    });
-                })
-
+        Service.GetADList({
+            categoryId: this.props.categoryId,
+            id: "588e4f30e9634523b34b5c913bfa4cd2"
+        }).then((response) => {
+            let banner = response.data.data
+            this.setState({ banner }, () => {
+                var swiper_wheel = new Swiper('.u-wheel .swiper-container', {
+                    loop: true,
+                    effect: 'fade',
+                    autoplay: {
+                        delay: 2000
+                    },
+                    pagination: {
+                        el: '.u-wheel .u-pagination',
+                        bulletClass: 'bull',
+                        bulletActiveClass: 'active',
+                        clickable: true
+                    }
+                });
             })
+        })
+    }
+
+    getBannerB = () => {
+        Service.GetADList({
+            categoryId: this.props.categoryId,
+            id: "243e981b6d30424c8f3fac513382483a"
+        }).then((response) => {
+            if (response.data.status === 1) {
+                this.setState({ bannerBList: response.data.data })
+            }
+        })
             .catch((error) => {
                 console.log(error)
             })
+
     }
 
     createBanner = () => {
         const { banner } = this.state
-        let bigBanner = banner.slice(0, 3)
-        return bigBanner.map((item, index) => {
+        return banner.map((item, index) => {
             return (
                 <a key={index} className="swiper-slide" href={item.link}>
                     <img src={item.image} />
@@ -60,8 +73,8 @@ export default class WheelBanner extends Component {
     }
 
     createBannerList = () => {
-        const { banner } = this.state
-        let smallBanner = banner.slice(3)
+        const { bannerBList } = this.state
+        let smallBanner = bannerBList.slice(0, 3)
         return smallBanner.map((item, index) => {
             return (
                 <li key={index}>

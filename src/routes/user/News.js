@@ -3,19 +3,17 @@ import { Menu, Icon, Badge, Tabs, List, Avatar, Divider, Button, Card, Popover }
 import Slider from "react-slick";
 import { StickyContainer, Sticky } from 'react-sticky';
 
-//import $ from 'jquery'
-import Swiper from 'swiper/dist/js/swiper.min.js'
-import axios from 'axios'
-
 import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
 import MyWork from './MyWork.js';
 import 'swiper/dist/css/swiper.min.css'
 import '../../static/less/u.icenter.less'
 import 'antd/lib/tabs/style/index.less';
-import { POST } from '../../service/service'
+import Service from '../../service/api.js'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
+import Utils from '../../static/js/utils/utils.js'
+import defaultPhoto from "../../static/images/user/default.png"
 const TabPane = Tabs.TabPane;
 
 export default class UserCenter extends Component {
@@ -36,11 +34,8 @@ export default class UserCenter extends Component {
     }
 
     getNews = (userId) => {
-        POST({
-            url: "/a/cms/article/latestAction?",
-            opts: {
-                userId: userId
-            }
+        Service.GetLatestAction({
+            userId: userId
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -52,11 +47,8 @@ export default class UserCenter extends Component {
             })
     }
     getNewsArticles = (userId) => {
-        POST({
-            url: "/a/cms/article/getAllArticle?",
-            opts: {
-                userId: userId
-            }
+        Service.GetAllArticle({
+            userId: userId
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -75,7 +67,7 @@ export default class UserCenter extends Component {
     }
 
     render() {
-        const userInfo = global.constants.userInfo
+        const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
         return (
             <div className="">
                 {/* 头部 */}
@@ -84,7 +76,7 @@ export default class UserCenter extends Component {
                     <div className="wrapper">
                         <div className="userTx">
                             <a href="javascript:;">
-                                <img src={userInfo.photo} />
+                                <img src={userInfo.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
                                 {/* <p><i className="icon-user-img"></i><span>更新个人头像</span></p> */}
                             </a>
                         </div>

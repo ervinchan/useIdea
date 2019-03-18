@@ -1,24 +1,18 @@
 import React, { Component } from 'react';
 import { Input, Tabs, Pagination } from 'antd';
-import axios from 'axios'
-import $ from 'jquery'
 import Swiper from 'swiper/dist/js/swiper.min.js'
-import FormatDate from '../../static/js/utils/formatDate.js'
 import Utils from '../../static/js/utils/utils.js'
-
+import Service from '../../service/api.js'
 import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
 import WheelBanner from '../../common/wheelBanner/Index'
-import BookMenu from '../../common/bookMenu/Menu'
-import SwiperList from '../../common/swiperList/Index'
 import HotRead from '../../common/hotRead/Index'
 import 'swiper/dist/css/swiper.min.css'
 
 import 'antd/lib/pagination/style/index.css';
 import '../../static/less/bigidea.less';
-import { list } from 'postcss';
-
-const PAGESIZE = 3;
+import defaultPhoto from "../../static/images/user/default.png"
+const PAGESIZE = 16;
 
 export default class Tool extends Component {
 
@@ -61,14 +55,9 @@ export default class Tool extends Component {
     }
 
     getTools = (categoryId) => {
-        let url = '/zsl/a/cms/article/getAllArticle?'
-        let opts = {
+        Service.GetAllArticle({
             categoryId: categoryId || ''
-        }
-        for (var key in opts) {
-            opts[key] && (url += "&" + key + "=" + opts[key])
-        }
-        axios.post(url, opts)
+        })
             .then((response) => {
                 if (categoryId) {
                     let toolList = response.data.data
@@ -104,7 +93,7 @@ export default class Tool extends Component {
                         <div class="tag">{item.category.name}</div>
                         <h1><a href={`/#/Inspiration/Article/${item.id}`}>{item.title}</a></h1>
                         <div class="alt clearfix">
-                            <a href="#" class="j_name"><img src={item.user.img} class="thumb-img" />{item.author}</a>
+                            <a href="#" class="j_name"><img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} class="thumb-img" />{item.user.name}</a>
                             <span class="dot"></span>
                             <span>{item.description}</span>
                         </div>

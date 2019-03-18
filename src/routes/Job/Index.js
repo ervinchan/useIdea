@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
 import { Input, Tabs, Pagination } from 'antd';
-import axios from 'axios'
 import $ from 'jquery'
 import Swiper from 'swiper/dist/js/swiper.min.js'
 import FormatDate from '../../static/js/utils/formatDate.js'
 import Utils from '../../static/js/utils/utils.js'
-import { POST } from '../../service/service'
+import Service from '../../service/api.js'
 import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
 import Menu from './Menu'
@@ -16,8 +15,8 @@ import 'swiper/dist/css/swiper.min.css'
 
 import 'antd/lib/pagination/style/index.css';
 import '../../static/less/jobs.less';
-import { list } from 'postcss';
 
+import defaultPhoto from "../../static/images/user/default.png"
 const PAGESIZE = 3;
 
 export default class Job extends Component {
@@ -34,6 +33,8 @@ export default class Job extends Component {
             adsList: [],
             searchTxt: "",
             city: '上海',
+            bannerAList: [],
+            bannerBList: []
         };
     }
 
@@ -72,25 +73,20 @@ export default class Job extends Component {
         this.getHotCompany()
         this.getJobLists();
         this.getHotPost();
-        this.getAds();
+        this.getBannerA();
+        this.getBannerB();
     }
 
     getHotCompany = (categoryId) => {
-        POST({
-            url: "/a/cms/article/getAllArticle?",
-            opts: {
-                hits: 1,
-                categoryId: "981892a5c2394fe7b01ce706d917699e"
-            }
+        Service.GetAllArticle({
+            hits: 1,
+            categoryId: "981892a5c2394fe7b01ce706d917699e"
         }).then((response) => {
             let hotCompanyList = response.data.data
             this.setState({ hotCompanyList })
 
 
         })
-            .catch((error) => {
-                console.log(error)
-            })
     }
 
     handleFavorite = (index) => {
@@ -117,21 +113,15 @@ export default class Job extends Component {
     }
 
     getJobLists = () => {
-        POST({
-            url: "/a/cms/article/getAllArticle?",
-            opts: {
-                categoryId: "981892a5c2394fe7b01ce706d917699e",
-                pageNo: this.state.curPage || 1
-            }
+        Service.GetAllArticle({
+            categoryId: "981892a5c2394fe7b01ce706d917699e",
+            pageNo: this.state.curPage || 1
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
                 this.setState({ jobList: response.data.data })
             }
         })
-            .catch((error) => {
-                console.log(error)
-            })
     }
 
     gotoRouter = () => {
@@ -141,8 +131,7 @@ export default class Job extends Component {
     createJobList = () => {
         const { jobList } = this.state;
         return jobList.list && jobList.list.map((item, index) => {
-            let Hours = FormatDate.apartHours(item.updateDate)
-            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`
+            let Time = FormatDate.formatTime(item.updateDate)
             return (
                 <li>
                     <a className="thumb-img" href="javascript:;" onClick={this.gotoRouter(item.id)}>
@@ -160,13 +149,11 @@ export default class Job extends Component {
     createHotCompanyList = () => {
         const { hotCompanyList } = this.state;
         return hotCompanyList.map((item, index) => {
-            let Hours = FormatDate.apartHours(item.updateDate)
-            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`
             return (
                 <li>
                     <div className="infos">
                         <a className="thumb-img" href="javascript:;" onClick={this.gotoRouter(item.id)}>
-                            <img src={item.user.photo} />
+                            <img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
                         </a>
                         <h1><a href="javascript:;" onClick={this.gotoRouter(item.id)}>{item.company}</a></h1>
                         <div className="bar">
@@ -180,18 +167,13 @@ export default class Job extends Component {
     }
 
     getHotPost = () => {
-        POST({
-            url: "/a/cms/article/getHostPost?",
-            opts: {
-                categoryId: "981892a5c2394fe7b01ce706d917699e"
-            }
+        Service.GetHotPost({
+            categoryId: "981892a5c2394fe7b01ce706d917699e"
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
                 this.setState({ hotPosts: response.data.data })
             }
-        }).catch((error) => {
-            console.log(error)
         })
     }
 
@@ -201,44 +183,58 @@ export default class Job extends Component {
             return <a href="javascript:;" onClick={() => this.setSearchTxt(item.category.name)}>{item.category.name}</a>
         })
     }
-
-    getAds = () => {
-        POST({
-            url: "/a/cms/article/adsList?",
-            opts: {
-                categoryId: "981892a5c2394fe7b01ce706d917699e"
-            }
+    getBannerA = () => {
+        Service.GetADList({
+            categoryId: "981892a5c2394fe7b01ce706d917699e",
+            id: "588e4f30e9634523b34b5c913bfa4cd2"
         }).then((response) => {
             if (response.data.status === 1) {
-                this.setState({ adsList: response.data.data })
+                this.setState({ bannerAList: response.data.data })
             }
         })
-            .catch((error) => {
-                console.log(error)
-            })
-
+    }
+    getBannerB = () => {
+        Service.GetADList({
+            categoryId: "981892a5c2394fe7b01ce706d917699e",
+            id: "243e981b6d30424c8f3fac513382483a"
+        }).then((response) => {
+            if (response.data.status === 1) {
+                this.setState({ bannerBList: response.data.data })
+            }
+        })
     }
 
-    createAds = () => {
-        const { adsList } = this.state;
+
+    createBannerA = () => {
+        const { bannerAList } = this.state;
         let top3 = []
         let top5 = []
-        adsList && adsList.map((item, index) => {
-            if (index < 3) {
-                top3.push(<li><a href={item.url}><img src={item.image} /></a></li>)
-            } else if (index >= 3 && index < 5) {
-                top5.push(<li><a href={item.url}><img src={item.image} /></a></li>)
-            }
+        bannerAList && bannerAList.map((item, index) => {
+
+            top3.push(<li><a href={item.url}><img src={item.image} /></a></li>)
+
         })
 
 
         return (
-            [<ul className="jb-seat-x3">
+            <ul className="jb-seat-x3">
                 {top3}
-            </ul>,
+            </ul>
+        )
+    }
+    createBannerB = () => {
+        const { bannerBList } = this.state;
+        let top3 = []
+        let top5 = []
+        bannerBList && bannerBList.map((item, index) => {
+            top5.push(<li><a href={item.url}><img src={item.image} /></a></li>)
+        })
+
+
+        return (
             <ul className="jb-seat-x2">
                 {top5}
-            </ul>]
+            </ul>
         )
     }
 
@@ -281,7 +277,8 @@ export default class Job extends Component {
 
                         </div>
                     </div>
-                    {this.createAds()}
+                    {this.createBannerA()}
+                    {this.createBannerB()}
                 </div>
                 <div className="wrapper g-jobs">
                     <div className="g-left">

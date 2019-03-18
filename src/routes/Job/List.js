@@ -1,27 +1,20 @@
 import React, { Component } from 'react';
 import { Input, Tabs, Pagination } from 'antd';
-import axios from 'axios'
 import $ from 'jquery'
-import Swiper from 'swiper/dist/js/swiper.min.js'
 import FormatDate from '../../static/js/utils/formatDate.js'
-import Utils from '../../static/js/utils/utils.js'
 
 import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
-import WheelBanner from '../../common/wheelBanner/Index'
-import BookMenu from '../../common/bookMenu/Menu'
-import SwiperList from '../../common/swiperList/Index'
-import HotRead from '../../common/hotRead/Index'
 import CityGroup from '../../common/cityGroup/Index'
-import { POST } from '../../service/service'
+import Service from '../../service/api.js'
+import Utils from '../../static/js/utils/utils.js'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
-import 'swiper/dist/css/swiper.min.css'
 
 import 'antd/lib/pagination/style/index.css';
 import '../../static/less/jobs.less';
-import { list } from 'postcss';
 
+import defaultPhoto from "../../static/images/user/default.png"
 const PAGESIZE = 3;
 
 export default class JobList extends Component {
@@ -84,71 +77,42 @@ export default class JobList extends Component {
     }
 
     getCityList = () => {
-        POST({
-            url: "/a/jobcity/jobCity/findAllJobCity",
-            opts: {
-
-            }
-        }).then((response) => {
+        Service.JobCity().then((response) => {
             global.constants.loading = false
             let cityList = response.data.data
             this.setState({ cityList })
         })
-            .catch((error) => {
-                console.log(error)
-            })
     }
     getPayList = (categoryId) => {
-        POST({
-            url: "/a/sys/dict/jobSelect?",
-            opts: {
-                type: 'pay'
-            }
+        Service.JobFilters()({
+            type: 'pay'
         }).then((response) => {
             global.constants.loading = false
             let payList = response.data.data
             this.setState({ payList })
         })
-            .catch((error) => {
-                console.log(error)
-            })
     }
     getEducationList = (categoryId) => {
-        POST({
-            url: "/a/sys/dict/jobSelect?",
-            opts: {
-                type: 'education'
-            }
+        Service.JobFilters()({
+            type: 'education'
         }).then((response) => {
             global.constants.loading = false
             let educationList = response.data.data
             this.setState({ educationList })
         })
-            .catch((error) => {
-                console.log(error)
-            })
     }
     getExperienceList = (categoryId) => {
-        POST({
-            url: "/a/sys/dict/jobSelect?",
-            opts: {
-                type: 'experience'
-            }
+        Service.JobFilters()({
+            type: 'experience'
         }).then((response) => {
             global.constants.loading = false
             let experienceList = response.data.data
             this.setState({ experienceList })
         })
-            .catch((error) => {
-                console.log(error)
-            })
     }
     getHotPost = () => {
-        POST({
-            url: "/a/cms/article/getHostPost?",
-            opts: {
-                categoryId: "981892a5c2394fe7b01ce706d917699e"
-            }
+        Service.GetHotPost()({
+            categoryId: "981892a5c2394fe7b01ce706d917699e"
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -221,33 +185,23 @@ export default class JobList extends Component {
     }
 
     getHotCompany = (categoryId) => {
-        POST({
-            url: "/a/cms/article/getAllArticle?",
-            opts: {
-                hits: 1,
-                categoryId: "981892a5c2394fe7b01ce706d917699e"
-            }
+        Service.GetAllArticle({
+            hits: 1,
+            categoryId: "981892a5c2394fe7b01ce706d917699e"
         }).then((response) => {
             let hotCompanyList = response.data.data
             this.setState({ hotCompanyList })
-
-
         })
-            .catch((error) => {
-                console.log(error)
-            })
     }
 
     createHotCompanyList = () => {
         const { hotCompanyList } = this.state;
         return hotCompanyList && hotCompanyList.map((item, index) => {
-            let Hours = FormatDate.apartHours(item.updateDate)
-            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`
             return (
                 <li>
                     <div className="infos">
                         <a className="thumb-img" href="javascript:;" onClick={this.gotoRouter(item.id)}>
-                            <img src={item.user.photo} />
+                            <img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
                         </a>
                         <h1><a href="javascript:;" onClick={this.gotoRouter(item.id)}>{item.company}</a></h1>
                         <div className="bar">
@@ -261,12 +215,9 @@ export default class JobList extends Component {
     }
 
     getJobLists = (curPage) => {
-        POST({
-            url: "/a/cms/article/getAllArticle?",
-            opts: {
-                categoryId: "981892a5c2394fe7b01ce706d917699e",
-                pageNo: this.state.curPage || 1
-            }
+        Service.GetAllArticle({
+            categoryId: "981892a5c2394fe7b01ce706d917699e",
+            pageNo: this.state.curPage || 1
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -280,8 +231,7 @@ export default class JobList extends Component {
     createJobList = () => {
         const { jobList } = this.state;
         return jobList.list && jobList.list.map((item, index) => {
-            let Hours = FormatDate.apartHours(item.updateDate)
-            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`
+            let Time = FormatDate.formatTime(item.updateDate)
             return (
                 <li>
                     <a className="thumb-img" href="javascript:;" onClick={this.gotoRouter(item.id)}>
@@ -302,26 +252,19 @@ export default class JobList extends Component {
 
     onSearch = () => {
         const { city, pay, education, experience } = this.state;
-        POST({
-            url: "/a/cms/article/getAllJobArticle?",
-            opts: {
-                company: this.state.searchTxt,
-                categoryId: "981892a5c2394fe7b01ce706d917699e",
-                area: city === "不限" ? "1" : city,
-                pay: pay,
-                education: education,
-                experience: experience
-
-            }
+        Service.GetAllJob({
+            company: this.state.searchTxt,
+            categoryId: "981892a5c2394fe7b01ce706d917699e",
+            area: city === "不限" ? "1" : city,
+            pay: pay,
+            education: education,
+            experience: experience
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
                 this.setState({ jobList: response.data.data })
             }
         })
-            .catch((error) => {
-                console.log(error)
-            })
     }
 
     changeSearchTxt = (e) => {

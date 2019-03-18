@@ -1,0 +1,204 @@
+﻿@import "_class.less";
+@import "_config.less";
+@import "less/_head.less";
+@import "less/_icon.less";
+@import "less/_user.menu.less";
+@import "less/_contact.list.less";
+@import "less/_bartool.less";
+@import "less/_more.less";
+@import "less/_fixed.less";
+@import "less/_footer.less";
+@import "less/_swiper.less";
+@import "less/_modal.less";
+//module
+@import "less/u/_u.head.less";
+@import "less/u/_u.tabs.less";
+@import "less/_title.less";
+@import "less/_hot.team.less";
+@import "less/qy/_qy.r.job.less";
+@import "less/_artlist.less";
+@import "less/qy/_qy.info.less";
+@import "less/qy/_qy.envi.less";
+@import "less/u/_u.article.less";
+@import "less/_pages.less";
+@import "less/qy/_qy.r.hotart.less";
+@import "less/_job.list.less";
+@import "less/_nolist.less";
+@import "less/qy/_qy.title.less";
+@import "less/u/_u_minav.less";
+@import "less/lx/_lx.fans.less";
+
+.g-space {
+    padding: 60px 0;
+    min-height: 800px;
+    max-width: 1100px;
+    text-align: left;
+
+    a {
+        color: #333;
+    }
+
+    a:hover {
+        color: @color;
+    }
+
+    .ue-tabnav {
+        margin-bottom: 60px;
+    }
+
+    .u-pages {
+        padding: 20px 0 50px;
+    }
+
+    .g-left {
+        width: 750px;
+
+        .u-title {
+            margin-bottom: 30px;
+        }
+    }
+
+    .g-right {
+        width: 260px;
+
+        .more-a {
+            line-height: 45px;
+        }
+
+        .r-joblist {
+            margin-bottom: 25px;
+        }
+    }
+}
+
+.more-a {
+    margin-bottom: 20px;
+}
+
+.qy-r-team {
+    margin-bottom: 20px;
+
+    .qy-title {
+        margin-bottom: 15px;
+    }
+}
+
+.qy-r-jobs {
+    margin-bottom: 20px;
+
+    .qy-rjob {
+        margin-bottom: 25px;
+    }
+}
+
+.qy-r-hotart {
+    margin-bottom: 20px;
+}
+
+.ue-article {
+    margin-bottom: 20px;
+
+    >li {
+        padding: 25px 30px 30px;
+        margin-bottom: 40px;
+        min-height: 250px;
+
+        .ue_box {
+            padding-right: 250px;
+
+            .thumb-img {
+                right: 10px;
+                width: 190px;
+                height: 120px;
+                margin-top: -65px;
+
+                img {
+                    width: 190px;
+                    height: 120px;
+                }
+            }
+        }
+    }
+}
+
+.qy-title1 {
+    font-size: 17px;
+    color: #333;
+    margin-bottom: 20px;
+
+    b {
+        display: inline-block;
+        padding-bottom: 15px;
+        border-bottom: 2px @color solid;
+    }
+}
+
+.qy-jobinfo {
+    margin-bottom: 60px;
+
+    .jtag {
+        margin-bottom: 20px;
+
+        span,
+        a {
+            display: inline-block;
+            float: left;
+            border: 1px #eee solid;
+            background-color: #f8f8f8;
+            color: #999;
+            line-height: 28px;
+            padding: 0 0.8em;
+            .border-radius(2px);
+            margin: 0 10px 10px 0;
+        }
+    }
+
+    .jalt {
+        padding: 20px 40px;
+        background-color: #f6f6f6;
+        margin-bottom: 20px;
+
+        ul {
+            margin: 0 -10px;
+        }
+
+        li {
+            float: left;
+            width: 50%;
+            padding: 0 10px;
+            line-height: 38px;
+            color: #666;
+
+            span {
+                color: #222;
+                padding-right: 10px;
+            }
+        }
+    }
+
+    .jitem {
+        font-size: 15px;
+        padding-top: 10px;
+        margin-bottom: 20px;
+        color: #333;
+
+        .tit {
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: @color;
+        }
+
+        .jhtml {
+            line-height: 1.8;
+
+            img {
+                max-width: 100%;
+            }
+        }
+    }
+
+    .jdepict {
+        font-size: 15px;
+        color: #999;
+    }
+}

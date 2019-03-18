@@ -7,20 +7,21 @@ import Swiper from 'swiper/dist/js/swiper.min.js'
 import Validate from '../../static/js/utils/validate.js'
 
 import '../../static/less/reginfo.less';
-import 'antd/lib/radio/style/css';
+import 'antd/lib/radio/style/index';
 
 import regBanner from '../../static/images/reg/1.jpg';
 import logo from "../../static/images/reg_logo.png";
 
 const RadioGroup = Radio.Group;
-export default class Reg extends Component {
+export default class RegInfo extends Component {
     constructor(props) {
         super(props);
         this.state = {
             district: null,
             city: null,
             province: null,
-            type: "国有"
+            type: "国有",
+            userPhoto: null
         }
     }
 
@@ -69,36 +70,36 @@ export default class Reg extends Component {
     }
 
     RegConfirm = () => {
-        const { regEmail, regPsw, regPswConfirm, agree } = this.state;
-        this.setState({ emailError: false, pswError: false, pswConfirmError: false })
+        const { qyName, userPhoto, avatarPhoto } = this.state;
         /*global layer */
-        if (!regEmail || !Validate.checkEmail(regEmail)) {
-            return this.setState({ emailError: true })
-        } else if (!regPsw) {
-            return this.setState({ pswError: true })
-        } else if (regPsw !== regPswConfirm) {
-            return this.setState({ pswConfirmError: true })
-        } else if (!agree) {
-            return layer.msg("请先阅读网站用户协议并同意")
-        }
-        let url = '/zsl/email?'
-        let opts = {
-            email: regEmail,
-            password: regPsw,
-            loginName: regEmail,
-            passwordConfirm: regPswConfirm,
-            isCompany: false
-        }
-        for (var key in opts) {
-            opts[key] && (url += "&" + key + "=" + opts[key])
-        }
-        axios.post(url, opts)
-            .then((response) => {
+        let g = global.constants;
+        g.loading = true;
+        var that = this
+        var oMyForm = new FormData();
+        this.editor.change && this.editor.change()
+        oMyForm.append("userId", JSON.parse(sessionStorage.getItem("userInfo")).id);
+        //oMyForm.append("classifying", addCategoryId);
+        oMyForm.append("title", qyName || "");
+        oMyForm.append('userPhoto', userPhoto);
+        oMyForm.append('avatarPhoto', avatarPhoto);
+        axios({
+            url: "/zsl/a/cms/article/consultationSave?",
+            method: "post",
+            data: oMyForm,
+            processData: false,// 告诉axios不要去处理发送的数据(重要参数)
+            contentType: false,   // 告诉axios不要去设置Content-Type请求头
+        }).then((response) => {
+            g.loading = false
+
+            layer.alert(response.data.message, () => {
                 if (response.data.status === 1) {
-                    this.props.history.push("/regFinish")
+                    this.props.history.push(`/`)
                 }
+                layer.closeAll()
             })
+        })
             .catch((error) => {
+                g.loading = false
                 console.log(error)
             })
     }
@@ -185,18 +186,51 @@ export default class Reg extends Component {
             type: e.target.value,
         });
     }
+    setUserPhoto = (e, file, reader) => {
+        // 图片base64化
+        let newUrl = reader.result;
+        this.setState(state => ({
+            userPhoto: file,
+            coverImg: newUrl
+        }));
+    };
+    setImg = (e, file, reader) => {
+        // 图片base64化
+        let newUrl = reader.result;
+        this.setState(state => ({
+            avatarPhoto: file,
+            imageUrl: newUrl
+        }));
+    };
+
+    setUploadPorps = (handleImg) => {
+        const { userPhoto } = this.state
+        return {
+            onRemove: (file) => {
+                this.setState((state) => {
+                    const index = state.fileList.indexOf(file);
+                    const newFileList = state.fileList.slice();
+                    newFileList.splice(index, 1);
+                    return {
+                        fileList: newFileList,
+                    };
+                });
+            },
+            beforeUpload: (file) => {
+
+                var reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (e) => handleImg(e, file, reader)
+
+                return false;
+            },
+            showUploadList: false
+        }
+    }
 
     render() {
-        const { province, cityItem, districtItem,
-            qyName,
-        } = this.state
-        const uploadButton = (
-            <div style={{ width: "100%", height: "100%" }}>
-                <Icon type={this.state.loading ? 'loading' : 'plus'} />
-                <div className="ant-upload-text">上传营业执照</div>
-            </div>
-        );
-        const imageUrl = this.state.imageUrl;
+        const { province, cityItem, districtItem, qyName, userPhoto, avatarPhoto, coverImg, imageUrl } = this.state
+
         return (
             <div className="reg-body">
                 <div className="reg-banner">
@@ -214,22 +248,24 @@ export default class Reg extends Component {
                         </div>
                         <div className="r-user-img">
                             <div className="r-title1">基本信息</div>
-                            <a href="javascript:;" className="thumb-img">
-                                <img src="css/images/1x1.png" />
-                                <p><i className="icon-user-img"></i><span>点击上传头像</span>
-                                    <Upload
-                                        name="userPhoto"
-                                        listType="picture-card"
-                                        className="avatar-uploader"
-                                        showUploadList={false}
-                                        action="//jsonplaceholder.typicode.com/posts/"
-                                        beforeUpload={beforeUpload}
-                                        onChange={this.handleChange}
-                                    >
-                                        {imageUrl ? <img src={imageUrl} alt="avatar" /> : uploadButton}
-                                    </Upload>
-                                </p>
-                            </a>
+                            <Upload
+                                name="userPhoto"
+                                className="avatar-uploader"
+                                {...this.setUploadPorps(this.setUserPhoto)}
+                            >
+                                <a href="javascript:;" className="thumb-img">
+                                    {/* <img src="css/images/1x1.png" /> */}
+
+
+                                    {
+                                        coverImg ?
+                                            <img src={coverImg} alt="avatar" /> :
+                                            <p><i className="icon-user-img"></i><span>点击上传头像</span></p>
+                                    }
+
+
+                                </a>
+                            </Upload>
                             <div className="txt">机构头像不低于150*150px</div>
                         </div>
                         <div className="u-inline width-250">
@@ -322,20 +358,17 @@ export default class Reg extends Component {
                             </div>
                         </div>
                         <div className="r-paper clearfix">
-                            <a href="javascript:;" className="thumb-img">
-                                <Upload
-                                    name="avatar"
-                                    listType="picture-card"
-                                    className="avatar-uploader"
-                                    showUploadList={false}
-                                    action="//jsonplaceholder.typicode.com/posts/"
-                                    beforeUpload={beforeUpload}
-                                    onChange={this.handleChange}
-                                >
-                                    {imageUrl ? <img src={imageUrl} alt="avatar" /> : uploadButton}
-                                </Upload>
-                            </a>
+                            <Upload
+                                name="avatar"
+                                className="avatar-uploader"
+                                {...this.setUploadPorps(this.setImg)}
+                            >
+                                <a href="javascript:;" className="thumb-img">
 
+                                    {imageUrl ? <img src={imageUrl} alt="avatar" /> : <div className="ant-upload-text">上传营业执照</div>}
+
+                                </a>
+                            </Upload>
                         </div>
                         <div className="u-helptxt">
                             请上传清晰的营销执照复印件或照片；<br />

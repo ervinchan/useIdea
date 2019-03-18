@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import axios from 'axios';
+import Service from '../../service/api.js'
 import $ from 'jquery'
 
 export default class JobMenu extends Component {
@@ -13,24 +13,17 @@ export default class JobMenu extends Component {
 
     componentDidMount() {
         let that = this;
-        let url = '/zsl/a/cms/category/navigationBar?'
-        let opts = {
+
+        Service.GetNav({
             id: "981892a5c2394fe7b01ce706d917699e",
             allchildcategory: true
-        }
-        for (var key in opts) {
-            opts[key] && (url += "&" + key + "=" + opts[key])
-        }
-        axios.post(url, opts)
+        })
             .then((response) => {
                 let menuDatas = response.data.data
                 this.setState({ menuDatas })
                 $(function () {
 
                 })
-            })
-            .catch((error) => {
-                console.log(error)
             })
 
     }
@@ -48,7 +41,7 @@ export default class JobMenu extends Component {
     }
 
     loop = (data) => {
-        return data.map((item, index) => {
+        return data && data.map((item, index) => {
             let Lis = []
             if (item.childList.length) {
                 return <li key={index}>
@@ -63,9 +56,9 @@ export default class JobMenu extends Component {
     createChild = (items) => {
         let Lis = items.map((item, index) => {
             if (index === items.length - 1) {
-                return [<a href="javascript:;"  onClick={() => this.props.setSearchTxt(item.name)}>{item.name}</a>, <i className="fa-angle-right"></i>]
+                return [<a href="javascript:;" onClick={() => this.props.setSearchTxt(item.name)}>{item.name}</a>, <i className="fa-angle-right"></i>]
             }
-            return <a href="javascript:;"  onClick={() => this.props.setSearchTxt(item.name)}>{item.name}</a>
+            return <a href="javascript:;" onClick={() => this.props.setSearchTxt(item.name)}>{item.name}</a>
         })
         return Lis
     }

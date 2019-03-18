@@ -5,7 +5,7 @@ import $ from 'jquery'
 
 import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
-import { POST } from '../../service/service'
+import Service from '../../service/api.js'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
 import Editor from 'rc-wang-editor'
@@ -15,9 +15,11 @@ import ed from 'wangeditor'
 import 'antd/lib/pagination/style/index.css';
 import '../../static/less/article.less';
 import coverImg from '../../static/images/1050x550.png'
+import Utils from '../../static/js/utils/utils.js';
 
 export default class ActicleEditor extends Component {
     editor = new ed('#editorContainer')
+    uploadDom = null;
     constructor(props) {
         super(props);
         this.state = {
@@ -67,13 +69,14 @@ export default class ActicleEditor extends Component {
             'justify',  // 对齐方式
             'quote',  // 引用
             'image',  // 插入图片
+            'video',
             'undo',  // 撤销
             'redo'  // 重复
         ]
         this.editor.customConfig.onchange = this.setEditorVal
         this.editor.customConfig.uploadImgServer = '/zsl/a/cms/article/uploadArticleSave'
         this.editor.customConfig.uploadImgParams = {
-            userId: global.constants.userInfo.id,
+            userId: JSON.parse(sessionStorage.getItem("userInfo")).id,
             categoryId: "ce009ff186fa4203ab07bd1678504228"
         }
         this.editor.create()
@@ -83,17 +86,11 @@ export default class ActicleEditor extends Component {
     }
 
     getCategory = () => {
-        POST({
-            url: "/a/cms/category/updateArticleClassify?",
-
-        }).then((response) => {
+        Service.ArticleClassify().then((response) => {
             if (response.data.status === 1) {
                 this.setState({ categoryList: response.data.data })
             }
         })
-            .catch((error) => {
-                console.log(error)
-            })
     }
     createCategory = () => {
         const { categoryList } = this.state
@@ -104,57 +101,6 @@ export default class ActicleEditor extends Component {
     setCategoryId = (item) => {
         this.setState({ addCategoryId: item.id, addCategoryName: item.name })
     }
-
-    // getDatas = (categoryId) => {
-    //     let url = '/zsl/a/cms/article/getAllArticle?'
-    //     let opts = {
-    //         categoryId: categoryId || ''
-    //     }
-    //     for (var key in opts) {
-    //         opts[key] && (url += "&" + key + "=" + opts[key])
-    //     }
-    //     axios.post(url, opts)
-    //         .then((response) => {
-    //             if (categoryId) {
-    //                 let toolList = response.data.data
-    //                 this.setState({ toolList })
-    //             } else {
-    //                 let hotBooks = response.data.data
-    //                 this.setState({ hotBooks }, () => {
-    //                     var swiper_read = new Swiper('.m-read-fade .swiper-container', {
-    //                         effect: 'fade',
-    //                         pagination: {
-    //                             el: '.m-read-fade .u-pagination',
-    //                             bulletClass: 'bull',
-    //                             bulletActiveClass: 'active',
-    //                             clickable: true
-    //                         }
-    //                     });
-    //                 })
-    //             }
-
-    //         })
-    //         .catch((error) => {
-    //             console.log(error)
-    //         })
-    // }
-
-    // createList = () => {
-    //     const { toolList } = this.state
-    //     return toolList.list && toolList.list.map((item, index) => {
-    //         return (
-    //             <li>
-    //                 <a className="thumb-img" href={`/#/Bookstore/Bookbuy/${item.id}`}><img src={item.image} /><span>{item.category.name}</span></a>
-    //                 <h1><a href={`/#/Bookstore/Bookbuy/${item.id}`}>{item.title}</a></h1>
-    //                 <div className="alt clearfix">
-    //                     <a href="#" className="j_name"><img src={item.user.img} className="thumb-img" />{item.author}</a>
-    //                     <span className="dot"></span>
-    //                     <span>{item.description}</span>
-    //                 </div>
-    //             </li>
-    //         )
-    //     })
-    // }
 
     handleChangeTitle = (e) => {
         this.setState({ articleTit: e.target.value })
@@ -169,11 +115,8 @@ export default class ActicleEditor extends Component {
     }
 
     getHotKeywords = (categoryId) => {
-        POST({
-            url: "/a/cms/article/getHostKeywords?",
-            opts: {
-                categoryId: categoryId || ''
-            }
+        Service.HotKeywords({
+            categoryId: categoryId || ''
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -181,9 +124,6 @@ export default class ActicleEditor extends Component {
                 this.setState({ HotKeywords })
             }
         })
-            .catch((error) => {
-                console.log(error)
-            })
     }
 
     createHotKeywords = () => {
@@ -247,7 +187,7 @@ export default class ActicleEditor extends Component {
         var that = this
         var oMyForm = new FormData();
         this.editor.change && this.editor.change()
-        oMyForm.append("userId", g.userInfo.id);
+        oMyForm.append("userId", JSON.parse(sessionStorage.getItem("userInfo")).id);
         oMyForm.append("categoryId", addCategoryId);
         //oMyForm.append("classifying", addCategoryId);
         oMyForm.append("title", articleTit || "");
@@ -258,16 +198,15 @@ export default class ActicleEditor extends Component {
         fileList.forEach((file) => {
             oMyForm.append('homeImage', file);
         });
-        axios({
-            url: "/zsl/a/cms/article/consultationSave?",
-            method: "post",
-            data: oMyForm,
-            processData: false,// 告诉axios不要去处理发送的数据(重要参数)
-            contentType: false,   // 告诉axios不要去设置Content-Type请求头
+        Service.ArticleBuild({
+            form: oMyForm
         }).then((response) => {
             g.loading = false
+
             layer.alert(response.data.message, () => {
-                this.props.history.push(`/`)
+                if (response.data.status === 1) {
+                    this.props.history.push(`/`)
+                }
                 layer.closeAll()
             })
         })
@@ -279,36 +218,25 @@ export default class ActicleEditor extends Component {
 
     render() {
         const { keywords, keyword, fileList, coverImg, addCategoryName } = this.state;
-        const props = {
-            onRemove: (file) => {
-                this.setState((state) => {
-                    const index = state.fileList.indexOf(file);
-                    const newFileList = state.fileList.slice();
-                    newFileList.splice(index, 1);
-                    return {
-                        fileList: newFileList,
-                    };
-                });
-            },
-            beforeUpload: (file) => {
-                var newUrl = ""
-                var reader = new FileReader();
-                reader.readAsDataURL(file);
-                var that = this
-                reader.onload = function (e) {
-                    // 图片base64化
-                    newUrl = this.result;
-                    that.setState(state => ({
-                        fileList: [...state.fileList, file],
-                        coverImg: newUrl
-                    }));
-                };
+        const props = Utils.uploadProps(fileList, (file, newUrl) => {
+            this.setState(state => ({
+                fileList: [...state.fileList, file],
+                coverImg: newUrl
+            }), () => {
+                $(".art-thumbnail").find("input[type=file]").css({
+                    position: "absolute",
+                    left: 0,
+                    top: 0,
+                    width: "100%",
+                    height: "100%",
+                    opacity: 0,
+                    zIndex: 1,
+                    display: "block"
+                })
 
-                return false;
-            },
-            fileList,
-            showUploadList: false
-        };
+            })
+        });
+
         return (
             <div className="">
                 {/* 头部 */}
@@ -400,7 +328,7 @@ export default class ActicleEditor extends Component {
                     </div>
                     <div className="g-right">
                         <div className="art-thumbnail">
-                            <Upload className="upload-btn" {...props}>
+                            <Upload className="upload-btn" {...props} ref={(e) => this.uploadDom = e}>
                                 <img src={coverImg} />
                                 <h3>封面头图，最佳尺寸建议1050*550px</h3>
                             </Upload>

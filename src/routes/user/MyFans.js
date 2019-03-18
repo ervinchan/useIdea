@@ -5,20 +5,20 @@ import { StickyContainer, Sticky } from 'react-sticky';
 
 //import $ from 'jquery'
 import Swiper from 'swiper/dist/js/swiper.min.js'
-import axios from 'axios'
 
 import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
-
+import Utils from '../../static/js/utils/utils.js'
 import 'swiper/dist/css/swiper.min.css'
 import '../../static/less/u.icenter.less'
 import 'antd/lib/tabs/style/index.less';
-import { POST } from '../../service/service'
+import Service from '../../service/api.js'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
 import MyWork from './MyWork.js';
 import MyHeart from './MyHeart.js';
 import Item from 'antd/lib/list/Item';
+import defaultPhoto from "../../static/images/user/default.png"
 const TabPane = Tabs.TabPane;
 
 export default class UserCenter extends Component {
@@ -97,11 +97,8 @@ export default class UserCenter extends Component {
     }
 
     getMyFocus = () => {
-        POST({
-            url: "/a/attention/userAttentionUserids/attentionList?",
-            opts: {
-                userId: global.constants.userInfo.id
-            }
+        Service.GetAttentionList({
+            userId: JSON.parse(sessionStorage.getItem("userInfo")).id
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -113,11 +110,8 @@ export default class UserCenter extends Component {
             })
     }
     getMyFans = () => {
-        POST({
-            url: "/a/attention/userAttentionUserids/attention2List?",
-            opts: {
-                userId: global.constants.userInfo.id
-            }
+        Service.GetFansList({
+            userId: JSON.parse(sessionStorage.getItem("userInfo")).id
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -139,7 +133,7 @@ export default class UserCenter extends Component {
                 <li>
                     <div class="lx-item">
                         <a href="javascript:;" class="face">
-                            <img src={item.photo} />
+                            <img src={item.photo || defaultPhoto} />
                         </a>
                         <h1><a href="javascript:;" class="j_name">{item.name}</a></h1>
                         <div class="lx_txt">
@@ -158,12 +152,9 @@ export default class UserCenter extends Component {
     }
     handleFoucs = (uid) => {
         const { articleInfo } = this.state;
-        POST({
-            url: "/a/attention/userAttentionUserids/attention?",
-            opts: {
-                attention2UserId: uid,
-                userId: global.constants.userInfo.id
-            }
+        Service.AddAttention({
+            attention2UserId: uid,
+            userId: JSON.parse(sessionStorage.getItem("userInfo")).id
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -185,7 +176,7 @@ export default class UserCenter extends Component {
                 <li>
                     <div class="lx-item">
                         <a href="javascript:;" class="face">
-                            <img src={item.photo} />
+                            <img src={item.photo || defaultPhoto} />
                         </a>
                         <h1><a href="javascript:;" class="j_name">{item.name}</a></h1>
                         <div class="lx_txt">
@@ -203,7 +194,7 @@ export default class UserCenter extends Component {
     }
 
     render() {
-        const userInfo = global.constants.userInfo
+        const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
         return (
             <div className="">
                 {/* 头部 */}
@@ -212,7 +203,7 @@ export default class UserCenter extends Component {
                     <div className="wrapper">
                         <div className="userTx">
                             <a href="javascript:;">
-                                <img src={userInfo.photo} />
+                                <img src={userInfo.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
                                 <p><i className="icon-user-img"></i><span>更新个人头像</span></p>
                             </a>
                         </div>

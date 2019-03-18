@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import { Input, Tabs, Pagination } from 'antd';
-import axios from 'axios'
 import $ from 'jquery'
-import { POST } from '../../service/service'
+import Service from '../../service/api.js'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
 import Swiper from 'swiper/dist/js/swiper.min.js'
@@ -26,15 +25,11 @@ export default class HotRead extends Component {
     }
 
     getHotBooks = (categoryId) => {
-        let url = '/zsl/a/cms/article/getAllArticle?'
-        let opts = {
+
+        Service.GetAllArticle({
             hits: 1,
             categoryId: categoryId || ''
-        }
-        for (var key in opts) {
-            opts[key] && (url += "&" + key + "=" + opts[key])
-        }
-        axios.post(url, opts)
+        })
             .then((response) => {
                 let hotBooks = response.data.data
                 this.setState({ hotBooks }, () => {
@@ -48,9 +43,6 @@ export default class HotRead extends Component {
                         }
                     });
                 })
-            })
-            .catch((error) => {
-                console.log(error)
             })
     }
 
@@ -95,11 +87,8 @@ export default class HotRead extends Component {
         })
     }
     handleLike = (item) => {
-        POST({
-            url: "/a/cms/article/like?",
-            opts: {
-                id: item.id
-            }
+        Service.AddLike({
+            id: item.id
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -114,12 +103,9 @@ export default class HotRead extends Component {
             })
     }
     handleCollect = (item) => {
-        POST({
-            url: "/a/artuser/articleCollect/collectArticle?",
-            opts: {
-                userId: 1,
-                articleId: item.id
-            }
+        Service.AddCollect({
+            userId: 1,
+            articleId: item.id
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {

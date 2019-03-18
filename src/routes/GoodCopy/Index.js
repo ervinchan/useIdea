@@ -1,26 +1,22 @@
 import React, { Component } from 'react';
 import { Input, Tabs, Pagination } from 'antd';
-import axios from 'axios'
 import $ from 'jquery'
 import Swiper from 'swiper/dist/js/swiper.min.js'
 import FormatDate from '../../static/js/utils/formatDate.js'
-import Utils from '../../static/js/utils/utils.js'
 
 import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
 import WheelBanner from '../../common/wheelBanner/Index'
-import BookMenu from '../../common/bookMenu/Menu'
-import SwiperList from '../../common/swiperList/Index'
 import HotRead from '../../common/hotRead/Index'
-import { POST } from '../../service/service'
+
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
 import 'swiper/dist/css/swiper.min.css'
-
+import Service from '../../service/api.js'
 import 'antd/lib/pagination/style/index.css';
 import '../../static/less/goodcopy.less';
-import { list } from 'postcss';
-
+import defaultPhoto from "../../static/images/user/default.png"
+import Utils from "../../static/js/utils/utils"
 const PAGESIZE = 3;
 
 export default class GoodCopy extends Component {
@@ -52,46 +48,37 @@ export default class GoodCopy extends Component {
     }
 
     getDatas = (categoryId, page) => {
-        let url = '/zsl/a/cms/article/getAllArticle?'
-        let opts = {
+        Service.GetAllArticle({
             categoryId: categoryId || '',
             pageNo: page
-        }
-        for (var key in opts) {
-            opts[key] && (url += "&" + key + "=" + opts[key])
-        }
-        axios.post(url, opts)
-            .then((response) => {
-                if (categoryId) {
-                    let goodcopyList = response.data.data
-                    this.setState({ goodcopyList })
-                } else {
-                    let hotBooks = response.data.data
-                    this.setState({ hotBooks }, () => {
-                        var swiper_read = new Swiper('.m-read-fade .swiper-container', {
-                            effect: 'fade',
-                            pagination: {
-                                el: '.m-read-fade .u-pagination',
-                                bulletClass: 'bull',
-                                bulletActiveClass: 'active',
-                                clickable: true
-                            }
-                        });
-                    })
-                }
+        }).then((response) => {
+            if (categoryId) {
+                let goodcopyList = response.data.data
+                this.setState({ goodcopyList })
+            } else {
+                let hotBooks = response.data.data
+                this.setState({ hotBooks }, () => {
+                    var swiper_read = new Swiper('.m-read-fade .swiper-container', {
+                        effect: 'fade',
+                        pagination: {
+                            el: '.m-read-fade .u-pagination',
+                            bulletClass: 'bull',
+                            bulletActiveClass: 'active',
+                            clickable: true
+                        }
+                    });
+                })
+            }
 
-            })
+        })
             .catch((error) => {
                 console.log(error)
             })
     }
 
     getHotKeywords = (categoryId) => {
-        POST({
-            url: "/a/cms/article/getHostKeywords?",
-            opts: {
-                categoryId: categoryId || ''
-            }
+        Service.HotKeywords({
+            categoryId: categoryId || ''
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -105,20 +92,14 @@ export default class GoodCopy extends Component {
     }
 
     getKeywordsList = (keyword) => {
-        let url = '/zsl/a/cms/article/getAllArticle?'
-        let opts = {
+        Service.GetAllArticle({
             categoryId: "ce009ff186fa4203ab07bd1678504228",
             keywords: keyword
-        }
-        for (var key in opts) {
-            opts[key] && (url += "&" + key + "=" + opts[key])
-        }
-        axios.post(url, opts)
-            .then((response) => {
-                let KeywordsList = response.data.data
-                this.setState({ KeywordsList })
+        }).then((response) => {
+            let KeywordsList = response.data.data
+            this.setState({ KeywordsList })
 
-            })
+        })
             .catch((error) => {
                 console.log(error)
             })
@@ -133,7 +114,7 @@ export default class GoodCopy extends Component {
                     <a className="thumb-img" href={`/#/Inspiration/Article/${item.id}`}><img src={item.image} /><span>{item.category.name}</span></a>
                     <h1><a href={`/#/Inspiration/Article/${item.id}`}>{item.title}</a></h1>
                     <div className="alt clearfix">
-                        <a href={`/#/Inspiration/Article/${item.id}`} className="j_name"><img src={item.user.img} className="thumb-img" />{item.author}</a>
+                        <a href={`/#/Inspiration/Article/${item.id}`} className="j_name"><img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />{item.user.name}</a>
                         <span className="dot"></span>
                         <span>{item.description}</span>
                     </div>
@@ -175,12 +156,9 @@ export default class GoodCopy extends Component {
 
     handleSearch = (k) => {
         const { keywords } = this.state;
-        POST({
-            url: "/a/cms/article/getAllArticle?",
-            opts: {
-                title: k || keywords,
-                categoryId: "ce009ff186fa4203ab07bd1678504228"
-            }
+        Service.GetAllArticle({
+            title: k || keywords,
+            categoryId: "ce009ff186fa4203ab07bd1678504228"
         }).then((response) => {
             /*global layer */
             global.constants.loading = false
@@ -201,7 +179,7 @@ export default class GoodCopy extends Component {
                 {/* 头部 */}
                 < Header />
                 {/* 轮播banner */}
-                <WheelBanner />
+                <WheelBanner categoryId={"ce009ff186fa4203ab07bd1678504228"} />
                 <div className="wa-search wrapper">
                     <div className="bar">
                         <div className="u-search">

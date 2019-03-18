@@ -1,24 +1,19 @@
 import React, { Component } from 'react';
 import { Input, Tabs, Pagination } from 'antd';
-import axios from 'axios'
 import $ from 'jquery'
-import Swiper from 'swiper/dist/js/swiper.min.js'
 import FormatDate from '../../static/js/utils/formatDate.js'
 import Utils from '../../static/js/utils/utils.js'
-
+import Service from '../../service/api.js'
 import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
 import WheelBanner from '../../common/wheelBanner/Index'
-import BookMenu from '../../common/bookMenu/Menu'
 import HotRead from '../../common/hotRead/Index'
-import { POST } from '../../service/service'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
 import 'swiper/dist/css/swiper.min.css'
 
 import 'antd/lib/pagination/style/index.css';
 import '../../static/less/bigidea.less';
-import { list } from 'postcss';
 
 const PAGESIZE = 3;
 
@@ -32,7 +27,10 @@ export default class Bigidea extends Component {
             banner: [],
             BigIdeaDatas: [],
             menus: [],
-            specialCol: []
+            specialCol: [],
+            bannerCList: [],
+            bannerDList: [],
+            bannerEList: []
         };
     }
 
@@ -46,23 +44,68 @@ export default class Bigidea extends Component {
         this.getBigIdeaDatas('b49c9133960c4700b253b7a3283dcbef');
         this.getBigIdeaMenu('b49c9133960c4700b253b7a3283dcbef');
         this.getSpecialCol();
+        this.getBannerC();
+        this.getBannerE();
     }
 
-    getBigIdeaDatas = (categoryId,pageNo) => {
-        let url = '/zsl/a/cms/article/getAllArticle?'
-        let opts = {
+    getBannerC = () => {
+        Service.GetADList({
+            categoryId: "b49c9133960c4700b253b7a3283dcbef",
+            id: "37e7de978cc14723b8d51ec902ed0f73"
+        }).then((response) => {
+            if (response.data.status === 1) {
+                this.setState({ bannerCList: response.data.data })
+            }
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+
+    }
+    getBannerE = () => {
+        Service.GetADList({
+            categoryId: "b49c9133960c4700b253b7a3283dcbef",
+            id: "df2c63345f9b42beb860f9150d4002f7"
+        }).then((response) => {
+            if (response.data.status === 1) {
+                this.setState({ bannerEList: response.data.data })
+            }
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+
+    }
+    createBannerC = () => {
+        const { bannerCList } = this.state
+        return bannerCList.slice(0, 3).map((item, index) => {
+            return <a href={item.url} className="seat-x315 lighten"><img src={item.image} /></a>
+        })
+    }
+    createBannerD = () => {
+        const { bannerCList } = this.state
+        let bannerDList = bannerCList.slice(3)
+        return bannerDList.map((item, index) => {
+            return <a href={item.url} className="seat-x315 lighten"><img src={item.image} /></a>
+        })
+    }
+    createBannerE = () => {
+        const { bannerEList } = this.state
+        return bannerEList.map((item, index) => {
+            return <a href={item.url} className="seat-h110 lighten"><img src={item.image} /></a>
+        })
+    }
+
+    getBigIdeaDatas = (categoryId, pageNo) => {
+        Service.GetAllArticle({
             categoryId: categoryId || '',
             pageNo: pageNo || 1,
             pageSize: global.constants.PAGESIZE,
-        }
-        for (var key in opts) {
-            opts[key] && (url += "&" + key + "=" + opts[key])
-        }
-        axios.post(url, opts)
+        })
             .then((response) => {
                 let BigIdeaDatas = response.data.data
                 this.setState({ BigIdeaDatas })
-
+                global.constants.loading = false
             })
             .catch((error) => {
                 console.log(error)
@@ -70,14 +113,9 @@ export default class Bigidea extends Component {
     }
 
     getBigIdeaMenu = (categoryId) => {
-        let url = '/zsl/a/cms/category/navigationBar?'
-        let opts = {
+        Service.GetNav({
             id: categoryId
-        }
-        for (var key in opts) {
-            opts[key] && (url += "&" + key + "=" + opts[key])
-        }
-        axios.post(url, opts)
+        })
             .then((response) => {
                 let menus = response.data.data
                 this.setState({ menus })
@@ -88,11 +126,8 @@ export default class Bigidea extends Component {
     }
 
     handleLike = (item) => {
-        POST({
-            url: "/a/cms/article/like?",
-            opts: {
-                id: item.id
-            }
+        Service.AddLike({
+            id: item.id
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -107,12 +142,9 @@ export default class Bigidea extends Component {
             })
     }
     handleCollect = (item) => {
-        POST({
-            url: "/a/artuser/articleCollect/collectArticle?",
-            opts: {
-                userId: 1,
-                articleId: item.id
-            }
+        Service.AddCollect({
+            userId: 1,
+            articleId: item.id
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -143,8 +175,9 @@ export default class Bigidea extends Component {
 
     //热门专栏
     getSpecialCol = () => {
-        let url = '/zsl/a/cms/category/navigationBar?subscriber=0'
-        axios.post(url)
+        Service.GetNav({
+            subscriber: 0
+        })
             .then((response) => {
                 let specialCol = response.data.data
                 this.setState({ specialCol })
@@ -157,8 +190,7 @@ export default class Bigidea extends Component {
     createBigIdeaList = () => {
         const { BigIdeaDatas } = this.state
         return BigIdeaDatas.list && BigIdeaDatas.list.map((item, index) => {
-            let Hours = FormatDate.apartHours(item.updateDate)
-            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`
+            let Time = FormatDate.formatTime(item.updateDate);
             return (
                 <div className="item user">
                     <a className="thumb-img" href={`/#/Inspiration/Article/${item.id}`}>
@@ -167,7 +199,7 @@ export default class Bigidea extends Component {
                     <div className="tit"><a href={`/#/Inspiration/Article/${item.id}`}>{item.title}</a></div>
                     <div className="txt">{item.description}</div>
                     <div className="bar">
-                        <span>{item.author}</span><span className="dot"></span><span>{Time}</span>
+                        <span>{item.user.name}</span><span className="dot"></span><span>{Time}</span>
                         <div className="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{item.commentNum}</span></a></div>
 
                     </div>
@@ -198,7 +230,7 @@ export default class Bigidea extends Component {
         return authorList && authorList.map((item, index) => {
             return (
                 <li>
-                    <a href="javascript:;" onClick={()=>this.gotoRouter(`/UserNews/${item.user && item.user.id}`)}>
+                    <a href="javascript:;" onClick={() => this.gotoRouter(`/UserNews/${item.user && item.user.id}`)}>
                         <em><img src={item.userImg} /></em>
                         <span>{item.name}</span>
                         <i className="fa-angle-right"></i>
@@ -207,7 +239,7 @@ export default class Bigidea extends Component {
             )
         })
     }
-    gotoRouter = (router)=>{
+    gotoRouter = (router) => {
         this.props.history.push(router)
     }
     createSpecialCol = () => {
@@ -221,7 +253,7 @@ export default class Bigidea extends Component {
                             <img src={item.image} />
                         </a>
                         <h1><a href="#">{item.name}</a></h1>
-                        <h3>{item.author}</h3>
+                        <h3>{item.user && item.user.name}</h3>
                     </li>
                 )
             } else {
@@ -232,7 +264,7 @@ export default class Bigidea extends Component {
                             <img src={item.image} />
                         </a>
                         <h1><a href="#">{item.name}</a></h1>
-                        <h3>{item.author}</h3>
+                        <h3>{item.user && item.user.name}</h3>
                         <div className="alt">
                             <img src="css/images/1x1.png" />
                             <img src="css/images/1x1.png" />
@@ -273,7 +305,7 @@ export default class Bigidea extends Component {
                 {/* 头部 */}
                 < Header />
                 {/* 轮播banner */}
-                <WheelBanner />
+                <WheelBanner categoryId={"b49c9133960c4700b253b7a3283dcbef"} />
 
                 <div className="m-chartlist background">
                     <div className="wrapper">
@@ -309,11 +341,8 @@ export default class Bigidea extends Component {
                         }
                     </div>
                     <div className="g-right">
-                        <a href="javascript:;" className="seat-x315"><img src="images/17.jpg" /></a>
-                        <a href="javascript:;" className="seat-x315"><img src="css/images/315x115.png" /></a>
-                        <a href="javascript:;" className="seat-x315"><img src="images/d5.jpg" /></a>
-                        <a href="javascript:;" className="seat-x315"><img src="images/d6.jpg" /></a>
-                        <a href="javascript:;" className="seat-x315"><img src="images/d7.jpg" /></a>
+                        {this.createBannerC()}
+                        {this.createBannerD()}
                         <div className="u-title4">
                             <b>热门专栏</b>
                         </div>

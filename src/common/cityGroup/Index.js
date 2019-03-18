@@ -1,12 +1,9 @@
 import React, { Component } from 'react';
 
 import $ from 'jquery'
-import axios from 'axios'
-import Utils from '../../static/js/utils/utils.js'
-import Swiper from 'swiper/dist/js/swiper.min.js'
+import Service from '../../service/api.js'
 
-
-export default class WheelBanner extends Component {
+export default class CityGroup extends Component {
 
     constructor(props) {
         super(props);
@@ -22,8 +19,7 @@ export default class WheelBanner extends Component {
     }
 
     getCityGroup = () => {
-        let url = '/zsl/a/jobcity/jobCity/findJobCity'
-        axios.post(url)
+        Service.findJobCity()
             .then((response) => {
                 if (response.data.status === 1) {
                     this.setState({ cityGroup: response.data.data })

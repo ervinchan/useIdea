@@ -8,7 +8,7 @@ import Swiper from 'swiper/dist/js/swiper.min.js'
 import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
 import FormatDate from '../../static/js/utils/formatDate.js'
-import { POST } from '../../service/service'
+import Service from '../../service/api.js'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
 import HotRead from '../../common/hotRead/Index'
@@ -16,11 +16,12 @@ import 'swiper/dist/css/swiper.min.css';
 import '../../static/less/question.less'
 import '../../static/less/index.less';
 import 'antd/lib/tabs/style/index.less'
-
+import Utils from '../../static/js/utils/utils.js';
+import defaultPhoto from "../../static/images/user/default.png"
 
 const TabPane = Tabs.TabPane;
 const PAGESIZE = 15;
-const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+const userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
 export default class App extends Component {
 
     constructor(props) {
@@ -30,6 +31,8 @@ export default class App extends Component {
             bannerBList: [],
             bannerCList: [],
             bannerEList: [],
+            bannerFList: [],
+            bannerGList: [],
             questionList: [],
             viewPointList: [],
             goodcopyList: [],
@@ -49,13 +52,13 @@ export default class App extends Component {
                 tab.show();
                 tab.siblings().hide();
             })
-            $("#tabNav").find("li").on("click", function () {
-                let item = $("#tabCont").find(".group").eq($(this).index());
-                $(this).addClass("active").siblings().removeClass("active")
-                item.show();
-                item.siblings().hide();
-            })
-            
+            // $("#tabNav").find("li").on("click", function () {
+            //     let item = $("#tabCont").find(".group").eq($(this).index());
+            //     $(this).addClass("active").siblings().removeClass("active")
+            //     item.show();
+            //     item.siblings().hide();
+            // })
+
 
             var swiper_read = new Swiper('.m-read .swiper-container', {
                 slidesPerView: 4,
@@ -116,7 +119,7 @@ export default class App extends Component {
                 $(this).parents("[role=menu]").hide();
             });
 
-            
+
 
             $(".m-menu-shu .menu>li>a").on("click", function (e) {
                 $(this).next().slideToggle(300);
@@ -151,7 +154,7 @@ export default class App extends Component {
                 }
             });
         })
-        this.getQuestionList();
+        // this.getQuestionList();
         this.getViewPointList();
         this.getGoodCopyList();
         this.getBootStoreList();
@@ -160,6 +163,8 @@ export default class App extends Component {
         this.getBannerB();
         this.getBannerC();
         this.getBannerE();
+        this.getBannerF();
+        this.getBannerG();
         this.getRecommendBooks();
         this.getTopAuthor();
         this.getHitsArticle();
@@ -167,15 +172,13 @@ export default class App extends Component {
     }
 
     getBannerA = () => {
-        POST({
-            url: "/a/cms/article/adsList?",
-            opts: {
-                categoryId: "981892a5c2394fe7b01ce706d917699e"
-            }
+        Service.GetADList({
+            categoryId: "e12f2236bc134e18ac3db4028c626650",
+            id: "588e4f30e9634523b34b5c913bfa4cd2"
         }).then((response) => {
             if (response.data.status === 1) {
                 global.constants.loading = false
-                this.setState({ bannerAList: response.data.data },()=>{
+                this.setState({ bannerAList: response.data.data }, () => {
                     var swiper_banner = new Swiper('.f-banner .swiper-container', {
                         slidesPerView: 'auto',
                         loop: true,
@@ -206,13 +209,47 @@ export default class App extends Component {
             .catch((error) => {
                 console.log(error)
             })
+        // Service.GetBanners({
+        //     categoryId: "981892a5c2394fe7b01ce706d917699e"
+        // }).then((response) => {
+        //     if (response.data.status === 1) {
+        //         global.constants.loading = false
+        //         this.setState({ bannerAList: response.data.data }, () => {
+        //             var swiper_banner = new Swiper('.f-banner .swiper-container', {
+        //                 slidesPerView: 'auto',
+        //                 loop: true,
+        //                 speed: 1000,
+        //                 autoplay: {
+        //                     delay: 3000,
+        //                     disableOnInteraction: false,
+        //                     waitForTransition: false
+        //                 },
+        //                 pagination: {
+        //                     el: '.swiper-pagination',
+        //                     clickable: true,
+        //                 },
+        //                 navigation: {
+        //                     nextEl: '.f-banner .u-next',
+        //                     prevEl: '.f-banner .u-prev'
+        //                 },
+        //                 pagination: {
+        //                     el: '.f-banner .u-pagination',
+        //                     bulletClass: 'bull',
+        //                     bulletActiveClass: 'active',
+        //                     clickable: true
+        //                 }
+        //             });
+        //         })
+        //     }
+        // })
+        //     .catch((error) => {
+        //         console.log(error)
+        //     })
     }
     getBannerB = () => {
-        POST({
-            url: "/a/cms/article/adsList?",
-            opts: {
-                categoryId: "981892a5c2394fe7b01ce706d917699e"
-            }
+        Service.GetADList({
+            categoryId: "e12f2236bc134e18ac3db4028c626650",
+            id: "243e981b6d30424c8f3fac513382483a"
         }).then((response) => {
             if (response.data.status === 1) {
                 this.setState({ bannerBList: response.data.data })
@@ -224,11 +261,9 @@ export default class App extends Component {
 
     }
     getBannerC = () => {
-        POST({
-            url: "/a/cms/article/adsList?",
-            opts: {
-                categoryId: "981892a5c2394fe7b01ce706d917699e"
-            }
+        Service.GetADList({
+            categoryId: "e12f2236bc134e18ac3db4028c626650",
+            id: "37e7de978cc14723b8d51ec902ed0f73"
         }).then((response) => {
             if (response.data.status === 1) {
                 this.setState({ bannerCList: response.data.data })
@@ -240,11 +275,9 @@ export default class App extends Component {
 
     }
     getBannerE = () => {
-        POST({
-            url: "/a/cms/article/adsList?",
-            opts: {
-                categoryId: "981892a5c2394fe7b01ce706d917699e"
-            }
+        Service.GetADList({
+            categoryId: "e12f2236bc134e18ac3db4028c626650",
+            id: "df2c63345f9b42beb860f9150d4002f7"
         }).then((response) => {
             if (response.data.status === 1) {
                 this.setState({ bannerEList: response.data.data })
@@ -255,17 +288,45 @@ export default class App extends Component {
             })
 
     }
+    getBannerF = () => {
+        Service.GetADList({
+            categoryId: "e12f2236bc134e18ac3db4028c626650",
+            id: "b3653c6c1da841569e04ccccd5c0a776"
+        }).then((response) => {
+            if (response.data.status === 1) {
+                this.setState({ bannerFList: response.data.data })
+            }
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+
+    }
+    getBannerG = () => {
+        Service.GetADList({
+            categoryId: "e12f2236bc134e18ac3db4028c626650",
+            id: "e0de5c7e4a514c158a74876c851f13ba"
+        }).then((response) => {
+            if (response.data.status === 1) {
+                this.setState({ bannerFList: response.data.data })
+            }
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+
+    }
     createBannerA = () => {
         const { bannerAList } = this.state
         let bannerList = bannerAList.map((item, index) => {
-            return <a className="swiper-slide" href={item.url}><img alt={item.title} src={item.image} /><div className="txt"><span>{item.descript}</span><h1>{item.title}</h1></div></a>
+            return <a className="swiper-slide" href={item.link} target="_blank"><img alt={item.title} src={item.image} /><div className="txt"><span>{item.descript}</span><h1>{item.title}</h1></div></a>
         })
         return (
             <div className="f-banner">
                 <div className="swiper-box">
                     <div className="swiper-container">
                         <div className="swiper-wrapper">
-                            {[bannerList,bannerList]}
+                            {[bannerList, bannerList]}
                         </div>
                     </div>
                 </div>
@@ -284,7 +345,7 @@ export default class App extends Component {
     createBannerB = () => {
         const { bannerBList } = this.state
         let bannerList = bannerBList.map((item, index) => {
-            return <li><a href={item.url} className="darken scale"><img src={item.image} /></a></li>
+            return <li><a href={item.link} target="_blank" className="darken scale"><img src={item.image} /></a></li>
         })
         return (
             <div className="m-seat-x4 wrapper">
@@ -297,27 +358,43 @@ export default class App extends Component {
     createBannerC = () => {
         const { bannerCList } = this.state
         return bannerCList.slice(0, 3).map((item, index) => {
-            return <a href={item.url} className="seat-h110 lighten"><img src={item.image} /></a>
+            return <a href={item.link} target="_blank" className="seat-h110 lighten"><img src={item.image} /></a>
         })
     }
     createBannerD = () => {
         const { bannerCList } = this.state
-        let bannerDList = bannerCList.slice(3, 5)
+        let bannerDList = bannerCList.slice(3)
         return bannerDList.map((item, index) => {
-            return <a href={item.url} className="seat-h110 lighten"><img src={item.image} /></a>
+            return <a href={item.link} target="_blank" className="seat-h110 lighten"><img src={item.image} /></a>
+        })
+    }
+    createBannerE = () => {
+        const { bannerEList } = this.state
+        return bannerEList.map((item, index) => {
+            return <a href={item.link} target="_blank" className="seat-h110 lighten"><img src={item.image} /></a>
+        })
+    }
+    createBannerG = () => {
+        const { bannerGList } = this.state
+        return bannerGList.map((item, index) => {
+            return (
+                <div className="swiper-slide">
+                    <a className="thumb-img" href={item.link} target="_blank">
+                        <img src={item.image} />
+                    </a>
+                    <a className="btn" href={item.link} target="_blank">参加</a>
+                </div>
+            )
         })
     }
 
     getViewPointList = () => {
-        POST({
-            url: "/a/cms/article/getAllArticle?",
-            opts: {
-                categoryId: "846cd0769ef9452aad0cc9c354ba07e3",
-                pageNo: 1,
-                pageSize: PAGESIZE
-            }
+        Service.GetAllArticle({
+            categoryId: "846cd0769ef9452aad0cc9c354ba07e3",
+            pageNo: 1,
+            pageSize: PAGESIZE
         }).then((response) => {
-            
+
             let viewPointList = response.data.data
             this.setState({ viewPointList })
         })
@@ -326,13 +403,10 @@ export default class App extends Component {
             })
     }
     getGoodCopyList = () => {
-        POST({
-            url: "/a/cms/article/getAllArticle?",
-            opts: {
-                categoryId: "ce009ff186fa4203ab07bd1678504228",
-                pageNo: 1,
-                pageSize: PAGESIZE
-            }
+        Service.GetAllArticle({
+            categoryId: "ce009ff186fa4203ab07bd1678504228",
+            pageNo: 1,
+            pageSize: PAGESIZE
         }).then((response) => {
             let goodcopyList = response.data.data
             this.setState({ goodcopyList })
@@ -342,13 +416,10 @@ export default class App extends Component {
             })
     }
     getBootStoreList = () => {
-        POST({
-            url: "/a/book/bookManager/bookSoft?",
-            opts: {
-                softType: 0,
-                pageNo: 1,
-                pageSize: PAGESIZE
-            }
+        Service.GetBooks({
+            softType: 0,
+            pageNo: 1,
+            pageSize: PAGESIZE
         }).then((response) => {
             let bootStoreList = response.data.data
             this.setState({ bootStoreList })
@@ -358,13 +429,10 @@ export default class App extends Component {
             })
     }
     getJobsList = () => {
-        POST({
-            url: "/a/cms/article/getAllArticle?",
-            opts: {
-                categoryId: "981892a5c2394fe7b01ce706d917699e",
-                pageNo: 1,
-                pageSize: PAGESIZE
-            }
+        Service.GetAllArticle({
+            categoryId: "981892a5c2394fe7b01ce706d917699e",
+            pageNo: 1,
+            pageSize: PAGESIZE
         }).then((response) => {
             let jobList = response.data.data
             this.setState({ jobList })
@@ -374,42 +442,52 @@ export default class App extends Component {
             })
     }
 
-    createList = (data, router) => {
-        return data.list && data.list.map((item, index) => {
-            let Hours = FormatDate.apartHours(item.updateDate)
-            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`
-            return (
-                // <div className="item">
-                //     <a className="thumb-img" href="javascript:;"><img src={item.image} />
-                //     </a>
-                //     <div className="tit"><a href="javascript:;">{item.title}</a></div>
-                //     <div className="txt">
-                //         <span>今天 22:32</span><br />
-                //         <span>Brand：锤子科技</span>
-                //     </div>
-                //     <div className="bar">
-                //         <a href="javascript:;" className="user-img">
-                //             <img src="css/images/1x1.png" />
-                //         </a>
-                //         <span className="name">企业用户名</span>
-                //         <div className="f-bartool clearfix"><a href="javascript:;"><i className="icon-heart"></i><span>99</span></a><a href="javascript:;"><i className="icon-thumbs"></i><span>36</span></a><a href="javascript:;"><i className="icon-comment"></i><span>51</span></a></div>
-
-                //     </div>
-                // </div>
-                <div class="item user" onClick={() => this.gotoRouter(`${router}/${item.id}`)}>
-                    <a class="thumb-img" href="javascript:;">
-                        <img src={item.image} />
-                    </a>
-                    <div class="tit"><a href="javascript:;">{item.title || item.bookName}</a></div>
-                    <div class="txt">{item.description}</div>
-                    <div class="bar">
-                        <span>{item.author}</span><span>·</span><span>{Time}</span>
-                        <div class="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item)}><i class="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item)}><i class="icon-thumbs"></i><span>{item.likeNum || item.praiseNum}</span></a><a href="javascript:;"><i class="icon-comment"></i><span>0</span></a></div>
-
+    createArticleForPerson = (item, router) => {
+        let Time = FormatDate.formatTime(item.updateDate)
+        return (
+            <div class="item user" onClick={() => this.gotoRouter(`${router}/${item.id}`)}>
+                <a class="thumb-img" href="javascript:;">
+                    <img src={item.image} />
+                </a>
+                <div class="tit"><a href="javascript:;">{item.title || item.bookName}</a></div>
+                <div class="txt">{item.description}</div>
+                <div class="bar">
+                    <span>{item.user.name}</span><span>·</span><span>{Time}</span>
+                    <div class="f-bartool clearfix">
+                        <a href="javascript:;" onClick={() => this.handleCollect(item)}><i class="icon-heart"></i><span>{item.collectNum}</span></a>
+                        <a href="javascript:;" onClick={() => this.handleLike(item)}><i class="icon-thumbs"></i><span>{item.praiseNum}</span></a>
+                        <a href="javascript:;"><i class="icon-comment"></i><span>{item.commentNum}</span></a>
                     </div>
                 </div>
-            )
-        })
+            </div>
+
+        )
+
+    }
+    createArticleForCompany = (item, router) => {
+        let Time = FormatDate.formatTime(item.updateDate)
+        return (
+            <div className="item" onClick={() => this.gotoRouter(`${router}/${item.id}`)}>
+                <a className="thumb-img" href="javascript:;"><img src={item.image} />
+                </a>
+                <div className="tit"><a href="javascript:;">{item.title}</a></div>
+                <div className="txt">
+                    <span>{Time}</span><br />
+                    <span>Brand：{item.brand}</span>
+                </div>
+                <div className="bar">
+                    <a href="javascript:;" className="user-img">
+                        <img src={item.user.photo} />
+                    </a>
+                    <span className="name">{item.user.name}</span>
+                    <div class="f-bartool clearfix">
+                        <a href="javascript:;" onClick={() => this.handleCollect(item)}><i class="icon-heart"></i><span>{item.collectNum}</span></a>
+                        <a href="javascript:;" onClick={() => this.handleLike(item)}><i class="icon-thumbs"></i><span>{item.praiseNum}</span></a>
+                        <a href="javascript:;"><i class="icon-comment"></i><span>{item.commentNum}</span></a>
+                    </div>
+                </div>
+            </div>
+        )
 
     }
 
@@ -440,11 +518,9 @@ export default class App extends Component {
 
     //主编荐书
     getRecommendBooks = () => {
-        POST({
-            url: "/a/book/bookManager/bookSoft?",
-            opts: {
-                isRecommend: 1
-            }
+        Service.GetAllArticle({
+            isRecommend: 1,
+            pageSize: PAGESIZE
         }).then((response) => {
             if (response.data.status === 1) {
                 let recommendBooks = response.data.data
@@ -455,16 +531,17 @@ export default class App extends Component {
                 console.log(error)
             })
     }
+
     createRecommonList = () => {
-        const { recommendBooks, bannerEList } = this.state
+        const { recommendBooks, bannerFList } = this.state;
+        const categoryUrl = global.constants.categoryUrl;
         return recommendBooks && recommendBooks.list && recommendBooks.list.map((item, index) => {
-            let Hours = FormatDate.apartHours(item.updateDate)
-            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`
-            let bookImagUrl = item.bookImagUrl.split('|')[1]
+            let Time = FormatDate.formatTime(item.updateDate)
             let banner = ''
-            if ((index + 1) % 5 === 0) {
+            let isCompany = item.user.isCompany;
+            if ((index + 1) % 5 === 0 && index < 14) {
                 let i = (index + 1) / 5
-                let bannerItem = bannerEList[i - 1]
+                let bannerItem = bannerFList[i - 1]
                 if (bannerItem) {
                     banner = (
                         <a href={bannerItem.url} class="seat-push">
@@ -479,53 +556,53 @@ export default class App extends Component {
             return (
                 [
                     banner,
-                    <div class="item user">
-                        <a class="thumb-img" href="javascript:;" onClick={() => this.gotoRouter(`/Bookstore/Bookbuy/${item.id}`)}>
-                            <img src={bookImagUrl} />
-                        </a>
-                        <div class="tit"><a href="javascript:;" onClick={() => this.gotoRouter(`/Bookstore/Bookbuy/${item.id}`)}>{item.bookName}</a></div>
-                        <div class="txt">{item.authorIntroduce}</div>
-                        <div class="bar">
-                            <span>{item.author}</span><span>·</span><span>{Time}</span>
-                            <div class="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item)}><i class="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item)}><i class="icon-thumbs"></i><span>{item.praiseNum}</span></a><a href="javascript:;"><i class="icon-comment"></i><span>{item.commentNum}</span></a></div>
+                    isCompany === "true" ? this.createArticleForCompany(item, "/Inspiration/Article") : this.createArticleForPerson(item, "/Inspiration/Article")
+                    // <div class="item user">
+                    //     <a class="thumb-img" href="javascript:;" onClick={() => this.gotoRouter(`/Bookstore/Bookbuy/${item.id}`)}>
+                    //         <img src={item.image} />
+                    //     </a>
+                    //     <div class="tit"><a href="javascript:;" onClick={() => this.gotoRouter(`/Bookstore/Bookbuy/${item.id}`)}>{item.title}</a></div>
+                    //     <div class="txt">{item.authorIntroduce}</div>
+                    //     <div class="bar">
+                    //         <span>{item.user.name}</span><span>·</span><span>{Time}</span>
+                    //         <div class="f-bartool clearfix">
+                    //             <a href="javascript:;" onClick={() => this.handleCollect(item)}><i class="icon-heart"></i><span>{item.collectNum}</span></a>
+                    //             <a href="javascript:;" onClick={() => this.handleLike(item)}><i class="icon-thumbs"></i><span>{item.praiseNum}</span></a>
+                    //             <a href="javascript:;"><i class="icon-comment"></i><span>{item.commentNum}</span></a>
+                    //         </div>
 
-                        </div>
-                    </div>
+                    //     </div>
+                    // </div>
                 ]
             )
         })
     }
 
-    getQuestionList = () => {
-        POST({
-            url: "/a/cms/comment/consultationList?",
-            opts: {
-                pageNo: 1,
-                pageSize: PAGESIZE
-            }
-        }).then((response) => {
-            if (response.data.status === 1) {
-                let questionList = response.data.data
-                this.setState({ questionList })
-            }
-        })
-            .catch((error) => {
-                console.log(error)
-            })
-    }
+    // getQuestionList = () => {
+    //     POST({
+    //         url: "/a/cms/comment/consultationList?",
+    //         opts: {
+    //             pageNo: 1,
+    //             pageSize: PAGESIZE
+    //         }
+    //     }).then((response) => {
+    //         if (response.data.status === 1) {
+    //             let questionList = response.data.data
+    //             this.setState({ questionList })
+    //         }
+    //     })
+    //         .catch((error) => {
+    //             console.log(error)
+    //         })
+    // }
 
     getTopAuthor = () => {
-        POST({
-            url: "/a/cms/article/getHostAuthor"
-        }).then((response) => {
+        Service.GetHostAuthor().then((response) => {
             if (response.data.status === 1) {
                 let topAuthorList = response.data.data
                 this.setState({ topAuthorList })
             }
         })
-            .catch((error) => {
-                console.log(error)
-            })
     }
 
     createTopAuthor = (router) => {
@@ -536,21 +613,17 @@ export default class App extends Component {
             return (
                 <li key={index}>
                     <a href="javascript:;" onClick={() => this.gotoRouter(`/UserNews/${item.user.id}`)}>
-                        <em><img src={item.user.photo} /></em>
-                        <span>{item.author}</span>
+                        <em><img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} /></em>
+                        <span>{item.user.name}</span>
                         <i className="fa-angle-right"></i>
                     </a>
                 </li>
             )
         })
     }
-
     getHitsArticle = () => {
-        POST({
-            url: "/a/cms/article/getAllArticle?",
-            opts: {
-                hits: 1
-            }
+        Service.GetAllArticle({
+            hits: 1
         }).then((response) => {
             if (response.data.status === 1) {
                 let hitsArticleList = response.data.data
@@ -569,11 +642,11 @@ export default class App extends Component {
             return (
                 <li key={index} onClick={() => this.gotoRouter(`/Inspiration/Article/${item.id}`)}>
                     <a href="javascript:;" className="thumb-img">
-                        <span>{index+1}</span>
+                        <span>{index + 1}</span>
                         <img src={item.image} />
                     </a>
                     <h1><a href="javascript:;">{item.title}</a></h1>
-                    <h3>{item.author}</h3>
+                    <h3>{item.user.name}</h3>
                 </li>
             )
         })
@@ -584,11 +657,8 @@ export default class App extends Component {
     }
 
     handleLike = (item) => {
-        POST({
-            url: "/a/cms/article/like?",
-            opts: {
-                id: item.id
-            }
+        Service.AddLike({
+            id: item.id
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -603,12 +673,9 @@ export default class App extends Component {
             })
     }
     handleCollect = (item) => {
-        POST({
-            url: "/a/artuser/articleCollect/collectArticle?",
-            opts: {
-                userId: userInfo.id,
-                articleId: item.id
-            }
+        Service.AddCollect({
+            userId: userInfo.id,
+            articleId: item.id
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -652,12 +719,12 @@ export default class App extends Component {
                             <li className="active">
                                 <a href="javascript:;">主编推荐</a>
                             </li>
-                            <li><a href="javascript:;">请 教</a></li>
+                            <li><a href="javascript:;" onClick={() => this.gotoRouter('/Question')}>请 教</a></li>
                             {/* <li><a href="javascript:;">小专栏</a></li> */}
-                            <li><a href="javascript:;">醒来再读</a></li>
-                            <li><a href="javascript:;">吃口文案</a></li>
-                            <li><a href="javascript:;">书单上新</a></li>
-                            <li><a href="javascript:;">招聘</a></li>
+                            <li><a href="javascript:;" onClick={() => this.gotoRouter('/Inspiration/Viewpoint')}>醒来再读</a></li>
+                            <li><a href="javascript:;" onClick={() => this.gotoRouter('/GoodCopy')}>吃口文案</a></li>
+                            <li><a href="javascript:;" onClick={() => this.gotoRouter('/Bookstore')}>书单上新</a></li>
+                            <li><a href="javascript:;" onClick={() => this.gotoRouter('/Job')}>招聘</a></li>
                         </ul>
                     </div>
                     <div id="tabCont" className="g-left">
@@ -667,18 +734,12 @@ export default class App extends Component {
                             </div>
                             <a href="javascript:;" className="more-a" onClick={() => this.gotoRouter('/Bookstore')}>点击浏览更多</a>
                         </div>
-                        <div className="group" index="1" style={{ display: "none" }}>
+                        {/* <div className="group" index="1" style={{ display: "none" }}>
                             <div className="m-artlist clearfix">
                                 {this.createList(questionList, `/Question/Article`)}
                             </div>
                             <a href="javascript:;" className="more-a" onClick={() => this.gotoRouter('/Question')}>点击浏览更多</a>
                         </div>
-                        {/* <div className="group" index="2" style={{ display: "none" }}>
-                            <div className="m-artlist clearfix">
-                                {this.createList(questionList)}
-                            </div>
-                            <a href="javascript:;" className="more-a">点击浏览更多</a>
-                        </div> */}
                         <div className="group" index="2" style={{ display: "none" }}>
                             <div className="m-artlist clearfix">
                                 {this.createList(viewPointList, `/Inspiration/Article`)}
@@ -702,13 +763,11 @@ export default class App extends Component {
                                 {this.createList(jobList, `/Job`)}
                             </div>
                             <a href="javascript:;" className="more-a" onClick={() => this.gotoRouter('/Job')}>点击浏览更多</a>
-                        </div>
+                        </div> */}
                     </div>
                     <div className="g-right">
                         {this.createBannerC()}
-                        <a href="javascript:;" class="seat-h190 lighten"><img src="images/d5.jpg" /></a>
-                        <a href="javascript:;" class="seat-h190 lighten"><img src="images/d5.jpg" /></a>
-                        <a href="javascript:;" class="seat-h190 lighten"><img src="images/d5.jpg" /></a>
+                        {this.createBannerE()}
                         <div className="m-r-hot">
                             <div className="u-title">
                                 <b>热文排行</b>
@@ -796,59 +855,20 @@ export default class App extends Component {
                     <div className="m-next"></div>
                 </div>
                 {/* //本周互动 */}
-                {/* <div className="m-interact wrapper">
+                <div className="m-interact wrapper">
                     <div className="u-title3">
-                        <b>本周互动</b><a href="#">更多></a>
+                        <b>本周互动</b>
+                        {/* <a href="#">更多></a> */}
                     </div>
                     <div className="swiper-container">
                         <div className="swiper-wrapper">
-                            <div className="swiper-slide">
-                                <a className="thumb-img" href="javascript:;">
-                                    <img src="images/h1.jpg" />
-                                </a>
-                                <a className="btn" href="javascript:;">参加</a>
-                            </div>
-                            <div className="swiper-slide">
-                                <a className="thumb-img" href="javascript:;">
-                                    <img src="images/h2.jpg" />
-                                </a>
-                                <a className="btn" href="javascript:;">参加</a>
-                            </div>
-                            <div className="swiper-slide">
-                                <a className="thumb-img" href="javascript:;">
-                                    <img src="images/h3.jpg" />
-                                </a>
-                                <a className="btn" href="javascript:;">参加</a>
-                            </div>
-                            <div className="swiper-slide">
-                                <a className="thumb-img" href="javascript:;">
-                                    <img src="images/h4.jpg" />
-                                </a>
-                                <a className="btn" href="javascript:;">参加</a>
-                            </div>
-                            <div className="swiper-slide">
-                                <a className="thumb-img" href="javascript:;">
-                                    <img src="images/h3.jpg" />
-                                </a>
-                                <a className="btn" href="javascript:;">参加</a>
-                            </div>
-                            <div className="swiper-slide">
-                                <a className="thumb-img" href="javascript:;">
-                                    <img src="css/images/225x275.png" />
-                                </a>
-                                <a className="btn" href="javascript:;">参加</a>
-                            </div>
-                            <div className="swiper-slide">
-                                <a className="thumb-img" href="javascript:;">
-                                    <img src="css/images/225x275.png" />
-                                </a>
-                                <a className="btn" href="javascript:;">参加</a>
-                            </div>
+                            {this.createBannerG()}
+
                         </div>
                     </div>
                     <div className="f-prev fa-angle-left"></div>
                     <div className="f-next fa-angle-right"></div>
-                </div> */}
+                </div>
                 {/* 热门阅读 */}
                 <HotRead />
                 {/* 底部 */}

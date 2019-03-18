@@ -1,25 +1,21 @@
 import React, { Component } from 'react';
 import { Input, Tabs, Pagination } from 'antd';
-import axios from 'axios'
-import $ from 'jquery'
-import Swiper from 'swiper/dist/js/swiper.min.js'
 import FormatDate from '../../static/js/utils/formatDate.js'
 import Utils from '../../static/js/utils/utils.js'
 
 import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
 import WheelBanner from '../../common/wheelBanner/Index'
-import BookMenu from '../../common/bookMenu/Menu'
 import HotRead from '../../common/hotRead/Index'
-import { POST } from '../../service/service'
+import Service from '../../service/api.js'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
 import 'swiper/dist/css/swiper.min.css'
 
 import 'antd/lib/pagination/style/index.css';
 import '../../static/less/bigidea.less';
-import { list } from 'postcss';
 
+import defaultPhoto from "../../static/images/user/default.png"
 const PAGESIZE = 3;
 
 export default class Viewpoint extends Component {
@@ -33,7 +29,8 @@ export default class Viewpoint extends Component {
             viewPointList: [],
             menus: [],
             authorList: [],
-            recommendList: []
+            recommendList: [],
+            bannerAList: []
         };
     }
 
@@ -49,15 +46,32 @@ export default class Viewpoint extends Component {
         this.getViewPoints("846cd0769ef9452aad0cc9c354ba07e3");
         this.getHostAuthor();
         this.getRecommendList("846cd0769ef9452aad0cc9c354ba07e3");
+        this.getBannerA();
     }
 
-    getViewPoints = (categoryId) => {
-        POST({
-            url: "/a/cms/article/getAllArticle?",
-            opts: {
-                categoryId: categoryId || ''
-
+    getBannerA = () => {
+        Service.GetADList({
+            categoryId: "846cd0769ef9452aad0cc9c354ba07e3",
+            id: "37e7de978cc14723b8d51ec902ed0f73"
+        }).then((response) => {
+            if (response.data.status === 1) {
+                this.setState({ bannerAList: response.data.data })
             }
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+
+    }
+    createBannerA = () => {
+        const { bannerAList } = this.state
+        return bannerAList.slice(0, 3).map((item, index) => {
+            return <a href={item.url} className="seat-x315 lighten"><img src={item.image} /></a>
+        })
+    }
+    getViewPoints = (categoryId) => {
+        Service.GetAllArticle({
+            categoryId: categoryId || ''
         }).then((response) => {
             global.constants.loading = false
             let viewPointList = response.data.data
@@ -69,12 +83,8 @@ export default class Viewpoint extends Component {
     }
 
     getViewPointMenu = (categoryId) => {
-        POST({
-            url: "/a/cms/category/navigationBar?",
-            opts: {
-                id: categoryId || ''
-
-            }
+        Service.GetNav({
+            id: categoryId || ''
         }).then((response) => {
             global.constants.loading = false
             let menus = response.data.data
@@ -86,12 +96,8 @@ export default class Viewpoint extends Component {
     }
 
     getRecommendList = (categoryId) => {
-        POST({
-            url: "/a/cms/category/navigationBar?",
-            opts: {
-                subscriber: 0
-
-            }
+        Service.GetNav({
+            subscriber: 0
         }).then((response) => {
             global.constants.loading = false
             let recommendList = response.data.data
@@ -104,9 +110,7 @@ export default class Viewpoint extends Component {
 
     //热门作者
     getHostAuthor = (categoryId) => {
-        POST({
-            url: "/a/cms/article/getHostAuthor"
-        }).then((response) => {
+        Service.GetHostAuthor().then((response) => {
             global.constants.loading = false
             let authorList = response.data.data
             this.setState({ authorList })
@@ -119,8 +123,7 @@ export default class Viewpoint extends Component {
     createViewPointList = () => {
         const { viewPointList } = this.state
         return viewPointList.list && viewPointList.list.map((item, index) => {
-            let Hours = FormatDate.apartHours(item.updateDate)
-            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`
+            let Time = FormatDate.formatTime(item.updateDate);
             return (
                 <div class="item">
                     <a class="thumb-img" href={`/#/Inspiration/Article/${item.id}`}><img src="{item.image} " /></a>
@@ -131,9 +134,9 @@ export default class Viewpoint extends Component {
                     </div>
                     <div class="bar">
                         <a href="javascript:;" class="user-img">
-                            <img src={item.user.photo} />
+                            <img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
                         </a>
-                        <span class="name">{item.author}</span>
+                        <span class="name">{item.user.name}</span>
                         <div class="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{item.commentNum}</span></a></div>
 
                     </div>
@@ -154,16 +157,16 @@ export default class Viewpoint extends Component {
         return authorList && authorList.map((item, index) => {
             return (
                 <li>
-                    <a href="javascript:;" onClick={()=>this.gotoRouter(`/UserNews/${item.user && item.user.id}`)}>
-                        <em><img src={item.user.photo} /></em>
-                        <span>{item.author}</span>
+                    <a href="javascript:;" onClick={() => this.gotoRouter(`/UserNews/${item.user && item.user.id}`)}>
+                        <em><img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} /></em>
+                        <span>{item.user.name}</span>
                         <i class="fa-angle-right"></i>
                     </a>
                 </li>
             )
         })
     }
-    gotoRouter = (router)=>{
+    gotoRouter = (router) => {
         this.props.history.push(router)
     }
 
@@ -186,11 +189,8 @@ export default class Viewpoint extends Component {
     }
 
     handleLike = (item) => {
-        POST({
-            url: "/a/cms/article/like?",
-            opts: {
-                id: item.id
-            }
+        Service.AddLike({
+            id: item.id
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -205,12 +205,9 @@ export default class Viewpoint extends Component {
             })
     }
     handleCollect = (item) => {
-        POST({
-            url: "/a/artuser/articleCollect/collectArticle?",
-            opts: {
-                userId: 1,
-                articleId: item.id
-            }
+        Service.AddCollect({
+            userId: 1,
+            articleId: item.id
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -240,7 +237,7 @@ export default class Viewpoint extends Component {
                 {/* 头部 */}
                 < Header />
                 {/* 轮播banner */}
-                <WheelBanner />
+                <WheelBanner categoryId={"846cd0769ef9452aad0cc9c354ba07e3"} />
 
                 <div class="m-chartlist background">
                     <div class="wrapper">
@@ -375,8 +372,9 @@ export default class Viewpoint extends Component {
                         <ul class="hot-writer clearfix">
                             {this.createAuthorList()}
                         </ul>
-                        <a href="javascript:;" class="seat-x315"><img src="images/17.jpg" /></a>
-                        <a href="javascript:;" class="seat-x315"><img src="images/d5.jpg" /></a>
+                        {/* <a href="javascript:;" class="seat-x315"><img src="images/17.jpg" /></a>
+                        <a href="javascript:;" class="seat-x315"><img src="images/d5.jpg" /></a> */}
+                        {this.createBannerA()}
                     </div>
                 </div>
                 <HotRead />

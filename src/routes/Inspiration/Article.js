@@ -1,25 +1,19 @@
 import React, { Component } from 'react';
 import { Input, Tabs, Pagination } from 'antd';
-import axios from 'axios'
-import $ from 'jquery'
-import Swiper from 'swiper/dist/js/swiper.min.js'
 import FormatDate from '../../static/js/utils/formatDate.js'
 import Utils from '../../static/js/utils/utils.js'
-
+import Service from '../../service/api.js'
 import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
-import WheelBanner from '../../common/wheelBanner/Index'
 import HotRead from '../../common/hotRead/Index'
-import { POST } from '../../service/service'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
 import 'swiper/dist/css/swiper.min.css'
 
 import 'antd/lib/pagination/style/index.css';
 import '../../static/less/article.less';
-import banner from "../../static/images/article/1.jpg"
+import defaultPhoto from "../../static/images/user/default.png"
 const PAGESIZE = 3;
-
 export default class Article extends Component {
 
     constructor(props) {
@@ -64,49 +58,34 @@ export default class Article extends Component {
     }
 
     getArticleInfo = (aid) => {
-        let url = '/zsl/a/cms/article/getAllArticle?'
-        let opts = {
+        Service.GetAllArticle({
             id: aid
-        }
-        for (var key in opts) {
-            opts[key] && (url += "&" + key + "=" + opts[key])
-        }
-        axios.post(url, opts)
-            .then((response) => {
-                let articleInfo = response.data.data
-                this.getArticleComment(aid, articleInfo.category.id)
-                this.setState({ articleInfo })
-            })
+        }).then((response) => {
+            let articleInfo = response.data.data
+            this.getArticleComment(aid, articleInfo.category.id)
+            this.setState({ articleInfo })
+        })
             .catch((error) => {
                 console.log(error)
             })
     }
 
     getArticleContent = (aid) => {
-        let url = '/zsl/a/cms/article/getArticleContent?'
-        let opts = {
+        Service.GetArticleContent({
             id: aid
-        }
-        for (var key in opts) {
-            opts[key] && (url += "&" + key + "=" + opts[key])
-        }
-        axios.post(url, opts)
-            .then((response) => {
-                let articleContent = response.data.data
-                this.setState({ articleContent })
-            })
+        }).then((response) => {
+            let articleContent = response.data.data
+            this.setState({ articleContent })
+        })
             .catch((error) => {
                 console.log(error)
             })
     }
 
     getArticleComment = (aid, cid) => {
-        POST({
-            url: "/a/cms/comment/consultationList?",
-            opts: {
-                categoryId: cid,
-                contentId: aid
-            }
+        Service.GetQuestion({
+            categoryId: cid,
+            contentId: aid
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -120,11 +99,8 @@ export default class Article extends Component {
     }
 
     getCollectUsers = (aid) => {
-        POST({
-            url: "/a/artuser/articleCollect/collectUsers?",
-            opts: {
-                articleId: aid
-            }
+        Service.GetCollectUsers({
+            articleId: aid
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -140,7 +116,7 @@ export default class Article extends Component {
     createCollectUsers = () => {
         const { collectUserList } = this.state
         let users = collectUserList && collectUserList.map((item, index) => {
-            return <a href="javascript:;" onClick={() => this.gotoRouter(`/UserNews/${item.id}`)}><img src={item.image} /></a>
+            return <a href="javascript:;" onClick={() => this.gotoRouter(`/UserNews/${item.id}`)}><img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} /></a>
 
         })
         return (
@@ -167,11 +143,8 @@ export default class Article extends Component {
     }
 
     handleLike = (item) => {
-        POST({
-            url: "/a/cms/article/like?",
-            opts: {
-                id: item.id
-            }
+        Service.AddLike({
+            id: item.id
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -181,17 +154,11 @@ export default class Article extends Component {
             /* global layer */
             layer.msg(response.data.message)
         })
-            .catch((error) => {
-                console.log(error)
-            })
     }
     handleCollect = (item) => {
-        POST({
-            url: "/a/artuser/articleCollect/collectArticle?",
-            opts: {
-                userId: global.constants.userInfo.id,
-                articleId: item.id
-            }
+        Service.AddCollect({
+            userId: 1,
+            articleId: item.id
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -202,22 +169,18 @@ export default class Article extends Component {
             /* global layer */
             layer.msg(response.data.message)
         })
-            .catch((error) => {
-                console.log(error)
-            })
     }
 
     createCommentList = (data) => {
         const { replyContent } = this.state;
-        const userInfo = global.constants.userInfo;
+        const userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
         return data.list && data.list.map((item, index) => {
-            let Hours = FormatDate.apartHours(item.createDate)
-            let Time = Hours > 24 ? FormatDate.customFormat(item.createDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`;
+            let Time = FormatDate.formatTime(item.createDate);
             return (
                 <div className="disc-item">
-                    <a href="javascript:;" className="thumb"><img src={item.user.photo} /></a>
+                    <a href="javascript:;" className="thumb"><img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} /></a>
                     <div className="alt">
-                        <a href="javascript:;" className="j_name" onClick={() => this.gotoRouter(`/UserNews${item.user.id}`)}>{item.name}</a><span className="dot"></span><span>{Time}</span>
+                        <a href="javascript:;" className="j_name" onClick={() => this.gotoRouter(`/UserNews${item.user.id}`)}>{item.user.name}</a><span className="dot"></span><span>{Time}</span>
                     </div>
                     <div className="txt">
                         {item.content}
@@ -225,7 +188,7 @@ export default class Article extends Component {
                     <div className="bar">
                         <a href="javascript:;">投诉</a><a href="javascript:;" onClick={() => this.handleReply(item)}>回复</a><a href="javascript:;" className="thumbs" onClick={() => this.handleLike(item)}><i className="icon-thumbs-up"></i>{item.commentNum}</a>
                     </div>
-                    <div class="replyfrom" style={{ display: (item.id === this.state.replyId ? "" : "none") }}><textarea placeholder="我来补充两句。" onChange={this.handleChangeReply} /><a href="javascript:;" class="thumb"><img src={userInfo.photo} /></a><a href="javascript:;" class="artbtn" onClick={() => this.submitComment(item.id, replyContent)}>留 言</a><a href="javascript:;" class="escbtn" data-el="replyesc">稍后再说</a></div>
+                    <div class="replyfrom" style={{ display: (item.id === this.state.replyId ? "" : "none") }}><textarea placeholder="我来补充两句。" onChange={this.handleChangeReply} /><a href="javascript:;" class="thumb"><img src={userInfo.photo || defaultPhoto} onError={Utils.setDefaultPhoto} /></a><a href="javascript:;" class="artbtn" onClick={() => this.submitComment(item.id, replyContent)}>留 言</a><a href="javascript:;" class="escbtn" data-el="replyesc">稍后再说</a></div>
                     {
                         item.childComments &&
                         <div className="disc-sub">
@@ -240,15 +203,14 @@ export default class Article extends Component {
 
     createChildCommentList = (data) => {
         const { replyContent } = this.state;
-        const userInfo = global.constants.userInfo;
+        const userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
         return data && data.map((item, index) => {
-            let Hours = FormatDate.apartHours(item.createDate)
-            let Time = Hours > 24 ? FormatDate.customFormat(item.createDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`;
+            let Time = FormatDate.formatTime(item.createDate)
             return (
                 <div className="disc-item">
-                    <a href="javascript:;" className="thumb"><img src={item.user.photo} /></a>
+                    <a href="javascript:;" className="thumb"><img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} /></a>
                     <div className="alt">
-                        <a href="javascript:;" className="j_name" onClick={() => this.gotoRouter(`/UserNews${item.user.id}`)}>{item.name}</a><span className="dot"></span><span>{Time}</span>
+                        <a href="javascript:;" className="j_name" onClick={() => this.gotoRouter(`/UserNews${item.user.id}`)}>{item.user.name}</a><span className="dot"></span><span>{Time}</span>
                     </div>
                     <div className="txt">
                         {item.content}
@@ -256,7 +218,7 @@ export default class Article extends Component {
                     <div className="bar">
                         <a href="javascript:;">投诉</a><a href="javascript:;" onClick={() => this.handleReply(item)}>回复</a><a href="javascript:;" className="thumbs" onClick={() => this.handleLike(item)}><i className="icon-thumbs-up"></i>{item.commentNum}</a>
                     </div>
-                    <div class="replyfrom" style={{ display: (item.id === this.state.replyId ? "" : "none") }}><textarea placeholder="我来补充两句。" onChange={this.handleChangeReply} /><a href="javascript:;" class="thumb"><img src={userInfo.photo} /></a><a href="javascript:;" class="artbtn" onClick={() => this.submitComment(item.id, replyContent)}>留 言</a><a href="javascript:;" class="escbtn" onClick={this.cancleReply}>稍后再说</a></div>
+                    <div class="replyfrom" style={{ display: (item.id === this.state.replyId ? "" : "none") }}><textarea placeholder="我来补充两句。" onChange={this.handleChangeReply} /><a href="javascript:;" class="thumb"><img src={userInfo.photo || defaultPhoto} onError={Utils.setDefaultPhoto} /></a><a href="javascript:;" class="artbtn" onClick={() => this.submitComment(item.id, replyContent)}>留 言</a><a href="javascript:;" class="escbtn" onClick={this.cancleReply}>稍后再说</a></div>
                     {
                         item.childComments &&
                         <div className="disc-sub">
@@ -285,12 +247,9 @@ export default class Article extends Component {
 
     handleAddFans = () => {
         const { articleInfo } = this.state;
-        POST({
-            url: "/a/attention/userAttentionUserids/attention?",
-            opts: {
-                attention2UserId: articleInfo.user.id,
-                userId: global.constants.userInfo.id
-            }
+        Service.AddAttention({
+            attention2UserId: articleInfo.user.id,
+            userId: JSON.parse(sessionStorage.getItem("userInfo")).id
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -312,17 +271,14 @@ export default class Article extends Component {
 
     submitComment = (pid, content) => {
         const { articleInfo, commentTxt } = this.state;
-        POST({
-            url: "/f/comment?",
-            opts: {
-                title: articleInfo.title,
-                categoryId: articleInfo.category.id,
-                contentId: this.props.match.params.aid,
-                replyId: pid || '',
-                name: global.constants.userInfo.name,
-                isValidate: "0",
-                content: content
-            }
+        Service.SubmitComment({
+            title: articleInfo.title,
+            categoryId: articleInfo.category.id,
+            contentId: this.props.match.params.aid,
+            replyId: pid || '',
+            name: JSON.parse(sessionStorage.getItem("userInfo")).name,
+            isValidate: "0",
+            content: content
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -339,9 +295,8 @@ export default class Article extends Component {
 
     render() {
         const { articleInfo, articleContent, articleComment, isFans, commentTxt } = this.state;
-        const userInfo = global.constants.userInfo;
-        let Hours = FormatDate.apartHours(articleInfo.updateDate)
-        let Time = Hours > 24 ? FormatDate.customFormat(articleInfo.updateDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`;
+        const userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+        let Time = FormatDate.formatTime(articleInfo.updateDate)
         return (
             <div className="">
                 {/* 头部 */}
@@ -415,7 +370,7 @@ export default class Article extends Component {
                         <div className="artfrom">
                             <textarea placeholder="万难尽如人意，或有些许共鸣可取……" onChange={this.handleChangeCommentTxt}></textarea>
                             <a href="javascript:;" className="thumb">
-                                <img src={userInfo.photo} />
+                                <img src={userInfo.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
                             </a>
                             <a href="javascript:;" className="artbtn" onClick={() => this.submitComment("", commentTxt)}>留 言</a>
                         </div>
@@ -423,7 +378,7 @@ export default class Article extends Component {
                             <h1>本文作者</h1>
                             <div className="box">
                                 <a href="javascript:;" className="thumb" onClick={() => this.gotoRouter(`/UserNews/${articleInfo.user && articleInfo.user.id}`)}>
-                                    <img src={articleInfo.user && articleInfo.user.photo} />
+                                    <img src={articleInfo.user && articleInfo.user.photo || defaultPhoto} />
                                 </a>
                                 <h2>{articleInfo.user && articleInfo.user.name}</h2>
                                 <div className="bar">
@@ -435,10 +390,10 @@ export default class Article extends Component {
                                 <div className="lk">
                                     {
                                         !isFans &&
-                                        <a href="javascript:;" onClick={() => this.handleAddFans(global.constants.userInfo && global.constants.userInfo.id)}>关 注</a>
+                                        <a href="javascript:;" onClick={() => this.handleAddFans(JSON.parse(sessionStorage.getItem("userInfo")) && JSON.parse(sessionStorage.getItem("userInfo")).id)}>关 注</a>
                                     }
                                     {/* {
-                                        isFans && <a href="javascript:;" onClick={() => this.handleSubFans(global.constants.userInfo && global.constants.userInfo.id)}>取消关注</a>
+                                        isFans && <a href="javascript:;" onClick={() => this.handleSubFans(JSON.parse(sessionStorage.getItem("userInfo")) && JSON.parse(sessionStorage.getItem("userInfo")).id)}>取消关注</a>
                                     } */}
                                     <a href="javascript:;" onClick={() => this.gotoRouter(`/UserNews/${articleInfo.user.id}`)}>主 页</a>
                                 </div>

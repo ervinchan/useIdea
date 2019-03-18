@@ -151,7 +151,7 @@ export default class Login extends Component {
                             </div>
                             <a href="javascript:;" className="r-btn" onClick={this.Login}>机构登录</a>
                             <div className="r-right-txt f17">
-                                暂无账户？点此开启你的灵感旅程：<a href="/#/Reg">创建账户</a>
+                                暂无账户？点此开启你的灵感旅程：<a href="/#/RegQy">创建账户</a>
                             </div>
                         </div>
                     </div>

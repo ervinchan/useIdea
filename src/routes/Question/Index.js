@@ -5,22 +5,20 @@ import { StickyContainer, Sticky } from 'react-sticky';
 
 import $ from 'jquery'
 import Swiper from 'swiper/dist/js/swiper.min.js'
-import axios from 'axios'
 
 import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
 import FormatDate from '../../static/js/utils/formatDate.js'
-import { POST } from '../../service/service'
+import Service from '../../service/api.js'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
 import HotRead from '../../common/hotRead/Index'
 import 'swiper/dist/css/swiper.min.css'
 import '../../static/less/question.less'
-
-import banner from '../../static/images/jingjiao/banner.jpg'
 import 'antd/lib/tabs/style/index.less';
 import 'antd/lib/upload/style/index.less';
-
+import Utils from '../../static/js/utils/utils.js';
+import defaultPhoto from "../../static/images/user/default.png"
 const TabPane = Tabs.TabPane;
 
 export default class Question extends Component {
@@ -41,7 +39,7 @@ export default class Question extends Component {
             categoryList: [],
             addCategoryId: "",
             addCategoryName: "",
-            userInfo: global.constants.userInfo,
+            userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
             curPage: 1,
             searchTxt: ""
         };
@@ -95,10 +93,7 @@ export default class Question extends Component {
     }
 
     getCategory = () => {
-        POST({
-            url: "/a/cms/article/findClassifying?",
-
-        }).then((response) => {
+        Service.FindClassifying().then((response) => {
             if (response.data.status === 1) {
                 this.setState({ categoryList: response.data.data })
             }
@@ -109,35 +104,31 @@ export default class Question extends Component {
     }
 
     getBannerA = () => {
-        POST({
-            url: "/a/cms/article/adsList?",
-            opts: {
-                categoryId: "981892a5c2394fe7b01ce706d917699e"
-            }
+        Service.GetADList({
+            categoryId: "4812062598ec4b10bedfb38b59ea3e94",
+            id: "588e4f30e9634523b34b5c913bfa4cd2"
         }).then((response) => {
             if (response.data.status === 1) {
-                this.setState({ bannerAList: response.data.data })
+                this.setState({ bannerFList: response.data.data })
             }
         })
-            .catch((error) => {
-                console.log(error)
-            })
     }
     getBannerB = () => {
-        POST({
-            url: "/a/cms/article/adsList?",
-            opts: {
-                categoryId: "981892a5c2394fe7b01ce706d917699e"
-            }
+        // Service.GetBanners({
+        //     categoryId: "981892a5c2394fe7b01ce706d917699e"
+        // }).then((response) => {
+        //     if (response.data.status === 1) {
+        //         this.setState({ bannerBList: response.data.data })
+        //     }
+        // })
+        Service.GetADList({
+            categoryId: "4812062598ec4b10bedfb38b59ea3e94",
+            id: "b3653c6c1da841569e04ccccd5c0a776"
         }).then((response) => {
             if (response.data.status === 1) {
-                this.setState({ bannerBList: response.data.data })
+                this.setState({ bannerFList: response.data.data })
             }
         })
-            .catch((error) => {
-                console.log(error)
-            })
-
     }
     createBannerA = () => {
         const { bannerAList } = this.state
@@ -166,13 +157,10 @@ export default class Question extends Component {
     }
 
     getQuestionList = (pageNo) => {
-        POST({
-            url: "/a/cms/comment/consultationList?",
-            opts: {
-                pageNo: pageNo || 1,
-                pageSize: global.constants.PAGESIZE,
-                categoryId: "4812062598ec4b10bedfb38b59ea3e94"
-            }
+        Service.GetQuestion({
+            pageNo: pageNo || 1,
+            pageSize: global.constants.PAGESIZE,
+            categoryId: "4812062598ec4b10bedfb38b59ea3e94"
         }).then((response) => {
             if (response.data.status === 1) {
                 global.constants.loading = false
@@ -185,12 +173,9 @@ export default class Question extends Component {
             })
     }
     getRecoList = () => {
-        POST({
-            url: "/a/cms/comment/consultationList?",
-            opts: {
-                isRecommend: 1,
-                categoryId: "4812062598ec4b10bedfb38b59ea3e94"
-            }
+        Service.GetQuestion({
+            isRecommend: 1,
+            categoryId: "4812062598ec4b10bedfb38b59ea3e94"
         }).then((response) => {
             if (response.data.status === 1) {
                 let recoList = response.data.data
@@ -202,12 +187,9 @@ export default class Question extends Component {
             })
     }
     getReplyList = () => {
-        POST({
-            url: "/a/cms/comment/consultationList?",
-            opts: {
-                parentContentId: 1,
-                categoryId: "4812062598ec4b10bedfb38b59ea3e94"
-            }
+        Service.GetQuestion({
+            parentContentId: 1,
+            categoryId: "4812062598ec4b10bedfb38b59ea3e94"
         }).then((response) => {
             if (response.data.status === 1) {
                 let replyList = response.data.data
@@ -221,13 +203,12 @@ export default class Question extends Component {
 
     createQuestionList = (data) => {
         let items = data.list && data.list.map((item, index) => {
-            let Hours = FormatDate.apartHours(item.createDate)
-            let Time = Hours > 24 ? FormatDate.customFormat(item.createDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`;
+            let Time = FormatDate.formatTime(item.createDate)
             if (item.isNewRecord) {
                 return (
                     <div className="item">
                         <a href="javascript:;" onClick={() => this.gotoRouter(item.contentId)} className="thumb-img">
-                            <img src={item.image} />
+                            <img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
                         </a>
                         <h1><a href="javascript:;" onClick={() => this.gotoRouter(item.contentId)}>{item.title}</a></h1>
                         <div className="alt"><span>{Time}</span></div>
@@ -238,7 +219,7 @@ export default class Question extends Component {
                 return (
                     <div class="item">
                         <a href="javascript:;" class="thumb-img" onClick={() => this.gotoRouter(item.contentId)}>
-                            <img src={item.image} />
+                            <img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
                         </a>
                         <h1><a href="javascript:;" onClick={() => this.gotoRouter(item.contentId)}>{item.title}</a></h1>
                         <div class="alt">
@@ -259,20 +240,14 @@ export default class Question extends Component {
 
     //主编荐书
     getRecommendBooks = () => {
-        POST({
-            url: "/a/book/bookManager/bookSoft?",
-            opts: {
-                isRecommend: 1
-            }
+        Service.GetBooks({
+            isRecommend: 1
         }).then((response) => {
             if (response.data.status === 1) {
                 let recommendBooks = response.data.data
                 this.setState({ recommendBooks })
             }
         })
-            .catch((error) => {
-                console.log(error)
-            })
     }
     createRecommonList = () => {
         const { recommendBooks } = this.state
@@ -308,12 +283,8 @@ export default class Question extends Component {
         fileList.forEach((file) => {
             oMyForm.append('homeImage', file);
         });
-        axios({
-            url: "/zsl/a/cms/article/consultationSave?",
-            method: "post",
-            data: oMyForm,
-            processData: false,// 告诉axios不要去处理发送的数据(重要参数)
-            contentType: false,   // 告诉axios不要去设置Content-Type请求头
+        Service.QuestionBuild({
+            form: oMyForm
         }).then((response) => {
             /*global layer */
             global.constants.loading = false
@@ -326,26 +297,6 @@ export default class Question extends Component {
                 global.constants.loading = false
                 console.log(error)
             })
-        // POST({
-        //     url: "/a/cms/article/consultationSave?",
-        //     opts: {
-        //         userId: 1,
-        //         categoryId: "4812062598ec4b10bedfb38b59ea3e94",
-        //         title: questionTit,
-        //         content: questionTxt,
-        //         homeImage: fileList[0]
-        //     },
-        //     // processData: false,
-        //     // data: oMyForm,
-        // }).then((response) => {
-        //     /*global layer */
-        //     global.constants.loading = false
-        //     layer.msg(response.data.message)
-        // })
-        //     .catch((error) => {
-        //         global.constants.loading = false
-        //         console.log(error)
-        //     })
     }
     createCategory = () => {
         const { categoryList } = this.state
@@ -363,12 +314,9 @@ export default class Question extends Component {
 
     handleSearch = () => {
         const { searchTxt } = this.state;
-        POST({
-            url: "/a/cms/article/getAllArticle?",
-            opts: {
-                title: searchTxt || this.props.match.params.txt,
-                categoryId: "4812062598ec4b10bedfb38b59ea3e94"
-            }
+        Service.GetAllArticle({
+            title: searchTxt || this.props.match.params.txt,
+            categoryId: "4812062598ec4b10bedfb38b59ea3e94"
         }).then((response) => {
             /*global layer */
             global.constants.loading = false
@@ -386,27 +334,44 @@ export default class Question extends Component {
     render() {
 
         const { questionList, recoList, replyList, questionTit, questionTxt, fileList, addCategoryName } = this.state;
-        const props = {
-            onRemove: (file) => {
-                this.setState((state) => {
-                    const index = state.fileList.indexOf(file);
-                    const newFileList = state.fileList.slice();
-                    newFileList.splice(index, 1);
-                    return {
-                        fileList: newFileList,
-                    };
-                });
-            },
-            beforeUpload: (file) => {
-                this.setState(state => ({
-                    //fileList: [...state.fileList, file],
-                    fileList: [file]
-                }));
-                return false;
-            },
-            fileList,
-            showUploadList: false
-        };
+        // const props = {
+        //     onRemove: (file) => {
+        //         this.setState((state) => {
+        //             const index = state.fileList.indexOf(file);
+        //             const newFileList = state.fileList.slice();
+        //             newFileList.splice(index, 1);
+        //             return {
+        //                 fileList: newFileList,
+        //             };
+        //         });
+        //     },
+        //     beforeUpload: (file) => {
+        //         this.setState(state => ({
+        //             //fileList: [...state.fileList, file],
+        //             fileList: [file]
+        //         }));
+        //         return false;
+        //     },
+        //     fileList,
+        //     showUploadList: false
+        // };
+        const props = Utils.uploadProps(fileList, (file, newUrl) => {
+            this.setState(state => ({
+                fileList: [file]
+            }), () => {
+                $(".question-upload").find("input[type=file]").css({
+                    position: "absolute",
+                    left: 0,
+                    top: 0,
+                    width: "100%",
+                    height: "100%",
+                    opacity: 0,
+                    zIndex: 1,
+                    display: "block"
+                })
+
+            })
+        });
         return (
             <div className="">
                 {/* 头部 */}
@@ -437,7 +402,7 @@ export default class Question extends Component {
                             </div>
                         </div>
                         <div className="fm-qj-tool clearfix">
-                            <Upload className="upload-btn" {...props}>
+                            <Upload className="upload-btn question-upload" {...props}>
                                 <a href="javascript:;" className="tl-img"><i className="icon-img"></i>{(fileList.length && fileList[0].name) || '图片'}</a>
                             </Upload>
                             {/* <a href="javascript:;" className="tl-img"><i className="icon-img"></i>图片</a> */}

@@ -2,26 +2,20 @@ import React, { Component } from 'react';
 import { Input, Tabs, Pagination } from 'antd';
 import Slider from "react-slick";
 import { StickyContainer, Sticky } from 'react-sticky';
-import axios from 'axios'
 import $ from 'jquery'
 import Swiper from 'swiper/dist/js/swiper.min.js'
 import FormatDate from '../../static/js/utils/formatDate.js'
 import Utils from '../../static/js/utils/utils.js'
-
+import Service from '../../service/api.js'
 import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
-import WheelBanner from '../../common/wheelBanner/Index'
 import BookMenu from '../../common/bookMenu/Menu'
-
+import WheelBanner from '../../common/wheelBanner/Index'
 import 'swiper/dist/css/swiper.min.css'
 
 import 'antd/lib/pagination/style/index.css';
 import '../../static/less/bookstore.less';
 
-
-import banner from "../../static/images/1.jpg"
-import banner2 from "../../static/images/2.jpg"
-import { CLASS } from 'postcss-selector-parser';
 
 const Search = Input.Search;
 const TabPane = Tabs.TabPane;
@@ -97,9 +91,7 @@ export default class Bookstore extends Component {
     }
 
     getReadData = () => {
-
-        let url = "/zsl/a/cms/article/readScene"
-        axios.post(url)
+        Service.GetReads()
             .then((response) => {
                 let readList = response.data.data
                 this.setState({ readList })
@@ -110,8 +102,7 @@ export default class Bookstore extends Component {
     }
 
     getBanner = () => {
-        let url = "/zsl/a/cms/article/adsList"
-        axios.post(url)
+        Service.GetBanners()
             .then((response) => {
                 let banner = response.data.data
                 this.setState({ banner }, () => {
@@ -167,8 +158,7 @@ export default class Bookstore extends Component {
     createNews = () => {
         const { news } = this.state
         return news.map((item, index) => {
-            let Hours = FormatDate.apartHours(item.updateDate)
-            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`
+            let Time = FormatDate.formatTime(item.updateDate);
             return (
                 <li key={index}><span>{Time}</span><a href={item.href}>{item.content}</a></li>
             )
@@ -176,7 +166,6 @@ export default class Bookstore extends Component {
     }
 
     getBooksList = (tid, sortType, pageNo, searchTxt) => {
-        let url = '/zsl/a/book/bookManager/bookSoft?'
         let opts = {
             softType: sortType,
             pageNo: pageNo || 1,
@@ -192,10 +181,7 @@ export default class Bookstore extends Component {
                 id: id
             })
         }
-        for (var key in opts) {
-            opts[key] && (url += "&" + key + "=" + opts[key])
-        }
-        axios.post(url, opts)
+        Service.GetBooks(opts)
             .then((response) => {
                 let BooksList = response.data.data
                 this.setState({ BooksList })
@@ -206,7 +192,7 @@ export default class Bookstore extends Component {
     }
 
     getNews = () => {
-        axios.post('/zsl/a/notice/bookNotice/notice')
+        Service.GetBooksNotice()
             .then((response) => {
                 let news = response.data.data
                 this.setState({ news })
@@ -275,7 +261,7 @@ export default class Bookstore extends Component {
                 {/* 头部 */}
                 < Header />
                 {/* 轮播banner */}
-                <div className="m-wheel wrapper">
+                {/* <div className="m-wheel wrapper">
                     <div className="u-wheel">
                         <div className="swiper-container">
                             <div className="swiper-wrapper">
@@ -290,7 +276,8 @@ export default class Bookstore extends Component {
 
                         </ul>
                     </div>
-                </div>
+                </div> */}
+                <WheelBanner categoryId={"9b45b13afc954595a3065bb0ef84dacd"} />
 
                 <div className="g-fanshu wrapper">
                     <div className="g-left">

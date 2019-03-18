@@ -31,7 +31,7 @@ import Loading from '../common/Loading/Index'
 //   })
 
 Axios.interceptors.request.use(function (config) {
-  var userInfo = JSON.parse(localStorage.getItem('userInfo'));
+  var userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
   if (userInfo) {
     config.headers.Authorization = `Bearer ${userInfo.token}`
   }
@@ -46,6 +46,9 @@ Axios.interceptors.response.use((config) => {
   //     ...
   //     // 在这里设置请求头与携带token信息
   // ])
+  if (config.data.status === 2) {
+
+  }
   return config
 }, (error) => {
   // 如何在这里加入react中的路由转跳？

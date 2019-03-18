@@ -4,19 +4,14 @@ import Slider from "react-slick";
 import { StickyContainer, Sticky } from 'react-sticky';
 // import $ from 'jquery'
 import Swiper from 'swiper/dist/js/swiper.min.js'
-import axios from 'axios'
+import Service from '../../service/api.js'
 import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
-import BookMenu from './Menu'
-import BreadCrumb from '../../common/BreadCrumb/Index.js'
+import BookMenu from '../../common/bookMenu/Menu'
 import FormatDate from '../../static/js/utils/formatDate.js'
 
 import 'swiper/dist/css/swiper.min.css'
 import '../../static/less/bookstore.less';
-
-
-import banner from "../../static/images/1.jpg"
-import banner2 from "../../static/images/2.jpg"
 
 const TabPane = Tabs.TabPane;
 const NODATA = "无数据";
@@ -64,9 +59,7 @@ export default class Bookstore extends Component {
     }
 
     getReadData = () => {
-
-        let url = "/zsl/a/cms/article/readScene"
-        axios.post(url)
+        Service.GetReads()
             .then((response) => {
                 let readList = response.data.data
                 this.setState({ readList })
@@ -77,8 +70,6 @@ export default class Bookstore extends Component {
     }
 
     getSameBookeData = (tid, sortType, pageNo, searchTxt) => {
-
-        let url = '/zsl/a/book/bookManager/bookSoft?'
         let opts = {
             softType: sortType,
             pageNo: pageNo || 1,
@@ -93,10 +84,7 @@ export default class Bookstore extends Component {
                 id: id
             })
         }
-        for (var key in opts) {
-            opts[key] && (url += "&" + key + "=" + opts[key])
-        }
-        axios.post(url, opts)
+        Service.GetBooks(opts)
             .then((response) => {
                 let sameBookList = response.data.data.list
                 this.setState({ sameBookList })
@@ -107,57 +95,51 @@ export default class Bookstore extends Component {
     }
 
     getBookDatas = () => {
-        let url = '/zsl/a/book/bookManager/bookSoft?'
-        let opts = {
+        Service.GetBooks({
             bookId: this.props.match.params.id
-        }
-        for (var key in opts) {
-            opts[key] && (url += "&" + key + "=" + opts[key])
-        }
-        axios.post(url, opts)
-            .then((response) => {
-                let bookInfo = response.data.data[0]
-                this.setState({ bookInfo }, () => {
-                    this.getSameBookeData()
-                    $(function () {
-                        var swiper_book = new Swiper('.fs-book .swiper-container', {
-                            slidesPerView: 3,
-                            spaceBetween: 10,
-                            slidesPerGroup: 3,
-                            loop: true,
-                            navigation: {
-                                nextEl: '.fs-book .m-next',
-                                prevEl: '.fs-book .m-prev'
-                            },
-                            pagination: {
-                                el: '.fs-book .u-pagination',
-                                bulletClass: 'bull',
-                                bulletActiveClass: 'active',
-                                clickable: true
-                            }
-                        });
+        }).then((response) => {
+            let bookInfo = response.data.data[0]
+            this.setState({ bookInfo }, () => {
+                this.getSameBookeData()
+                $(function () {
+                    var swiper_book = new Swiper('.fs-book .swiper-container', {
+                        slidesPerView: 3,
+                        spaceBetween: 10,
+                        slidesPerGroup: 3,
+                        loop: true,
+                        navigation: {
+                            nextEl: '.fs-book .m-next',
+                            prevEl: '.fs-book .m-prev'
+                        },
+                        pagination: {
+                            el: '.fs-book .u-pagination',
+                            bulletClass: 'bull',
+                            bulletActiveClass: 'active',
+                            clickable: true
+                        }
+                    });
 
-                        var galleryThumbs = new Swiper('.fs-preview .gallery-thumbs', {
-                            spaceBetween: 10,
-                            slidesPerView: 'auto',
-                            freeMode: true,
-                            watchSlidesVisibility: true,
-                            watchSlidesProgress: true
-                        });
-                        var galleryTop = new Swiper('.fs-preview .gallery-top', {
-                            spaceBetween: 10,
-                            navigation: {
-                                nextEl: '.fs-preview .m-next',
-                                prevEl: '.fs-preview .m-prev'
-                            },
-                            thumbs: {
-                                swiper: galleryThumbs,
-                                slideThumbActiveClass: 'active'
-                            }
-                        });
-                    })
+                    var galleryThumbs = new Swiper('.fs-preview .gallery-thumbs', {
+                        spaceBetween: 10,
+                        slidesPerView: 'auto',
+                        freeMode: true,
+                        watchSlidesVisibility: true,
+                        watchSlidesProgress: true
+                    });
+                    var galleryTop = new Swiper('.fs-preview .gallery-top', {
+                        spaceBetween: 10,
+                        navigation: {
+                            nextEl: '.fs-preview .m-next',
+                            prevEl: '.fs-preview .m-prev'
+                        },
+                        thumbs: {
+                            swiper: galleryThumbs,
+                            slideThumbActiveClass: 'active'
+                        }
+                    });
                 })
             })
+        })
             .catch((error) => {
                 console.log(error)
             })

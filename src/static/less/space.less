@@ -7,7 +7,7 @@
 @import "./less/_bartool.less";
 @import "./less/_more.less";
 @import "./less/_fixed.less";
-@import "./less/_footer.less"; 
+@import "./less/_footer.less";
 @import "./less/_swiper.less";
 @import "./less/_modal.less";
 //module
@@ -15,31 +15,87 @@
 @import "./less/_u.banner.less";
 
 
-.g-user { padding: 60px 0; min-height: 800px;
-    .ue-tabs { margin-bottom: 80px; }
+.g-user {
+    padding: 60px 0;
+    min-height: 800px;
+
+    .ue-tabs {
+        margin-bottom: 80px;
+    }
 }
 
-.ue-tabs { text-align: center;
-    ul { display: inline-block;
-        li { float: left; line-height: 30px; padding-bottom: 10px; border-bottom: 2px transparent solid; color: #999; font-size: 17px; margin: 0 30px; cursor: pointer;
-            &.active { color: #333; border-color: #333; }
+.ue-tabs {
+    text-align: center;
+
+    ul {
+        display: inline-block;
+
+        li {
+            float: left;
+            line-height: 30px;
+            padding-bottom: 10px;
+            border-bottom: 2px transparent solid;
+            color: #999;
+            font-size: 17px;
+            margin: 0 30px;
+            cursor: pointer;
+
+            &.active {
+                color: #333;
+                border-color: #333;
+            }
         }
     }
 }
 
-.nolist { text-align: center; padding: 15vh 0;
-    &:before { content: ''; display: inline-block; width: 60px; height: 60px; background: url(images/icon-x1.png) 0 -230px no-repeat; }
-    &:after { content: ''; display: block; width: 100%; line-height: 30px; font-size: 15px; color: #dadada; }
+.nolist {
+    text-align: center;
+    padding: 15vh 0;
+
+    &:before {
+        content: '';
+        display: inline-block;
+        width: 60px;
+        height: 60px;
+        background: url(../images/icon-x1.png) 0 -230px no-repeat;
+    }
+
+    &:after {
+        content: '';
+        display: block;
+        width: 100%;
+        line-height: 30px;
+        font-size: 15px;
+        color: #dadada;
+    }
 }
+
 .ue-news .nolist {
-    &:before { background-position: 0 -230px; }
-    &:after { content: '· 暂未留下动态 ·'; }
+    &:before {
+        background-position: 0 -230px;
+    }
+
+    &:after {
+        content: '· 暂未留下动态 ·';
+    }
 }
+
 .ue-articlebox .nolist {
-    &:before { background-position: -60px -230px; }
-    &:after { content: '· 暂未发表文章 ·'; }
+    &:before {
+        background-position: -60px -230px;
+    }
+
+    &:after {
+        content: '· 暂未发表文章 ·';
+    }
 }
+
 .ue-taread .nolist {
-    &:before { background-position: -120px -230px; }
-    &:after { content: '· 暂未订阅专栏 ·'; }
+    &:before {
+        background-position: -120px -230px;
+    }
+
+    &:after {
+        content: '· 暂未订阅专栏 ·';
+    }
 }

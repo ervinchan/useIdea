@@ -13,3 +13,13 @@ export function POST(data) {
     global.constants.loading = true
     return axios.post(url, opts)
 }
+
+export function FormData(data) {
+    return axios({
+        url: config.name + data.url,
+        method: "post",
+        data: data.opts,
+        processData: false,// 告诉axios不要去处理发送的数据(重要参数)
+        contentType: false,   // 告诉axios不要去设置Content-Type请求头
+    })
+}

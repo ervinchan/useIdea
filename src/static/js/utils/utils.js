@@ -1,3 +1,4 @@
+import defaultPhoto from "../../images/user/default.png"
 class Utils {
     static getQueryString(name) {
         var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
@@ -29,6 +30,38 @@ class Utils {
             }
             return _arr;
         }
+    }
+    static uploadProps(fileList, callback) {
+        return {
+            onRemove: (file) => {
+                this.setState((state) => {
+                    const index = state.fileList.indexOf(file);
+                    const newFileList = state.fileList.slice();
+                    newFileList.splice(index, 1);
+                    return {
+                        fileList: newFileList,
+                    };
+                });
+            },
+            beforeUpload: (file) => {
+                var newUrl = ""
+                var reader = new FileReader();
+                reader.readAsDataURL(file);
+                var that = this
+                reader.onload = function (e) {
+                    // 图片base64化
+                    newUrl = this.result;
+                    callback(file, newUrl)
+                };
+
+                return false;
+            },
+            fileList,
+            showUploadList: false
+        }
+    }
+    static setDefaultPhoto(e) {
+        e.target.src = defaultPhoto
     }
 }
 

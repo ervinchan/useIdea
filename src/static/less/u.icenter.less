@@ -17,20 +17,37 @@
 @import "./less/_pages.less";
 @import "./less/u/_u_minav.less";
 @import "./less/lx/_lx.fans.less";
+
 .g-icenter {
     padding: 60px 0;
     min-height: 800px;
     max-width: 1100px;
+
+    a {
+        color: #333;
+    }
+
+    a:hover {
+        color: @color;
+    }
+
     .ue-tabnav {
         margin-bottom: 60px;
     }
+
+    .msg-tab {
+        margin-bottom: 0;
+    }
+
     &.minpage .u-pages {
         max-width: 1000px;
         padding: 10px 0 40px;
     }
+
     .ue-article {
         text-align: left;
     }
+
     .badge {
         top: 12px;
         height: 16px;
@@ -40,4 +57,25 @@
         margin-left: -0.5em;
         padding: 0 3px;
     }
+
+    .tab-cont {
+        .tab-item {
+            display: none;
+
+            &.active {
+                display: block;
+            }
+        }
+    }
+}
+
+.cover-modal,
+.ad-modal {
+    display: none !important;
+    text-align: left;
+}
+
+.layui-fromimg .cover-modal,
+.layui-fromad .ad-modal {
+    display: block !important;
 }
