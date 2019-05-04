@@ -6,7 +6,7 @@ import Swiper from 'swiper/dist/js/swiper.min.js'
 import Utils from '../../static/js/utils/utils.js'
 import Validate from '../../static/js/utils/validate.js'
 import '../../static/less/reg.less';
-
+import Service from '../../service/api.js'
 import regBanner from '../../static/images/reg/1.jpg';
 import logo from "../../static/images/reg_logo.png";
 
@@ -79,19 +79,28 @@ export default class Login extends Component {
         } else if (!loginPsw) {
             return this.setState({ pswError: true })
         }
-        let url = 'zsl/ValidateLoginName?'
-        let opts = {
+        // let url = 'zsl/ValidateLoginName?'
+        // let opts = {
+        //     loginName: loginEmail,
+        //     password: loginPsw,
+        //     isCompany: "true"
+        // }
+        // for (var key in opts) {
+        //     opts[key] && (url += "&" + key + "=" + opts[key])
+        // }
+        Service.Login({
             loginName: loginEmail,
             password: loginPsw,
             isCompany: "true"
-        }
-        for (var key in opts) {
-            opts[key] && (url += "&" + key + "=" + opts[key])
-        }
-        axios.post(url, opts)
+        })
             .then((response) => {
-                let KeywordsList = response.data.data
-                this.setState({ KeywordsList })
+                if (response.data.status === 1) {
+                    sessionStorage.setItem('userInfo', JSON.stringify(response.data.data))
+                    setTimeout(this.props.history.push("/"), 300)
+                } else {
+                    layer.msg(response.data.message)
+                }
+
 
             })
             .catch((error) => {

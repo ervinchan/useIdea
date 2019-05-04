@@ -13,7 +13,7 @@ import QyHead from './qyHead'
 import 'swiper/dist/css/swiper.min.css'
 import '../../static/less/u.icenter.less'
 import 'antd/lib/tabs/style/index.less';
-import { POST } from '../../service/service'
+import Service from '../../service/api.js'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
 import userImg from "../../static/images/user/userTx.jpg"
@@ -32,7 +32,27 @@ export default class AdModal extends Component {
             listData: [],
             activeKey: 'news',
             fileList: [],
-            collectList: []
+            collectList: [],
+            type: [
+                { name: "案例作品图文", id: "inputR1" },
+                { name: "微信推广案例", id: "inputR2" },
+                { name: "首页轮播头条", id: "inputR3" },
+                { name: "侧栏焦点广告", id: "inputR4" },
+                { name: "打包KOL推广", id: "inputR5" },
+                { name: "专访案例报道", id: "inputR6" },
+                { name: "活动征集推广", id: "inputR7" },
+                { name: "其它合作形式", id: "inputR8" }
+            ],
+            period: [
+                { name: "24h" },
+                { name: "3天" },
+                { name: "1周" },
+                { name: "1个月" },
+                { name: "其它时长" }
+            ],
+            adType: [],
+            info: {},
+            periodName: "24h"
         };
     }
 
@@ -72,8 +92,6 @@ export default class AdModal extends Component {
             $(".u-select [role=menu]").hide();
             $(this).next().show();
         });
-        this.getCollectList();
-        this.getMyWork();
     }
     handleTabChange = (key) => {
         console.log(key);
@@ -84,44 +102,92 @@ export default class AdModal extends Component {
     gotoRouter = (router) => {
         this.props.history.push(router)
     }
-
-    getCollectList = () => {
-        POST({
-            url: "/a/artuser/articleCollect/collectList?",
-            opts: {
-                userId: JSON.parse(sessionStorage.getItem("userInfo")).id
-            }
-        }).then((response) => {
-            global.constants.loading = false
-            if (response.data.status === 1) {
-                this.setState({ collectList: response.data.data.articles })
-            }
-        })
-            .catch((error) => {
-                console.log(error)
-            })
-    }
-    getMyWork = () => {
-        POST({
-            url: "/a/cms/article/latestAction?",
-            opts: {
-                userId: JSON.parse(sessionStorage.getItem("userInfo")).id
-            }
-        }).then((response) => {
-            global.constants.loading = false
-            if (response.data.status === 1) {
-                this.setState({ listData: response.data.data })
-            }
-        })
-            .catch((error) => {
-                console.log(error)
-            })
-    }
     handleCancel = (e) => {
         /*global layer */
         layer.closeAll()
     }
+
+    submitAdRequirement = () => {
+        /*global layer */
+        const { info, periodName, adType } = this.state;
+        if (!info.title) {
+            return layer.msg("请填写标题")
+        } else if (!adType.length) {
+            return layer.msg("请选择广告类型")
+        } else if (!(info.email || info.wechatId)) {
+            return layer.msg("请填联系方式")
+        }
+        let params = {
+            title: info.title || "",
+            adType: adType || "",
+            email: info.email || "",
+            wechatId: info.wechatId || "",
+            period: periodName || "",
+            content: info.content || ""
+        }
+        var oMyForm = new FormData();
+
+        for (let key in params) {
+            oMyForm.append(key, params[key]);
+        }
+        Service.adRequirement({
+            form: oMyForm
+        })
+            .then((response) => {
+                global.constants.loading = false
+                if (response.data.status === 1) {
+                    layer.closeAll();
+                    layer.msg("投放成功，请等待审核")
+                } else {
+                    layer.msg(response.data.message)
+                }
+            })
+    }
+
+    createTypeRadio = () => {
+        const { type } = this.state;
+        return type.map((item) => {
+            return (
+                <li>
+                    <input type="checkbox" id={item.id} name="inputRadios" className="u-radio" onClick={(e) => this.setModalTypes(e, item.name)} />
+                    <label for={item.id}>{item.name}</label>
+                </li>
+            )
+        })
+    }
+    setModalTypes = (e, name) => {
+        const { adType } = this.state;
+        if (e.target.checked && !adType.includes(name)) {
+            let adTypes = [...adType];
+            adTypes.push(name)
+            this.setState({ adType: adTypes })
+        } else {
+            let index = adType.indexOf(name);
+            let adTypes = [...adType];
+            adTypes.splice(index, 1)
+            this.setState({ adType: adTypes });
+
+        }
+    }
+
+    createPeriod = () => {
+        const { period } = this.state;
+        return period.map(item => <li onClick={(e) => this.setPeriod(e, item.name)}>{item.name}</li>)
+    }
+
+    setPeriod = (e, name) => {
+        this.setState({ periodName: name })
+    }
+
+    changeInfo = (e, field) => {
+        const { info } = this.state;
+        info[field] = e.target.value
+        this.setState({ info: info }, () => {
+
+        })
+    }
     render() {
+        const { info, periodName } = this.state;
         return (
             <div className="ad-modal">
                 <div id="" className="layui-layer-content">
@@ -130,70 +196,36 @@ export default class AdModal extends Component {
                         <div className="u-inline width-full">
                             <label className="u-form-label">广告投放标题</label>
                             <div className="u-form-input">
-                                <input type="text" className="u-input" placeholder="2019.5.20（时间） 响创意（品牌名）品牌形象TVC传播推广（项目名）" />
+                                <input type="text" className="u-input" placeholder="2019.5.20（时间） 响创意（品牌名）品牌形象TVC传播推广（项目名）" value={info.title} onChange={(e) => this.changeInfo(e, 'title')} />
                             </div>
                         </div>
                         <div className="u-inline width-full">
                             <label className="u-form-label"><i>*</i>投放类型<span>( *可多选 )</span> </label>
                             <div className="checkbox-custom">
                                 <ul className="clearfix">
-                                    <li>
-                                        <input type="checkbox" id="inputR1" name="inputRadios" className="u-radio" />
-                                        <label for="inputR1">案例作品图文</label>
-                                    </li>
-                                    <li>
-                                        <input type="checkbox" id="inputR2" name="inputRadios" className="u-radio" />
-                                        <label for="inputR2">微信推广案例</label>
-                                    </li>
-                                    <li>
-                                        <input type="checkbox" id="inputR3" name="inputRadios" className="u-radio" />
-                                        <label for="inputR3">首页轮播头条</label>
-                                    </li>
-                                    <li>
-                                        <input type="checkbox" id="inputR4" name="inputRadios" className="u-radio" />
-                                        <label for="inputR4">侧栏焦点广告</label>
-                                    </li>
-                                    <li>
-                                        <input type="checkbox" id="inputR5" name="inputRadios" className="u-radio" />
-                                        <label for="inputR5">打包KOL推广</label>
-                                    </li>
-                                    <li>
-                                        <input type="checkbox" id="inputR6" name="inputRadios" className="u-radio" />
-                                        <label for="inputR6">专访案例报道</label>
-                                    </li>
-                                    <li>
-                                        <input type="checkbox" id="inputR7" name="inputRadios" className="u-radio" />
-                                        <label for="inputR7">活动征集推广</label>
-                                    </li>
-                                    <li>
-                                        <input type="checkbox" id="inputR8" name="inputRadios" className="u-radio" />
-                                        <label for="inputR8">其它合作形式</label>
-                                    </li>
+                                    {this.createTypeRadio()}
                                 </ul>
                             </div>
                         </div>
                         <div className="u-inline width-full">
                             <label className="u-form-label"><i>*</i>工作联系</label>
                             <div className="u-form-input width-200">
-                                <input type="text" className="u-input" placeholder="ideazhu@gmail.com" />
+                                <input type="text" className="u-input" placeholder="ideazhu@gmail.com" value={info.email} onChange={(e) => this.changeInfo(e, 'email')} />
                             </div>
                             <div className="adtip">工作邮箱</div>
                             <div className="u-form-input width-200">
-                                <input type="text" className="u-input" />
+                                <input type="text" className="u-input" value={info.wechatId} onChange={(e) => this.changeInfo(e, 'wechatId')} />
                             </div>
                             <div className="adtip">微信ID</div>
                         </div>
                         <div className="u-inline width-full">
                             <label className="u-form-label">投放周期</label>
                             <div className="u-select width-200">
-                                <div className="in_province" role="note">1次</div>
+                                <div className="in_province" role="note">{periodName}</div>
                                 <div data-for=".in_province" role="menu">
                                     <ul>
-                                        <li>24h</li>
-                                        <li>3天</li>
-                                        <li>1周</li>
-                                        <li>1个月</li>
-                                        <li>其它时长</li>
+                                        {this.createPeriod()}
+
                                     </ul>
                                 </div>
                             </div>
@@ -201,13 +233,13 @@ export default class AdModal extends Component {
                         <div className="u-inline width-full">
                             <label className="u-form-label">附件内容</label>
                             <div className="u-form-input">
-                                <input type="text" className="u-input" placeholder="填写内容预览链接，或附件网盘及提取码" />
+                                <input type="text" className="u-input" placeholder="填写内容预览链接，或附件网盘及提取码" value={info.content} onChange={(e) => this.changeInfo(e, 'content')} />
                             </div>
                             <div className="u-helptxt">投放内容经编辑审核后，会在24小时内与您取得联系，沟通具体传播方案和报价。</div>
                         </div>
                         <div className="adbtn">
-                            <a href="javascript:;" data-el="closeAll">取 消</a>
-                            <a href="javascript:;" className="active">提交需求</a>
+                            <a href="javascript:;" onClick={this.handleCancel}>取 消</a>
+                            <a href="javascript:;" className="active" onClick={this.submitAdRequirement}>提交需求</a>
                         </div>
                     </div>
                 </div>

@@ -5,13 +5,14 @@ import axios from 'axios'
 import Utils from '../../static/js/utils/utils.js'
 import Swiper from 'swiper/dist/js/swiper.min.js'
 import Validate from '../../static/js/utils/validate.js'
-
+import Service from '../../service/api.js'
 import '../../static/less/reginfo.less';
 import 'antd/lib/radio/style/index';
 
+import Header from '../../common/header/Index.js'
 import regBanner from '../../static/images/reg/1.jpg';
 import logo from "../../static/images/reg_logo.png";
-
+const regInfo = JSON.parse(sessionStorage.getItem("regInfo"))
 const RadioGroup = Radio.Group;
 export default class RegInfo extends Component {
     constructor(props) {
@@ -21,7 +22,9 @@ export default class RegInfo extends Component {
             city: null,
             province: null,
             type: "国有",
-            userPhoto: null
+            userPhoto: [],
+            avatarPhoto: [],
+            info: {}
         }
     }
 
@@ -70,50 +73,75 @@ export default class RegInfo extends Component {
     }
 
     RegConfirm = () => {
-        const { qyName, userPhoto, avatarPhoto } = this.state;
+        const { type, info, userPhoto, avatarPhoto, district, city, province, districtItem, cityItem } = this.state;
         /*global layer */
         let g = global.constants;
         g.loading = true;
         var that = this
         var oMyForm = new FormData();
-        this.editor.change && this.editor.change()
-        oMyForm.append("userId", JSON.parse(sessionStorage.getItem("userInfo")).id);
-        //oMyForm.append("classifying", addCategoryId);
-        oMyForm.append("title", qyName || "");
-        oMyForm.append('userPhoto', userPhoto);
-        oMyForm.append('avatarPhoto', avatarPhoto);
-        axios({
-            url: "/zsl/a/cms/article/consultationSave?",
-            method: "post",
-            data: oMyForm,
-            processData: false,// 告诉axios不要去处理发送的数据(重要参数)
-            contentType: false,   // 告诉axios不要去设置Content-Type请求头
+        for (var x in regInfo) {
+            oMyForm.append(x, regInfo[x]);
+        }
+        oMyForm.append("shortName", info.shortName || "");
+        oMyForm.append("officeLink", info.officeLink || "");
+        oMyForm.append("provence", province ? province.name : "");
+        oMyForm.append('city', cityItem ? cityItem.name : "");
+        oMyForm.append('district', districtItem ? districtItem.name : "");
+        oMyForm.append("name", info.name || "");
+        oMyForm.append("position", info.position || "");
+        oMyForm.append("officeName", info.officeName || "");
+        oMyForm.append('officeType', type || "");
+        oMyForm.append('mobile', info.mobile || "");
+        oMyForm.append('officeIntroduction', info.officeIntroduction || "");
+        oMyForm.append('email', info.email || "");
+        avatarPhoto.forEach((file) => {
+            oMyForm.append('file', file);
+        });
+        userPhoto.forEach((file) => {
+            oMyForm.append('image', file);
+        });
+        Service.companyReg({
+            form: oMyForm
         }).then((response) => {
             g.loading = false
+            if (response.data.status === 1) {
+                sessionStorage.removeItem("regInfo");
+                this.props.history.push("/regFinish")
 
-            layer.alert(response.data.message, () => {
-                if (response.data.status === 1) {
-                    this.props.history.push(`/`)
-                }
-                layer.closeAll()
-            })
+            } else {
+                layer.alert(response.data.message, function () {
+                    layer.closeAll()
+                })
+            }
         })
             .catch((error) => {
                 g.loading = false
                 console.log(error)
             })
+        // axios({
+        //     url: "/zsl/a/cms/article/consultationSave?",
+        //     method: "post",
+        //     data: oMyForm,
+        //     processData: false,// 告诉axios不要去处理发送的数据(重要参数)
+        //     contentType: false,   // 告诉axios不要去设置Content-Type请求头
+        // }).then((response) => {
+        //     g.loading = false
+
+        //     layer.alert(response.data.message, () => {
+        //         if (response.data.status === 1) {
+        //             this.props.history.push(`/`)
+        //         }
+        //         layer.closeAll()
+        //     })
+        // })
+        //     .catch((error) => {
+        //         g.loading = false
+        //         console.log(error)
+        //     })
     }
 
     getRegionDatas = () => {
-        const { } = this.state;
-        let url = '/zsl/getArea?'
-        let opts = {
-
-        }
-        for (var key in opts) {
-            opts[key] && (url += "&" + key + "=" + opts[key])
-        }
-        axios.post(url, opts)
+        Service.getArea()
             .then((response) => {
                 if (response.data.status === 1) {
                     let regionDatas = response.data.data
@@ -186,53 +214,122 @@ export default class RegInfo extends Component {
             type: e.target.value,
         });
     }
-    setUserPhoto = (e, file, reader) => {
-        // 图片base64化
-        let newUrl = reader.result;
+    setUserPhoto = (file, newUrl) => {
         this.setState(state => ({
-            userPhoto: file,
+            userPhoto: [...state.userPhoto, file],
             coverImg: newUrl
-        }));
+        }), () => {
+            $(".r-user-img").find("input[type=file]").css({
+                position: "absolute",
+                left: 0,
+                top: 0,
+                width: "100%",
+                height: "100%",
+                opacity: 0,
+                zIndex: 1,
+                display: "block"
+            })
+
+        })
     };
-    setImg = (e, file, reader) => {
-        // 图片base64化
-        let newUrl = reader.result;
+    setImg = (file, newUrl) => {
         this.setState(state => ({
-            avatarPhoto: file,
+            avatarPhoto: [...state.avatarPhoto, file],
             imageUrl: newUrl
-        }));
+        }), () => {
+
+            $(".upload-avatar").find("input[type=file]").css({
+                position: "absolute",
+                left: 0,
+                top: 0,
+                width: "100%",
+                height: "100%",
+                opacity: 0,
+                zIndex: 1,
+                display: "block"
+            })
+
+        });
     };
 
-    setUploadPorps = (handleImg) => {
-        const { userPhoto } = this.state
-        return {
-            onRemove: (file) => {
-                this.setState((state) => {
-                    const index = state.fileList.indexOf(file);
-                    const newFileList = state.fileList.slice();
-                    newFileList.splice(index, 1);
-                    return {
-                        fileList: newFileList,
-                    };
-                });
-            },
-            beforeUpload: (file) => {
+    // setUploadPorps = (handleImg) => {
+    //     const { userPhoto } = this.state
+    //     return {
+    //         onRemove: (file) => {
+    //             this.setState((state) => {
+    //                 const index = state.fileList.indexOf(file);
+    //                 const newFileList = state.fileList.slice();
+    //                 newFileList.splice(index, 1);
+    //                 return {
+    //                     fileList: newFileList,
+    //                 };
+    //             });
+    //         },
+    //         beforeUpload: (file) => {
 
-                var reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = (e) => handleImg(e, file, reader)
+    //             var reader = new FileReader();
+    //             reader.readAsDataURL(file);
+    //             reader.onload = (e) => handleImg(e, file, reader)
 
-                return false;
-            },
-            showUploadList: false
-        }
+    //             return false;
+    //         },
+    //         showUploadList: false
+    //     }
+    // }
+    setUploadPorps = (files, handleImg) => {
+        return Utils.uploadProps(files, (file, newUrl) => {
+            handleImg(file, newUrl)
+            // this.setState(state => ({
+            //     userPhoto: [...state.userPhoto, file],
+            //     coverImg: newUrl
+            // }), () => {
+            //     $(".r-user-img").find("input[type=file]").css({
+            //         position: "absolute",
+            //         left: 0,
+            //         top: 0,
+            //         width: "100%",
+            //         height: "100%",
+            //         opacity: 0,
+            //         zIndex: 1,
+            //         display: "block"
+            //     })
+
+            // })
+        });
+    }
+
+    changeInfo = (e, field) => {
+        const { info } = this.state;
+        info[field] = e.target.value
+        this.setState({ info: info }, () => {
+
+        })
     }
 
     render() {
-        const { province, cityItem, districtItem, qyName, userPhoto, avatarPhoto, coverImg, imageUrl } = this.state
+        const { province, type, info, cityItem, districtItem, userPhoto, avatarPhoto, coverImg, imageUrl } = this.state
 
+        const props = Utils.uploadProps(userPhoto, (file, newUrl) => {
+            this.setState(state => ({
+                fileList: [...state.userPhoto, file],
+                coverImg: newUrl
+            }), () => {
+                $(".r-user-img").find("input[type=file]").css({
+                    position: "absolute",
+                    left: 0,
+                    top: 0,
+                    width: "100%",
+                    height: "100%",
+                    opacity: 0,
+                    zIndex: 1,
+                    display: "block"
+                })
+
+            })
+        });
         return (
-            <div className="reg-body">
+            <div className="">
+                <Header />
                 <div className="reg-banner">
                     <img src="" />
                 </div>
@@ -251,12 +348,9 @@ export default class RegInfo extends Component {
                             <Upload
                                 name="userPhoto"
                                 className="avatar-uploader"
-                                {...this.setUploadPorps(this.setUserPhoto)}
+                                {...this.setUploadPorps(userPhoto, this.setUserPhoto)}
                             >
-                                <a href="javascript:;" className="thumb-img">
-                                    {/* <img src="css/images/1x1.png" /> */}
-
-
+                                <a href="javascript:;" className="thumb-img photo-upload">
                                     {
                                         coverImg ?
                                             <img src={coverImg} alt="avatar" /> :
@@ -271,7 +365,7 @@ export default class RegInfo extends Component {
                         <div className="u-inline width-250">
                             <label className="u-form-label">机构简称</label>
                             <div className="u-form-input">
-                                <input type="text" className="u-input" name="input1" placeholder="请输入机构简称" value={qyName} />
+                                <input type="text" className="u-input" name="input1" placeholder="请输入机构简称" value={info.shortName} onChange={(e) => this.changeInfo(e, 'shortName')} />
                                 <span className="red">*</span>
                             </div>
                         </div>
@@ -348,20 +442,21 @@ export default class RegInfo extends Component {
                         <div className="u-inline">
                             <label className="u-form-label">官网</label>
                             <div className="u-form-input">
-                                <input type="text" className="u-input" name="input1" placeholder="官网选填" />
+                                <input type="text" className="u-input" name="input1" placeholder="官网选填" value={info.officeLink} onChange={(e) => this.changeInfo(e, 'officeLink')} />
                             </div>
                         </div>
                         <div className="u-inline">
                             <label className="u-form-label">机构全称</label>
                             <div className="u-form-input">
-                                <input type="text" className="u-input" name="input1" placeholder="请正确填写营业执照上的机构全称" /><span className="red">*</span>
+                                <input type="text" className="u-input" name="input1" placeholder="请正确填写营业执照上的机构全称" value={info.name} onChange={(e) => this.changeInfo(e, 'name')} /><span className="red">*</span>
                             </div>
                         </div>
-                        <div className="r-paper clearfix">
+                        <div className="r-paper clearfix upload-avatar">
                             <Upload
                                 name="avatar"
                                 className="avatar-uploader"
-                                {...this.setUploadPorps(this.setImg)}
+                                // {...this.setUploadPorps(this.setImg)}
+                                {...this.setUploadPorps(avatarPhoto, this.setImg)}
                             >
                                 <a href="javascript:;" className="thumb-img">
 
@@ -380,7 +475,7 @@ export default class RegInfo extends Component {
                             <div className="r-title1">机构简介</div>
                             <div className="u-inline">
                                 <div className="u-form-input">
-                                    <textarea className="u-textarea" placeholder="字数要求需多余100，少于600字"></textarea>
+                                    <textarea className="u-textarea" placeholder="字数要求需多余100，少于600字" value={info.officeIntroduction} onChange={(e) => this.changeInfo(e, 'officeIntroduction')} maxLength={600}></textarea>
                                 </div>
                             </div>
                         </div>
@@ -389,25 +484,25 @@ export default class RegInfo extends Component {
                             <div className="u-inline titr">
                                 <label className="u-form-label">联系人</label>
                                 <div className="u-form-input">
-                                    <input type="text" className="u-input" name="input1" placeholder="联系人" />
+                                    <input type="text" className="u-input" name="input1" placeholder="联系人" value={info.officeName} onChange={(e) => this.changeInfo(e, 'officeName')} />
                                 </div>
                             </div>
                             <div className="u-inline titr">
                                 <label className="u-form-label">职务</label>
                                 <div className="u-form-input">
-                                    <input type="text" className="u-input" name="input1" placeholder="职务" />
+                                    <input type="text" className="u-input" name="input1" placeholder="职务" value={info.position} onChange={(e) => this.changeInfo(e, 'position')} />
                                 </div>
                             </div>
                             <div className="u-inline titr">
                                 <label className="u-form-label">联系方式</label>
                                 <div className="u-form-input">
-                                    <input type="text" className="u-input" name="input1" placeholder="联系方式" />
+                                    <input type="text" className="u-input" name="input1" placeholder="联系方式" value={info.mobile} onChange={(e) => this.changeInfo(e, 'mobile')} />
                                 </div>
                             </div>
                             <div className="u-inline  width-250">
                                 <label className="u-form-label">工作邮箱</label>
                                 <div className="u-form-input">
-                                    <input type="text" className="u-input" name="input1" placeholder="工作邮箱" value="BBDzhang@zhong-group.com" />
+                                    <input type="text" className="u-input" name="input1" placeholder="工作邮箱" value={info.email} onChange={(e) => this.changeInfo(e, 'email')} />
                                 </div>
                             </div>
                             <div className="u-helptxt">
@@ -415,7 +510,7 @@ export default class RegInfo extends Component {
                             </div>
                         </div>
                     </div>
-                    <div className="f-right"><a href="javascript:;" className="reg-submit">提交验证</a></div>
+                    <div className="f-right"><a href="javascript:;" className="reg-submit" onClick={this.RegConfirm}>提交验证</a></div>
                 </div>
             </div>
         )

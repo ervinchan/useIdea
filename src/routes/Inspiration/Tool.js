@@ -12,10 +12,10 @@ import 'swiper/dist/css/swiper.min.css'
 import 'antd/lib/pagination/style/index.css';
 import '../../static/less/bigidea.less';
 import defaultPhoto from "../../static/images/user/default.png"
-const PAGESIZE = 16;
+const PAGESIZE = 20;
 
 export default class Tool extends Component {
-
+    categoryIds = global.constants.categoryIds['工具包']
     constructor(props) {
         super(props);
         this.state = {
@@ -48,15 +48,14 @@ export default class Tool extends Component {
     }
 
     componentDidMount() {
-        let that = this
-        let tid = this.props.match.params.tid
-
-        this.getTools("7a8bbb7d262142cbb7ae5bf884935e81")
+        this.getTools(this.categoryIds.id)
     }
 
-    getTools = (categoryId) => {
+    getTools = (categoryId, page) => {
         Service.GetAllArticle({
-            categoryId: categoryId || ''
+            categoryId: categoryId || '',
+            pageNo: page || 1,
+            pageSize: PAGESIZE
         })
             .then((response) => {
                 if (categoryId) {
@@ -90,7 +89,7 @@ export default class Tool extends Component {
                 <li>
                     <div class="item">
                         <a class="thumb-img" href={`/#/Inspiration/Article/${item.id}`}><img src={item.image} /></a>
-                        <div class="tag">{item.category.name}</div>
+                        <div class="tag">{item.brand}</div>
                         <h1><a href={`/#/Inspiration/Article/${item.id}`}>{item.title}</a></h1>
                         <div class="alt clearfix">
                             <a href="#" class="j_name"><img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} class="thumb-img" />{item.user.name}</a>
@@ -118,7 +117,7 @@ export default class Tool extends Component {
     handlePageChange = (page, pageSize) => {
         console.log(page, pageSize)
         this.setState({ curPage: page })
-        this.getBooksList(this.props.match.params.tid, this.state.sortType, page)
+        this.getTools(this.props.match.params.tid, page)
     }
 
     render() {
@@ -129,7 +128,7 @@ export default class Tool extends Component {
                 {/* 头部 */}
                 < Header />
                 {/* 轮播banner */}
-                <WheelBanner />
+                <WheelBanner categoryId={this.categoryIds.id} />
 
                 <div class="wrapper g-tools">
                     <div class="u-title2">

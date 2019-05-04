@@ -12,6 +12,10 @@ import Service from '../../service/api.js'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
 import HotRead from '../../common/hotRead/Index'
+import Collect from '../../common/collect'
+import Like from '../../common/like'
+import Comment from '../../common/comment'
+import LazyLoad from 'react-lazyload';
 import 'swiper/dist/css/swiper.min.css';
 import '../../static/less/question.less'
 import '../../static/less/index.less';
@@ -37,10 +41,13 @@ export default class App extends Component {
             viewPointList: [],
             goodcopyList: [],
             bootStoreList: [],
-            recommendBooks: [],
+            recommendBooks: {},
             topAuthorList: [],
             hitsArticleList: [],
-            jobList: []
+            jobList: [],
+            hotCompanyList: [],
+            pageNo: 1,
+            noMore: false
         };
     }
 
@@ -165,10 +172,10 @@ export default class App extends Component {
         this.getBannerE();
         this.getBannerF();
         this.getBannerG();
-        this.getRecommendBooks();
+        this.getRecommendBooks(this.state.pageNo);
         this.getTopAuthor();
         this.getHitsArticle();
-
+        this.getHotCompany();
     }
 
     getBannerA = () => {
@@ -305,10 +312,10 @@ export default class App extends Component {
     getBannerG = () => {
         Service.GetADList({
             categoryId: "e12f2236bc134e18ac3db4028c626650",
-            id: "e0de5c7e4a514c158a74876c851f13ba"
+            id: "3c43ad8ac9ad4a2b860e335aea1ae97c"
         }).then((response) => {
             if (response.data.status === 1) {
-                this.setState({ bannerFList: response.data.data })
+                this.setState({ bannerGList: response.data.data })
             }
         })
             .catch((error) => {
@@ -319,14 +326,14 @@ export default class App extends Component {
     createBannerA = () => {
         const { bannerAList } = this.state
         let bannerList = bannerAList.map((item, index) => {
-            return <a className="swiper-slide" href={item.link} target="_blank"><img alt={item.title} src={item.image} /><div className="txt"><span>{item.descript}</span><h1>{item.title}</h1></div></a>
+            return <a className="swiper-slide" href={item.link} target="_blank"><img alt={item.name} src={item.image} /><div className="txt"><span>{item.description}</span><h1>{item.name}</h1></div></a>
         })
         return (
             <div className="f-banner">
                 <div className="swiper-box">
                     <div className="swiper-container">
                         <div className="swiper-wrapper">
-                            {[bannerList, bannerList]}
+                            {[bannerList]}
                         </div>
                     </div>
                 </div>
@@ -358,20 +365,20 @@ export default class App extends Component {
     createBannerC = () => {
         const { bannerCList } = this.state
         return bannerCList.slice(0, 3).map((item, index) => {
-            return <a href={item.link} target="_blank" className="seat-h110 lighten"><img src={item.image} /></a>
+            return <a href={item.link} target="_blank" className="seat-h110 lighten"><LazyLoad><img src={item.image} /></LazyLoad></a>
         })
     }
     createBannerD = () => {
         const { bannerCList } = this.state
         let bannerDList = bannerCList.slice(3)
         return bannerDList.map((item, index) => {
-            return <a href={item.link} target="_blank" className="seat-h110 lighten"><img src={item.image} /></a>
+            return <a href={item.link} target="_blank" className="seat-h110 lighten"><LazyLoad><img src={item.image} /></LazyLoad></a>
         })
     }
     createBannerE = () => {
         const { bannerEList } = this.state
         return bannerEList.map((item, index) => {
-            return <a href={item.link} target="_blank" className="seat-h110 lighten"><img src={item.image} /></a>
+            return <a href={item.link} target="_blank" className="seat-h190 lighten"><LazyLoad><img src={item.image} /></LazyLoad></a>
         })
     }
     createBannerG = () => {
@@ -380,13 +387,14 @@ export default class App extends Component {
             return (
                 <div className="swiper-slide">
                     <a className="thumb-img" href={item.link} target="_blank">
-                        <img src={item.image} />
+                        <LazyLoad><img src={item.image} /></LazyLoad>
                     </a>
                     <a className="btn" href={item.link} target="_blank">参加</a>
                 </div>
             )
         })
     }
+
 
     getViewPointList = () => {
         Service.GetAllArticle({
@@ -447,16 +455,16 @@ export default class App extends Component {
         return (
             <div class="item user" onClick={() => this.gotoRouter(`${router}/${item.id}`)}>
                 <a class="thumb-img" href="javascript:;">
-                    <img src={item.image} />
+                    <LazyLoad><img src={item.image} /></LazyLoad>
                 </a>
                 <div class="tit"><a href="javascript:;">{item.title || item.bookName}</a></div>
                 <div class="txt">{item.description}</div>
                 <div class="bar">
                     <span>{item.user.name}</span><span>·</span><span>{Time}</span>
                     <div class="f-bartool clearfix">
-                        <a href="javascript:;" onClick={() => this.handleCollect(item)}><i class="icon-heart"></i><span>{item.collectNum}</span></a>
-                        <a href="javascript:;" onClick={() => this.handleLike(item)}><i class="icon-thumbs"></i><span>{item.praiseNum}</span></a>
-                        <a href="javascript:;"><i class="icon-comment"></i><span>{item.commentNum}</span></a>
+                        <Collect fn={this.handleCollect} item={item} />
+                        <Like fn={this.handleLike} item={item} />
+                        <Comment fn={this.handleLike} item={item} />
                     </div>
                 </div>
             </div>
@@ -468,7 +476,7 @@ export default class App extends Component {
         let Time = FormatDate.formatTime(item.updateDate)
         return (
             <div className="item" onClick={() => this.gotoRouter(`${router}/${item.id}`)}>
-                <a className="thumb-img" href="javascript:;"><img src={item.image} />
+                <a className="thumb-img" href="javascript:;"><LazyLoad><img src={item.image} /></LazyLoad>
                 </a>
                 <div className="tit"><a href="javascript:;">{item.title}</a></div>
                 <div className="txt">
@@ -481,9 +489,12 @@ export default class App extends Component {
                     </a>
                     <span className="name">{item.user.name}</span>
                     <div class="f-bartool clearfix">
-                        <a href="javascript:;" onClick={() => this.handleCollect(item)}><i class="icon-heart"></i><span>{item.collectNum}</span></a>
+                        <Collect fn={this.handleCollect} item={item} />
+                        <Like fn={this.handleLike} item={item} />
+                        <Comment fn={this.handleLike} item={item} />
+                        {/* <a href="javascript:;" onClick={() => this.handleCollect(item)}><i class="icon-heart"></i><span>{item.collectNum}</span></a>
                         <a href="javascript:;" onClick={() => this.handleLike(item)}><i class="icon-thumbs"></i><span>{item.praiseNum}</span></a>
-                        <a href="javascript:;"><i class="icon-comment"></i><span>{item.commentNum}</span></a>
+                        <a href="javascript:;"><i class="icon-comment"></i><span>{item.commentNum}</span></a> */}
                     </div>
                 </div>
             </div>
@@ -495,10 +506,10 @@ export default class App extends Component {
         const { bootStoreList } = this.state;
 
         return bootStoreList.list && bootStoreList.list.map((item, index) => {
-
+            let bookImagUrl = item.bookImagUrl.split('|')[1]
             return (
                 <a href="javascript:;" style={{ width: "280px", marginRight: "10px" }} key={index} className="swiper-slide" onClick={() => this.gotoRouter(`${router}/${item.id}`)}>
-                    <em><img src={item.img} /> </em>
+                    <em><img src={bookImagUrl} /> </em>
                     <h1>{item.name}</h1>
                     <h3> {item.author}</h3>
                     <div className="txt">{item.editorRecommend}</div>
@@ -517,14 +528,29 @@ export default class App extends Component {
     );
 
     //主编荐书
-    getRecommendBooks = () => {
+    getRecommendBooks = (pageNo) => {
         Service.GetAllArticle({
             isRecommend: 1,
+            pageNo: pageNo || 1,
             pageSize: PAGESIZE
         }).then((response) => {
             if (response.data.status === 1) {
-                let recommendBooks = response.data.data
-                this.setState({ recommendBooks })
+                if (pageNo === 1) {
+                    const recommendBooks = response.data.data
+                    this.setState({ recommendBooks, pageNo: ++pageNo })
+                } else {
+                    if (this.state.recommendBooks.list.length < response.data.data.count) {
+                        const list = this.state.recommendBooks.list.concat(response.data.data.list);
+                        Object.assign(this.state.recommendBooks, { list })
+                        this.setState({ recommendBooks: this.state.recommendBooks, pageNo: ++pageNo }, () => {
+                            window.dispatchEvent(new Event('resize'));
+                        })
+                    } else {
+                        this.setState({ noMore: true })
+                    }
+
+                }
+
             }
         })
             .catch((error) => {
@@ -545,9 +571,9 @@ export default class App extends Component {
                 if (bannerItem) {
                     banner = (
                         <a href={bannerItem.url} class="seat-push">
-                            <img src={bannerItem.image} />
+                            <LazyLoad><img src={bannerItem.image} /></LazyLoad>
                             <span class="badge">推荐</span>
-                            <p class="txt">{bannerItem.title}</p>
+                            <p class="txt">{bannerItem.name}</p>
                         </a>
                     )
                 }
@@ -613,8 +639,8 @@ export default class App extends Component {
             return (
                 <li key={index}>
                     <a href="javascript:;" onClick={() => this.gotoRouter(`/UserNews/${item.user.id}`)}>
-                        <em><img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} /></em>
-                        <span>{item.user.name}</span>
+                        <em><LazyLoad><img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} /></LazyLoad></em>
+                        <span>{item.author}</span>
                         <i className="fa-angle-right"></i>
                     </a>
                 </li>
@@ -635,6 +661,31 @@ export default class App extends Component {
             })
     }
 
+    getHotCompany = (categoryId) => {
+        Service.GetAllArticle({
+            hits: 1,
+            categoryId: "981892a5c2394fe7b01ce706d917699e"
+        }).then((response) => {
+            let hotCompanyList = response.data.data
+            this.setState({ hotCompanyList })
+
+
+        })
+    }
+
+    createHotCompanyList = () => {
+        const { hotCompanyList } = this.state;
+        return hotCompanyList.map((item, index) => {
+            return (
+                <li>
+                    <a href="javascript:;" onClick={() => this.gotoRouter(`/Qyspace/${item.user.id}`)}>
+                        <LazyLoad><img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} /></LazyLoad>
+                    </a>
+                </li>
+            )
+        })
+    }
+
     createHitsArticle = () => {
         const { hitsArticleList } = this.state;
         return hitsArticleList && hitsArticleList.slice(0, 10).map((item, index) => {
@@ -643,7 +694,7 @@ export default class App extends Component {
                 <li key={index} onClick={() => this.gotoRouter(`/Inspiration/Article/${item.id}`)}>
                     <a href="javascript:;" className="thumb-img">
                         <span>{index + 1}</span>
-                        <img src={item.image} />
+                        <LazyLoad><img src={item.image} /></LazyLoad>
                     </a>
                     <h1><a href="javascript:;">{item.title}</a></h1>
                     <h3>{item.user.name}</h3>
@@ -674,7 +725,7 @@ export default class App extends Component {
     }
     handleCollect = (item) => {
         Service.AddCollect({
-            userId: userInfo.id,
+            userId: userInfo && userInfo.id,
             articleId: item.id
         }).then((response) => {
             global.constants.loading = false
@@ -691,8 +742,12 @@ export default class App extends Component {
             })
     }
 
+    onLoadMore = () => {
+        this.getRecommendBooks(this.state.pageNo);
+    }
+
     render() {
-        const { questionList, viewPointList, goodcopyList, bootStoreList, jobList, recommendBooks } = this.state;
+        const { questionList, viewPointList, goodcopyList, bootStoreList, jobList, recommendBooks, noMore } = this.state;
         const settingsBanner = {
             dots: true,
             className: "swiper-container",
@@ -707,6 +762,7 @@ export default class App extends Component {
         };
         return (
             <div className="">
+
                 {/* 头部 */}
                 < Header />
                 {/* 轮播banner */}
@@ -721,18 +777,20 @@ export default class App extends Component {
                             </li>
                             <li><a href="javascript:;" onClick={() => this.gotoRouter('/Question')}>请 教</a></li>
                             {/* <li><a href="javascript:;">小专栏</a></li> */}
-                            <li><a href="javascript:;" onClick={() => this.gotoRouter('/Inspiration/Viewpoint')}>醒来再读</a></li>
+                            <li><a href="javascript:;" onClick={() => this.gotoRouter('/Viewpoint')}>醒来再读</a></li>
                             <li><a href="javascript:;" onClick={() => this.gotoRouter('/GoodCopy')}>吃口文案</a></li>
                             <li><a href="javascript:;" onClick={() => this.gotoRouter('/Bookstore')}>书单上新</a></li>
                             <li><a href="javascript:;" onClick={() => this.gotoRouter('/Job')}>招聘</a></li>
                         </ul>
                     </div>
+
                     <div id="tabCont" className="g-left">
                         <div className="group" index="0">
                             <div className="m-artlist clearfix">
                                 {this.createRecommonList(recommendBooks)}
                             </div>
-                            <a href="javascript:;" className="more-a" onClick={() => this.gotoRouter('/Bookstore')}>点击浏览更多</a>
+                            <a style={{ display: !noMore ? "" : "none" }} href="javascript:;" className="more-a" onClick={() => this.onLoadMore()}>点击浏览更多</a>
+                            <p style={{ display: noMore ? "" : "none", textAlign: 'center' }}>-------------已经全部加载-------------</p>
                         </div>
                         {/* <div className="group" index="1" style={{ display: "none" }}>
                             <div className="m-artlist clearfix">
@@ -786,48 +844,7 @@ export default class App extends Component {
                             <div>
                                 <div className="tab-team">
                                     <ul className="hot-team clearfix">
-                                        <li>
-                                            <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                        </li>
+                                        {this.createHotCompanyList()}
                                     </ul>
                                 </div>
                                 <div className="tab-writer" style={{ display: "none" }}>
@@ -838,9 +855,9 @@ export default class App extends Component {
                             </div>
                         </div>
                     </div>
-                </div>
+                </div >
                 {/* 同行在读 */}
-                <div className="m-fs-book p-txzd wrapper">
+                < div className="m-fs-book p-txzd wrapper" >
                     <div className="u-title2">
                         <h1>同行在读</h1>
                         <h3><a href="javascript:;" className="book" onClick={() => this.gotoRouter('/Bookstore')}>更多<i className="fa-angle-right"></i></a></h3>
@@ -850,12 +867,12 @@ export default class App extends Component {
                             {this.createSameBookList(`/Bookstore/Bookbuy`)}
                         </div>
                         <div className="u-pagination wide"></div>
-                    </div>
+                    </div >
                     <div className="m-prev"></div>
                     <div className="m-next"></div>
-                </div>
+                </div >
                 {/* //本周互动 */}
-                <div className="m-interact wrapper">
+                < div className="m-interact wrapper" >
                     <div className="u-title3">
                         <b>本周互动</b>
                         {/* <a href="#">更多></a> */}
@@ -868,13 +885,13 @@ export default class App extends Component {
                     </div>
                     <div className="f-prev fa-angle-left"></div>
                     <div className="f-next fa-angle-right"></div>
-                </div>
+                </div >
                 {/* 热门阅读 */}
-                <HotRead />
+                < HotRead />
                 {/* 底部 */}
-                <Footer />
+                < Footer />
                 <Loading />
-            </div>
+            </div >
         );
     }
 }

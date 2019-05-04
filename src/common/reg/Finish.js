@@ -28,12 +28,14 @@ export default class Reg extends Component {
                 clickable: true
             }
         });
+        console.log(this.props.location.state)
     }
     gobackHome = () => {
         this.props.history.push("/")
     }
 
     render() {
+        let state = this.props.location.state
         return (
             <div className="reg-body">
                 <div className="r-banner">
@@ -58,7 +60,7 @@ export default class Reg extends Component {
                             恭喜你！一身才华，从此迸发。
                         </div>
                         <div className="r-txt">
-                            离正式踏上灵感旅程，只有一步之遥。我们已向您的邮箱（ideazhu@gmail.com）发送了一款验证邮件，请进入邮箱完成确认注册。
+                            离正式踏上灵感旅程，只有一步之遥。我们已向您的邮箱（{state && state.email}）发送了一款验证邮件，请进入邮箱完成确认注册。
                         </div>
                         <div className="reg-section top80">
                             <a href="javascript:;" className="r-btn" onClick={this.gobackHome}>返回首页登录</a>

@@ -10,7 +10,8 @@ export default class BookMenu extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            booksMenu: []
+            booksMenu: [],
+            bannerAList: []
         };
     }
 
@@ -55,10 +56,14 @@ export default class BookMenu extends Component {
 
     }
 
+    componentWillReceiveProps(nextProps) {
+        this.categoryIds = this.props.categoryid
+    }
+
     searchBooks = () => {
         console.log(this.props)
         let searchTxt = $("#bookSearchTxt").val()
-        window.location.href = `/#/Bookstore/search=${searchTxt}`
+        window.location.href = `/#/Bookstore/NewBooks/search=${searchTxt}`
         // this.props.history.replaceState({ tid: $("#bookSearchTxt").val() }, "/Bookstore")
     }
 
@@ -75,15 +80,15 @@ export default class BookMenu extends Component {
                 Lis = this.loopChildren(item, item.children)
             }
             let Li = item.children.length ?
-                <li key={index}><a href={`/#/Bookstore/${item.id}&${item.parentId}`}>{item.name}</a><ul>{Lis}</ul></li>
+                <li key={index}><a href={`/#/Bookstore/NewBooks/${item.id}&${item.parentId}`}>{item.name}</a><ul>{Lis}</ul></li>
                 :
-                <li key={index}><a href={`/#/Bookstore/${item.id}&${item.parentId}`}>{item.name}</a></li>
+                <li key={index}><a href={`/#/Bookstore/NewBooks/${item.id}&${item.parentId}`}>{item.name}</a></li>
             return Li
         })
     }
 
     loopChildren = (parent, items) => {
-        let Lis = items.map((item, index) => <li key={index} ><a href={`/#/Bookstore/${item.id}&${parent.id}`}>{item.name}</a><span>({item.count || 0})</span></li>)
+        let Lis = items.map((item, index) => <li key={index} ><a href={`/#/Bookstore/NewBooks/${item.id}&${parent.id}`}>{item.name}</a><span>({item.count || 0})</span></li>)
         return Lis
     }
 
@@ -111,6 +116,33 @@ export default class BookMenu extends Component {
         }
     }
 
+    getBannerA = () => {
+        Service.GetADList({
+            categoryId: this.categoryIds.id,
+            id: "e0de5c7e4a514c158a74876c851f13ba"
+        }).then((response) => {
+            if (response.data.status === 1) {
+                this.setState({ bannerAList: response.data.data })
+            }
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+
+    }
+    createBannerA = () => {
+        const { bannerAList } = this.state
+        return bannerAList.map((item, index) => {
+            return (
+                <a className="seat" href={item.url} target="_blank">
+                    <img src={item.image} />
+                </a>
+            )
+        })
+    }
+
+
+
     render() {
         return (
             <div className="g-right">
@@ -126,7 +158,7 @@ export default class BookMenu extends Component {
                         </li>
                         <li>
                             <i className="icon-star"></i>
-                            <a href="/#/ReadingTime">阅读场景</a>
+                            <a href="/#/Bookstore/ReadingTime">阅读场景</a>
                         </li>
                     </ul>
                     <div className="scroll"></div>
@@ -140,9 +172,10 @@ export default class BookMenu extends Component {
                             {this.createBooksMenu()}
 
                         </ul>
-                        {/* <a className="seat" href="javascript:;">
-                            <img src="images/fanshu/1.jpg" />
-                        </a>
+                        {
+                            this.createBannerA()
+                        }
+
                         <ul className="menu">
                             <li>
                                 <a href="javascript:;">阅读帮助</a>
@@ -151,7 +184,7 @@ export default class BookMenu extends Component {
                                     <li><a href="javascript:;">联系编辑</a></li>
                                 </ul>
                             </li>
-                        </ul> */}
+                        </ul>
                     </div>
                 </div>
             </div>

@@ -7,6 +7,7 @@ import Utils from '../../static/js/utils/utils.js'
 import Service from '../../service/api.js'
 import LOGO from "../../static/images/m-logo.png"
 import defaultPhoto from "../../static/images/user/default.png"
+let userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
 export default class Header extends Component {
 
     constructor(props) {
@@ -35,7 +36,7 @@ export default class Header extends Component {
                 case '/Bookstore/Bookbuy':
                     document.title = "书单详情-" + this.state.title;
                     break;
-                case '/ReadingTime':
+                case '/Bookstore//ReadingTime':
                     document.title = "阅读场景-" + this.state.title;
                     break;
                 case '/Inspiration':
@@ -44,7 +45,7 @@ export default class Header extends Component {
                 case '/Inspiration/Interview':
                     document.title = "专访幕后-" + this.state.title;
                     break;
-                case '/Inspiration/Viewpoint':
+                case '/Viewpoint':
                     document.title = "醒来再读-" + this.state.title;
                     break;
                 case '/Inspiration/Tool':
@@ -72,6 +73,21 @@ export default class Header extends Component {
             console.log(nextProps)
             let tid = this.props.match.params.tid
         }
+        userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
+        if (userInfo) {
+            switch (userInfo.isCompany) {
+                case "true":
+                    this.setState({ roleNames: "企业用户" })
+                    break;
+                case "false":
+                    this.setState({ roleNames: "个人用户" })
+                    break;
+                default:
+                    this.setState({ roleNames: "游客" })
+                    break;
+            }
+        }
+        this.setState({ userInfo: userInfo })
     }
     shouldComponentUpdate(nextProps, nextState) {
         return true
@@ -96,7 +112,7 @@ export default class Header extends Component {
             e.stopPropagation();
         });
 
-        var userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
+
         if (userInfo) {
             switch (userInfo.isCompany) {
                 case "true":
@@ -137,13 +153,13 @@ export default class Header extends Component {
                 <li key={index} ><NavLink to={{
                     pathname: `/${url}`,
                     state: { navId: item.id },
-                    hash: item.id
+                    // hash: item.id
                 }} activeClassName="active" isActive={(match, location) => this.setActive(match, location, url)}>{item.name}</NavLink><ul>{Lis}</ul></li>
                 :
                 <li key={index} ><NavLink to={{
                     pathname: `/${url}`,
                     state: { navId: item.id },
-                    hash: item.id
+                    // hash: item.id
                 }} activeClassName="active" isActive={(match, location) => this.setActive(match, location, url)}>{item.name}</NavLink></li>
             return Li
         })
@@ -176,6 +192,11 @@ export default class Header extends Component {
     }
 
     logOut = () => {
+        Service.Logout({
+            userId: userInfo.id
+        }).then(() => {
+
+        })
         sessionStorage.clear()
         window.location.href = "/#/Login"
         //this.props.history.push("/Login")
@@ -248,7 +269,7 @@ export default class Header extends Component {
                                         <a href={`/#/UserCenter/${userInfo.id}`}>我的首页</a>
                                     </li>
                                     <li>
-                                        <a href={`/#/UserCenter/${userInfo.id}`}>我的订阅</a>
+                                        <a href={`/#/UserCenter/${userInfo.id}`}>我的心选</a>
                                     </li>
                                     <li>
                                         <a href={`/#/UserCenter/${userInfo.id}`}>来 信{userInfo.attentionNum !== "0" && <i className="badge">{userInfo.attentionNum}</i>}</a>
@@ -263,21 +284,21 @@ export default class Header extends Component {
                             userInfo &&
                             <div className="fm-userinfo" style={{ display: roleNames === "企业用户" ? '' : 'none' }}>
                                 <div className="info">
-                                    <a href="javascript:;" className="thumb qy">
+                                    <a href={`/#/QyHome/${userInfo.id}`} className="thumb qy">
                                         <img src={userInfo.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
                                     </a>
-                                    <h1><a href="#">VML 上海</a></h1>
-                                    <h3><a href="#">修改企业资料</a></h3>
+                                    <h1><a href={`/#/QyHome/${userInfo.id}`}>{userInfo.name}</a></h1>
+                                    <h3><a href={`/#/QyInfo/${userInfo.id}`}>修改企业资料</a></h3>
                                 </div>
                                 <ul className="nav clearfix">
                                     <li>
                                         <a href="#">发布项目</a>
                                     </li>
                                     <li>
-                                        <a href="#">发布岗位</a>
+                                        <a href={`/#/QyJobAdd/${userInfo.id}`}>发布岗位</a>
                                     </li>
                                     <li>
-                                        <a href="#">广告投放管理</a>
+                                        <a href={`/#/QyAd/${userInfo.id}`}>广告投放管理</a>
                                     </li>
                                     <li>
                                         <a href="#">来 信<i className="badge">42</i></a>

@@ -14,6 +14,7 @@ import 'antd/lib/pagination/style/index.css';
 import '../../static/less/article.less';
 import defaultPhoto from "../../static/images/user/default.png"
 const PAGESIZE = 3;
+const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
 export default class Article extends Component {
 
     constructor(props) {
@@ -23,7 +24,7 @@ export default class Article extends Component {
             curPage: 1,
             articleInfo: {},
             articleContent: {},
-            articleComment: [],
+            articleComment: {},
             collectUserList: [],
             isFans: 0,
             replyContent: ""
@@ -31,7 +32,9 @@ export default class Article extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-
+        var script = document.createElement('script');
+        script.src = 'http://bdimg.share.baidu.com/static/api/js/share.js?cdnversion=' + ~(-new Date() / 36e5);
+        document.body.appendChild(script);
     }
 
     componentWillMount() {
@@ -88,6 +91,7 @@ export default class Article extends Component {
             contentId: aid
         }).then((response) => {
             global.constants.loading = false
+            debugger
             if (response.data.status === 1) {
                 let articleComment = response.data.data
                 this.setState({ articleComment })
@@ -173,7 +177,6 @@ export default class Article extends Component {
 
     createCommentList = (data) => {
         const { replyContent } = this.state;
-        const userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
         return data.list && data.list.map((item, index) => {
             let Time = FormatDate.formatTime(item.createDate);
             return (
@@ -188,7 +191,7 @@ export default class Article extends Component {
                     <div className="bar">
                         <a href="javascript:;">投诉</a><a href="javascript:;" onClick={() => this.handleReply(item)}>回复</a><a href="javascript:;" className="thumbs" onClick={() => this.handleLike(item)}><i className="icon-thumbs-up"></i>{item.commentNum}</a>
                     </div>
-                    <div class="replyfrom" style={{ display: (item.id === this.state.replyId ? "" : "none") }}><textarea placeholder="我来补充两句。" onChange={this.handleChangeReply} /><a href="javascript:;" class="thumb"><img src={userInfo.photo || defaultPhoto} onError={Utils.setDefaultPhoto} /></a><a href="javascript:;" class="artbtn" onClick={() => this.submitComment(item.id, replyContent)}>留 言</a><a href="javascript:;" class="escbtn" data-el="replyesc">稍后再说</a></div>
+                    <div class="replyfrom" style={{ display: (item.id === this.state.replyId ? "" : "none") }}><textarea value={replyContent} placeholder="我来补充两句。" onChange={this.handleChangeReply} /><a href="javascript:;" class="thumb"><img src={(userInfo && userInfo.photo) || defaultPhoto} onError={Utils.setDefaultPhoto} /></a><a href="javascript:;" class="artbtn" onClick={() => this.submitComment(item.id, replyContent)}>留 言</a><a href="javascript:;" class="escbtn" onClick={this.cancleReply}>稍后再说</a></div>
                     {
                         item.childComments &&
                         <div className="disc-sub">
@@ -203,7 +206,6 @@ export default class Article extends Component {
 
     createChildCommentList = (data) => {
         const { replyContent } = this.state;
-        const userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
         return data && data.map((item, index) => {
             let Time = FormatDate.formatTime(item.createDate)
             return (
@@ -218,7 +220,7 @@ export default class Article extends Component {
                     <div className="bar">
                         <a href="javascript:;">投诉</a><a href="javascript:;" onClick={() => this.handleReply(item)}>回复</a><a href="javascript:;" className="thumbs" onClick={() => this.handleLike(item)}><i className="icon-thumbs-up"></i>{item.commentNum}</a>
                     </div>
-                    <div class="replyfrom" style={{ display: (item.id === this.state.replyId ? "" : "none") }}><textarea placeholder="我来补充两句。" onChange={this.handleChangeReply} /><a href="javascript:;" class="thumb"><img src={userInfo.photo || defaultPhoto} onError={Utils.setDefaultPhoto} /></a><a href="javascript:;" class="artbtn" onClick={() => this.submitComment(item.id, replyContent)}>留 言</a><a href="javascript:;" class="escbtn" onClick={this.cancleReply}>稍后再说</a></div>
+                    <div class="replyfrom" style={{ display: (item.id === this.state.replyId ? "" : "none") }}><textarea value={replyContent} placeholder="我来补充两句。" onChange={this.handleChangeReply} /><a href="javascript:;" class="thumb"><img src={(userInfo && userInfo.photo) || defaultPhoto} onError={Utils.setDefaultPhoto} /></a><a href="javascript:;" class="artbtn" onClick={() => this.submitComment(item.id, replyContent)}>留 言</a><a href="javascript:;" class="escbtn" onClick={this.cancleReply}>稍后再说</a></div>
                     {
                         item.childComments &&
                         <div className="disc-sub">
@@ -230,8 +232,8 @@ export default class Article extends Component {
             )
         })
     }
-    cancleReply = (item) => {
-        this.setState({ replyId: '' })
+    cancleReply = () => {
+        this.setState({ replyId: '', replyContent: '', commentTxt: '' });
     }
 
     handleReply = (item) => {
@@ -249,7 +251,7 @@ export default class Article extends Component {
         const { articleInfo } = this.state;
         Service.AddAttention({
             attention2UserId: articleInfo.user.id,
-            userId: JSON.parse(sessionStorage.getItem("userInfo")).id
+            userId: userInfo && userInfo.id
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -276,12 +278,13 @@ export default class Article extends Component {
             categoryId: articleInfo.category.id,
             contentId: this.props.match.params.aid,
             replyId: pid || '',
-            name: JSON.parse(sessionStorage.getItem("userInfo")).name,
+            name: userInfo && userInfo.name,
             isValidate: "0",
             content: content
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
+                this.cancleReply();
                 this.getArticleComment(this.props.match.params.aid, articleInfo.category.id)
             }
 
@@ -295,7 +298,7 @@ export default class Article extends Component {
 
     render() {
         const { articleInfo, articleContent, articleComment, isFans, commentTxt } = this.state;
-        const userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+
         let Time = FormatDate.formatTime(articleInfo.updateDate)
         return (
             <div className="">
@@ -366,11 +369,11 @@ export default class Article extends Component {
                         <img src="images/article/d1.jpg" />
                     </a>
                     <div className="art-discuss">
-                        <h1>刚收到 {articleComment.length ? articleComment.length : 0} 条评论留言</h1>
+                        <h1>刚收到 {articleComment.count ? articleComment.count : 0} 条评论留言</h1>
                         <div className="artfrom">
-                            <textarea placeholder="万难尽如人意，或有些许共鸣可取……" onChange={this.handleChangeCommentTxt}></textarea>
+                            <textarea value={commentTxt} placeholder="万难尽如人意，或有些许共鸣可取……" onChange={this.handleChangeCommentTxt}></textarea>
                             <a href="javascript:;" className="thumb">
-                                <img src={userInfo.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
+                                <img src={(userInfo && userInfo.photo) || defaultPhoto} onError={Utils.setDefaultPhoto} />
                             </a>
                             <a href="javascript:;" className="artbtn" onClick={() => this.submitComment("", commentTxt)}>留 言</a>
                         </div>
@@ -390,7 +393,7 @@ export default class Article extends Component {
                                 <div className="lk">
                                     {
                                         !isFans &&
-                                        <a href="javascript:;" onClick={() => this.handleAddFans(JSON.parse(sessionStorage.getItem("userInfo")) && JSON.parse(sessionStorage.getItem("userInfo")).id)}>关 注</a>
+                                        <a href="javascript:;" onClick={() => this.handleAddFans(userInfo && userInfo.id)}>关 注</a>
                                     }
                                     {/* {
                                         isFans && <a href="javascript:;" onClick={() => this.handleSubFans(JSON.parse(sessionStorage.getItem("userInfo")) && JSON.parse(sessionStorage.getItem("userInfo")).id)}>取消关注</a>

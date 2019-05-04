@@ -19,6 +19,7 @@ const NODATA = "无数据";
 export default class Bookstore extends Component {
     /*global $ */
     /*global layer */
+    categoryIds = global.constants.categoryIds['书单上新']
     constructor(props) {
         super(props);
         this.state = {
@@ -69,22 +70,13 @@ export default class Bookstore extends Component {
             })
     }
 
-    getSameBookeData = (tid, sortType, pageNo, searchTxt) => {
-        let opts = {
-            softType: sortType,
-            pageNo: pageNo || 1,
-            isRecommend: 1
-        }
+    getSameBookeData = (tid, bookType) => {
         const { bookInfo } = this.state;
-        let parentId = bookInfo.secondClassId.parentId
-        let id = bookInfo.secondClassId.id
-        if (id) {
-            Object.assign(opts, {
-                parentId: parentId,
-                id: id
-            })
+        let opts = {
+            bookType: bookInfo.secondClassId.name || bookInfo.firstClassId.name,
+            id: bookInfo.id
         }
-        Service.GetBooks(opts)
+        Service.SameBooks(opts)
             .then((response) => {
                 let sameBookList = response.data.data.list
                 this.setState({ sameBookList })
@@ -185,8 +177,14 @@ export default class Bookstore extends Component {
     }
 
     render() {
-        const { bookInfo, readList } = this.state
-        let bookCategory = bookInfo.secondClassId
+        const { bookInfo, readList } = this.state;
+        let bookCategory = {}
+        if (bookInfo.secondClassId && bookInfo.secondClassId.name) {
+            bookCategory = bookInfo.secondClassId
+        } else if (bookInfo.firstClassId && bookInfo.firstClassId.name) {
+            bookCategory = bookInfo.firstClassId
+        }
+
         return (
             <div className="">
                 {/* 头部 */}
@@ -195,7 +193,7 @@ export default class Bookstore extends Component {
                 {
                     bookCategory && <div className="wrapper u-position">
                         {/* <BreadCrumb /> */}
-                        您当前的位置：<a href="#">蜗牛翻书</a> <span className="fa-angle-double-right"></span> <a href={`/#/Bookstore/${bookCategory.id}&${bookCategory.parentId}`}>{bookCategory.name}</a> <span className="fa-angle-double-right"></span> <a href="javascript:;">{bookInfo.bookName}</a>
+                        您当前的位置：<a href="#/Bookstore">蜗牛翻书</a> <span className="fa-angle-double-right"></span> <a href={`/#/Bookstore/${bookCategory.id}&${bookCategory.parentId}`}>{bookCategory.name}</a> <span className="fa-angle-double-right"></span> <a href="javascript:;">{bookInfo.bookName}</a>
                     </div>
                 }
 
@@ -221,11 +219,11 @@ export default class Bookstore extends Component {
                             <div className="fs-item-buy clearfix">
                                 <div className="g-left">
                                     <div className="itemname">
-                                        <h1>{bookInfo.book_name}</h1>
+                                        <h1>{bookInfo.bookName}</h1>
                                         <div className="txt">{bookInfo.author}</div>
                                     </div>
                                     <div className="itemdepict">
-                                        <h1>{bookInfo.bookName}</h1>
+                                        <h1>創造者</h1>
                                         <div className="txt">
                                             <p dangerouslySetInnerHTML={{ __html: bookInfo.authorIntroduce }} />
                                         </div>
@@ -275,7 +273,7 @@ export default class Bookstore extends Component {
                                 </ul>
                             </div>
                         </div>
-                        <BookMenu getBooksList={this.getBooksList} />
+                        <BookMenu categoryid={this.categoryIds.id} getBooksList={this.getBooksList} />
                     </div>
                 }
 

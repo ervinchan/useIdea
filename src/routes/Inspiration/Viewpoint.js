@@ -16,10 +16,10 @@ import 'antd/lib/pagination/style/index.css';
 import '../../static/less/bigidea.less';
 
 import defaultPhoto from "../../static/images/user/default.png"
-const PAGESIZE = 3;
+const PAGESIZE = 20;
 
 export default class Viewpoint extends Component {
-
+    categoryIds = global.constants.categoryIds['醒来再读']
     constructor(props) {
         super(props);
         this.state = {
@@ -30,7 +30,8 @@ export default class Viewpoint extends Component {
             menus: [],
             authorList: [],
             recommendList: [],
-            bannerAList: []
+            bannerAList: [],
+
         };
     }
 
@@ -42,16 +43,16 @@ export default class Viewpoint extends Component {
 
     componentDidMount() {
 
-        this.getViewPointMenu("846cd0769ef9452aad0cc9c354ba07e3");
-        this.getViewPoints("846cd0769ef9452aad0cc9c354ba07e3");
+        this.getViewPointMenu(this.categoryIds.id);
+        this.getViewPoints(this.categoryIds.id);
         this.getHostAuthor();
-        this.getRecommendList("846cd0769ef9452aad0cc9c354ba07e3");
+        this.getRecommendList(this.categoryIds.id);
         this.getBannerA();
     }
 
     getBannerA = () => {
         Service.GetADList({
-            categoryId: "846cd0769ef9452aad0cc9c354ba07e3",
+            categoryId: this.categoryIds.id,
             id: "37e7de978cc14723b8d51ec902ed0f73"
         }).then((response) => {
             if (response.data.status === 1) {
@@ -71,7 +72,8 @@ export default class Viewpoint extends Component {
     }
     getViewPoints = (categoryId) => {
         Service.GetAllArticle({
-            categoryId: categoryId || ''
+            categoryId: categoryId || '',
+            pageSize: PAGESIZE
         }).then((response) => {
             global.constants.loading = false
             let viewPointList = response.data.data
@@ -83,8 +85,8 @@ export default class Viewpoint extends Component {
     }
 
     getViewPointMenu = (categoryId) => {
-        Service.GetNav({
-            id: categoryId || ''
+        Service.FindAllClassify({
+            // id: categoryId || ''
         }).then((response) => {
             global.constants.loading = false
             let menus = response.data.data
@@ -95,13 +97,16 @@ export default class Viewpoint extends Component {
             })
     }
 
-    getRecommendList = (categoryId) => {
-        Service.GetNav({
-            subscriber: 0
+    getRecommendList = () => {
+        Service.GetAllArticle({
+            isRecommend: 1,
+            pageNo: 1,
+            pageSize: 4
         }).then((response) => {
-            global.constants.loading = false
-            let recommendList = response.data.data
-            this.setState({ recommendList })
+            if (response.data.status === 1) {
+                const recommendList = response.data.data
+                this.setState({ recommendList })
+            }
         })
             .catch((error) => {
                 console.log(error)
@@ -124,31 +129,47 @@ export default class Viewpoint extends Component {
         const { viewPointList } = this.state
         return viewPointList.list && viewPointList.list.map((item, index) => {
             let Time = FormatDate.formatTime(item.updateDate);
-            return (
-                <div class="item">
-                    <a class="thumb-img" href={`/#/Inspiration/Article/${item.id}`}><img src="{item.image} " /></a>
-                    <div class="tit"><a href={`/#/Inspiration/Article/${item.id}`}>{item.title}</a></div>
-                    <div class="txt">
-                        <span>{Time}</span><br />
-                        <span>Brand：锤子科技</span>
-                    </div>
-                    <div class="bar">
-                        <a href="javascript:;" class="user-img">
-                            <img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
-                        </a>
-                        <span class="name">{item.user.name}</span>
-                        <div class="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{item.commentNum}</span></a></div>
+            if (item.user.isCompany === "false") {
+                return (
+                    <div class="item user">
+                        <a class="thumb-img" href={`/#/Inspiration/Article/${item.id}`}><img src={item.image} /></a>
+                        <div class="tit"><a href={`/#/Inspiration/Article/${item.id}`}>{item.title}</a></div>
+                        <div class="txt">{item.description}</div>
+                        <div class="bar">
+                            <span>{item.user.name}</span><span class="dot"></span><span>{Time}</span>
+                            <div class="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{item.commentNum}</span></a></div>
 
+                        </div>
                     </div>
-                </div>
-            )
+                )
+            } else {
+                return (
+                    <div class="item">
+                        <a class="thumb-img" href={`/#/Inspiration/Article/${item.id}`}><img src={item.image} /></a>
+                        <div class="tit"><a href={`/#/Inspiration/Article/${item.id}`}>{item.title}</a></div>
+                        <div class="txt">
+                            <span>{Time}</span><br />
+                            <span>Brand：{item.user.brand}</span>
+                        </div>
+                        <div class="bar">
+                            <a href="javascript:;" class="user-img">
+                                <img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
+                            </a>
+                            <span class="name">{item.user.name}</span>
+                            <div class="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{item.commentNum}</span></a></div>
+
+                        </div>
+                    </div>
+                )
+            }
+
         })
     }
 
     createMenus = () => {
         const { menus } = this.state
         return menus && menus.map((item, index) => {
-            return <li onClick={(e) => this.getViewPoints(item.id)}><a href="javascript:;">{item.name}</a><i class="fa-angle-right"></i></li>
+            return <li onClick={(e) => this.getViewPoints(item.id)}><a href="javascript:;">{item.articleClassify}</a><i class="fa-angle-right"></i></li>
         })
     }
 
@@ -172,16 +193,15 @@ export default class Viewpoint extends Component {
 
     createRecommendList = () => {
         const { recommendList } = this.state
-        let items = recommendList.slice(0, 4)
-        return items && items.map((item, index) => {
+        return recommendList.list && recommendList.list.map((item, index) => {
             return (
-                <li>
-                    <a class="thumb-img" href="javascript:;">
+                <li key={index}>
+                    <a className="thumb-img" href="javascript:;">
                         <img src={item.image} />
-                        <span>{item.name}</span>
+                        <span>{item.category.name}</span>
                     </a>
                     <h1><a href="#">{item.description}</a></h1>
-                    <div class="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{item.commentNum}</span></a></div>
+                    <div className="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{item.commentNum}</span></a></div>
 
                 </li>
             )
@@ -237,7 +257,7 @@ export default class Viewpoint extends Component {
                 {/* 头部 */}
                 < Header />
                 {/* 轮播banner */}
-                <WheelBanner categoryId={"846cd0769ef9452aad0cc9c354ba07e3"} />
+                <WheelBanner categoryId={this.categoryIds.id} />
 
                 <div class="m-chartlist background">
                     <div class="wrapper">

@@ -15,8 +15,6 @@ import 'antd/lib/tabs/style/index.less';
 import Service from '../../service/api.js'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
-import MyWork from './MyWork.js';
-import MyHeart from './MyHeart.js';
 import Item from 'antd/lib/list/Item';
 import defaultPhoto from "../../static/images/user/default.png"
 const TabPane = Tabs.TabPane;
@@ -236,8 +234,8 @@ export default class UserCenter extends Component {
                             
                         </ul> */}
                         <Tabs ref={e => this.tabDom = e} className="clearfix" onChange={this.handleTabChange}>
-                            <TabPane tab={["我关注的人", <i className="badge">{userInfo.attentionNum}</i>]} key="news" className="qj-news lx-fans clearfix">{this.createMyFocus()}</TabPane>
-                            <TabPane tab={["我的粉丝", <i className="badge">{userInfo.attention2Num}</i>]} key="reco" className="qj-news lx-fans clearfix">{this.createMyFans()}</TabPane>
+                            <TabPane tab={["我关注的人", <span>{userInfo.attentionNum}</span>]} key="news" className="qj-news lx-fans clearfix">{this.createMyFocus()}</TabPane>
+                            <TabPane tab={["我的粉丝", <span>{userInfo.attention2Num}</span>]} key="reco" className="qj-news lx-fans clearfix">{this.createMyFans()}</TabPane>
                         </Tabs>
                         {/* <a href="u_myaccount.html" class="edit">更新个人资料</a> */}
                     </div>

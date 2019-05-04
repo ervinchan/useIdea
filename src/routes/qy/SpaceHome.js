@@ -5,7 +5,7 @@ import $ from 'jquery'
 import Swiper from 'swiper/dist/js/swiper.min.js'
 import FormatDate from '../../static/js/utils/formatDate.js'
 import Utils from '../../static/js/utils/utils.js'
-
+import Service from '../../service/api.js'
 import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
 import WheelBanner from '../../common/wheelBanner/Index'
@@ -16,8 +16,8 @@ import 'antd/lib/pagination/style/index.css';
 import '../../static/less/question.less'
 
 import defaultPhoto from "../../static/images/user/default.png"
-const PAGESIZE = 3;
-
+const PAGESIZE = 15;
+const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
 export default class SpaceHome extends Component {
 
     constructor(props) {
@@ -26,7 +26,8 @@ export default class SpaceHome extends Component {
             sortType: 0,
             curPage: 1,
             banner: [],
-            toolList: []
+            JobList: [],
+            articleList: []
         };
     }
 
@@ -48,42 +49,110 @@ export default class SpaceHome extends Component {
                 clickable: true
             }
         });
-        this.getArticleInfo("7a8bbb7d262142cbb7ae5bf884935e81")
+        let uid = this.props.match.params.uid
+        this.getUserInfoDetail(uid);
+        this.getArticleList(uid);
+
     }
 
-    getArticleInfo = (categoryId) => {
-        let url = '/zsl/a/cms/article/getAllArticle?'
-        let opts = {
-            hits: 1,
-            categoryId: categoryId || ''
-        }
-        for (var key in opts) {
-            opts[key] && (url += "&" + key + "=" + opts[key])
-        }
-        axios.post(url, opts)
+    getUserInfoDetail = (userId) => {
+        Service.getUserInfoDetail({
+            userId: userId
+        })
             .then((response) => {
-                if (categoryId) {
-                    let toolList = response.data.data
-                    this.setState({ toolList })
-                } else {
-                    let hotBooks = response.data.data
-                    this.setState({ hotBooks }, () => {
-                        var swiper_read = new Swiper('.m-read-fade .swiper-container', {
-                            effect: 'fade',
-                            pagination: {
-                                el: '.m-read-fade .u-pagination',
-                                bulletclassName: 'bull',
-                                bulletActiveclassName: 'active',
-                                clickable: true
-                            }
-                        });
-                    })
-                }
-
+                let userInfoDetail = response.data.data;
+                Object.assign(userInfo, userInfoDetail);
             })
             .catch((error) => {
                 console.log(error)
             })
+    }
+
+    getArticleList = (userId) => {
+        Service.GetAllArticle({
+            userId: userId
+        })
+            .then((response) => {
+                this.setState({ articleList: response.data.data })
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+
+    createArticleList = () => {
+        const { articleList } = this.state;
+        const categorys = global.constants.categorys
+        return articleList.list && articleList.list.map(item => {
+            let Time = FormatDate.formatTime(item.updateDate)
+            let router = ``
+            switch (item.category.id) {
+                case categorys[0].id:
+                    router = `/Question/Article/`
+                    break;
+                case categorys[1].id:
+
+                case categorys[1].id:
+                    router = `/Bookstore/Bookbuy/`
+                    break;
+                default:
+                    router = `/Inspiration/Article/`
+                    break;
+            }
+            return (
+                <div class="item">
+                    <a class="thumb-img" href="javascript:;" onClick={() => this.gotoRouter(`${router}${item.id}`)}><img src={item.image} />
+                    </a>
+                    <div class="tit"><a href="javascript:;" onClick={() => this.gotoRouter(`${router}${item.id}`)}>{item.title}</a></div>
+                    <div class="txt">
+                        <span>{Time}</span><br />
+                        <span>Brand：{item.brand}</span>
+                    </div>
+                    <div class="bar">
+                        <a href="javascript:;" class="user-img">
+                            <img src="css/images/1x1.png" />
+                        </a>
+                        <span class="name">{item.user.name}</span>
+                        <div class="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{item.commentNum}</span></a></div>
+
+                    </div>
+                </div>
+            )
+        })
+
+    }
+
+    gotoRouter = (router) => {
+        this.props.history.push(router)
+    }
+
+    handleLike = (item) => {
+        Service.AddLike({
+            id: item.id
+        }).then((response) => {
+            global.constants.loading = false
+            if (response.data.status === 1) {
+                item.likeNum++
+                this.setState({})
+            }
+            /* global layer */
+            layer.msg(response.data.message)
+        })
+    }
+    handleCollect = (item) => {
+        Service.AddCollect({
+            userId: 1,
+            articleId: item.id
+        }).then((response) => {
+            global.constants.loading = false
+            if (response.data.status === 1) {
+                item.collectNum++
+                this.setState({})
+            }
+
+            /* global layer */
+            layer.msg(response.data.message)
+        })
     }
 
     createToolList = () => {
@@ -147,7 +216,7 @@ export default class SpaceHome extends Component {
                 <li>
                     <div class="ue_info">
                         <a href="javascript:;" class="face" onClick={() => this.gotoRouter(`${router}${item.id}`)}>
-                            <img src={item.user.photo  || defaultPhoto} />
+                            <img src={item.user.photo || defaultPhoto} />
                         </a>
                         <div class="alt clearfix">
                             <a href="javascript:;" class="j_name">{item.user.name}</a>
@@ -168,32 +237,46 @@ export default class SpaceHome extends Component {
             )
         })
     }
+    createJobList = () => {
+        const { JobList } = this.state;
+        JobList.list && JobList.list.map((item) => {
+            return <li><a href="javascript:;" onClick={this.gotoRouter(`/QyspaceJobInfo/${item.id}`)}>{item.name}</a></li>
+        })
+
+    }
 
     render() {
-        const { toolList } = this.state;
+        const { articleList, JobList } = this.state;
 
         return (
             <div className="">
                 <div class="g-left">
                     <div class="qy-info">
+                        <p>{userInfo.subscription}</p>
                         <p>
-                            In 1949, three enterprising gentlemen, Bill Bernbach, Ned Doyle and Maxwell Dane gave the advertising industry a wake-up call. In short, they said: Let’s stop talking at people and instead start conversations that lead to action and mutual benefit.</p>
-                        <p><br /></p>
-                        <p>This heritage tells us who we are, what we believe and how we should behave. It inspires us to continually challenge standard convention. From Bill Bernbach to Keith Reinhard to the present generation of DDB leaders.From Bill Bernbach to Keith Reinhard  DDB leaders
-                        <a href="javascript:;">展开</a>
+                            <a href="javascript:;">展开</a>
                         </p>
                     </div>
                     <div class="qy-envi">
                         <h1><b>创作环境</b></h1>
                         <div class="swiper-container">
                             <div class="swiper-wrapper">
-                                <div class="swiper-slide">
-                                    <a href="javascript:;"><img src="images/user/4.jpg" /></a>
-                                </div>
-                                <div class="swiper-slide">
-                                    <a href="javascript:;"><img src="images/user/4.jpg" /></a></div>
-                                <div class="swiper-slide">
-                                    <a href="javascript:;"><img src="images/user/4.jpg" /></a></div>
+                                {
+                                    userInfo.file1 &&
+                                    <div class="swiper-slide">
+                                        <a href="javascript:;"><img src={userInfo.file1} /></a>
+                                    </div>
+                                }
+                                {
+                                    userInfo.file2 &&
+                                    <div class="swiper-slide">
+                                        <a href="javascript:;"><img src={userInfo.file2} /></a></div>
+                                }
+                                {
+                                    userInfo.file3 &&
+                                    <div class="swiper-slide">
+                                        <a href="javascript:;"><img src={userInfo.file3} /></a></div>
+                                }
                             </div>
                         </div>
                         <div class="u-pagination wide"></div>
@@ -201,87 +284,29 @@ export default class SpaceHome extends Component {
                     <div class="u-title">
                         <b>最新文章</b>
                     </div>
-                    <div class="m-artlist clearfix" role="list">
-                        <div class="item">
-                            <a class="thumb-img" href="javascript:;"><img src="images/user/5.jpg" />
-                            </a>
-                            <div class="tit"><a href="javascript:;">网易云音乐一次次“营销刷屏”，内部人士公开分享营销心得</a></div>
-                            <div class="txt">
-                                <span>今天 22:32</span><br />
-                                <span>Brand：网易云音乐</span>
-                            </div>
-                            <div class="bar">
-                                <a href="javascript:;" class="user-img">
-                                    <img src="css/images/1x1.png" />
-                                </a>
-                                <span class="name">网易云音乐</span>
-                                <div class="f-bartool clearfix"><a href="javascript:;"><i class="icon-heart"></i><span>99</span></a><a href="javascript:;"><i class="icon-thumbs"></i><span>36</span></a><a href="javascript:;"><i class="icon-comment"></i><span>51</span></a></div>
+                    {
+                        (articleList && articleList.list && articleList.list.length) &&
 
-                            </div>
-                        </div>
-                        <div class="item">
-                            <a class="thumb-img" href="javascript:;"><img src="images/user/5.jpg" />
-                            </a>
-                            <div class="tit"><a href="javascript:;">网易云音乐一次次“营销刷屏”，内部人士公开分享营销心得</a></div>
-                            <div class="txt">
-                                <span>今天 22:32</span><br />
-                                <span>Brand：网易云音乐</span>
-                            </div>
-                            <div class="bar">
-                                <a href="javascript:;" class="user-img">
-                                    <img src="css/images/1x1.png" />
-                                </a>
-                                <span class="name">网易云音乐</span>
-                                <div class="f-bartool clearfix"><a href="javascript:;"><i class="icon-heart"></i><span>99</span></a><a href="javascript:;"><i class="icon-thumbs"></i><span>36</span></a><a href="javascript:;"><i class="icon-comment"></i><span>51</span></a></div>
+                        [<div class="m-artlist clearfix" role="list">
+                            {this.createArticleList()}
+                        </div>,
+                        <a href="javascript:;" class="more-a">点击查看全部项目</a>]
 
-                            </div>
+                    }
+                    {
+                        (!articleList || !articleList.list || articleList.list.length <= 0) &&
+                        <div class="nolist">
+                            <i class="icon-no-art"></i>
+                            <span>· 暂未发表文章 ·</span>
                         </div>
-                        <div class="item">
-                            <a class="thumb-img" href="javascript:;"><img src="images/user/5.jpg" />
-                            </a>
-                            <div class="tit"><a href="javascript:;">网易云音乐一次次“营销刷屏”，内部人士公开分享营销心得</a></div>
-                            <div class="txt">
-                                <span>今天 22:32</span><br />
-                                <span>Brand：网易云音乐</span>
-                            </div>
-                            <div class="bar">
-                                <a href="javascript:;" class="user-img">
-                                    <img src="css/images/1x1.png" />
-                                </a>
-                                <span class="name">网易云音乐</span>
-                                <div class="f-bartool clearfix"><a href="javascript:;"><i class="icon-heart"></i><span>99</span></a><a href="javascript:;"><i class="icon-thumbs"></i><span>36</span></a><a href="javascript:;"><i class="icon-comment"></i><span>51</span></a></div>
+                    }
 
-                            </div>
-                        </div>
-                        <div class="item">
-                            <a class="thumb-img" href="javascript:;"><img src="images/user/5.jpg" />
-                            </a>
-                            <div class="tit"><a href="javascript:;">网易云音乐一次次“营销刷屏”，内部人士公开分享营销心得</a></div>
-                            <div class="txt">
-                                <span>今天 22:32</span><br />
-                                <span>Brand：网易云音乐</span>
-                            </div>
-                            <div class="bar">
-                                <a href="javascript:;" class="user-img">
-                                    <img src="css/images/1x1.png" />
-                                </a>
-                                <span class="name">网易云音乐</span>
-                                <div class="f-bartool clearfix"><a href="javascript:;"><i class="icon-heart"></i><span>99</span></a><a href="javascript:;"><i class="icon-thumbs"></i><span>36</span></a><a href="javascript:;"><i class="icon-comment"></i><span>51</span></a></div>
-
-                            </div>
-                        </div>
-                    </div>
-                    <a href="javascript:;" class="more-a">点击查看全部项目</a>
-                    <div class="nolist">
-                        <i class="icon-no-art"></i>
-                        <span>· 暂未发表文章 ·</span>
-                    </div>
                 </div>
                 <div class="g-right">
                     <div class="qy-r-team">
                         <div class="qy-title">近期合作机构</div>
                         <ul class="hot-team clearfix">
-                            <li>
+                            {/* <li>
                                 <a href="javascript:;"><img src="css/images/1x1.png" /></a>
                             </li>
                             <li>
@@ -310,24 +335,28 @@ export default class SpaceHome extends Component {
                             </li>
                             <li>
                                 <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                            </li>
+                            </li> */}
                         </ul>
                     </div>
                     <div class="qy-r-jobs clearfix">
                         <div class="qy-title">最新招聘</div>
-                        <ul class="qy-rjob">
-                            <li><a href="javascript:;">美术指导/Art Director </a></li>
-                            <li><a href="javascript:;">Art Director </a></li>
-                            <li><a href="javascript:;">美术指导/Art Director </a></li>
-                            <li><a href="javascript:;">美术指导/Art Director </a></li>
-                            <li><a href="javascript:;">美术指导/Art Director </a></li>
-                            <li><a href="javascript:;">Art Director </a></li>
-                        </ul>
-                        <a href="javascript:;" class="more-a">更多招聘+</a>
+                        {
+                            JobList.list &&
+
+                            [<ul class="qy-rjob">
+                                {this.createJobList()}
+                            </ul>,
+                            <a href="javascript:;" class="more-a">更多招聘+</a>]
+
+                        }
+                        {
+                            !JobList.list &&
+                            <div class="nolist">
+                                <span>· 暂未发布招聘 ·</span>
+                            </div>
+                        }
                     </div>
-                    <div class="nolist">
-                        <span>· 暂未发布招聘 ·</span>
-                    </div>
+
                 </div>
             </div>
         );

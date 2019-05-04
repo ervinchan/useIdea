@@ -50,35 +50,29 @@ export default class MyWork extends Component {
     }
 
     getArticleInfo = (categoryId) => {
-        let url = '/zsl/a/cms/article/getAllArticle?'
-        let opts = {
+        Service.GetAllArticle({
             hits: 1,
             categoryId: categoryId || ''
-        }
-        for (var key in opts) {
-            opts[key] && (url += "&" + key + "=" + opts[key])
-        }
-        axios.post(url, opts)
-            .then((response) => {
-                if (categoryId) {
-                    let toolList = response.data.data
-                    this.setState({ toolList })
-                } else {
-                    let hotBooks = response.data.data
-                    this.setState({ hotBooks }, () => {
-                        var swiper_read = new Swiper('.m-read-fade .swiper-container', {
-                            effect: 'fade',
-                            pagination: {
-                                el: '.m-read-fade .u-pagination',
-                                bulletclassName: 'bull',
-                                bulletActiveclassName: 'active',
-                                clickable: true
-                            }
-                        });
-                    })
-                }
+        }).then((response) => {
+            if (categoryId) {
+                let toolList = response.data.data
+                this.setState({ toolList })
+            } else {
+                let hotBooks = response.data.data
+                this.setState({ hotBooks }, () => {
+                    var swiper_read = new Swiper('.m-read-fade .swiper-container', {
+                        effect: 'fade',
+                        pagination: {
+                            el: '.m-read-fade .u-pagination',
+                            bulletclassName: 'bull',
+                            bulletActiveclassName: 'active',
+                            clickable: true
+                        }
+                    });
+                })
+            }
 
-            })
+        })
             .catch((error) => {
                 console.log(error)
             })
@@ -155,7 +149,7 @@ export default class MyWork extends Component {
     createList = () => {
         const { data } = this.props
         const categorys = global.constants.categorys
-        return data && data.map((item, index) => {
+        return data && data.list && data.list.map((item, index) => {
             let Time = FormatDate.formatTime(item.updateDate)
             let router = ``
             switch (item.category.id) {
@@ -199,76 +193,32 @@ export default class MyWork extends Component {
 
     render() {
         const { toolList } = this.state;
-
+        const { data } = this.props
 
         return (
             <div className="">
                 <ul class="ue-article clearfix">
                     {this.createList()}
-                    {/* <li>
-                        <div class="ue_info">
-                            <a href="#" class="face">
-                                <img src="css/images/1x1.png" />
-                            </a>
-                            <div class="alt clearfix">
-                                <a href="#" class="j_name">布谷云</a>
-                                <span class="dot"></span>
-                                <span>12月07日  20:45</span>
-                            </div>
-                            <div class="bat">文章栏目</div>
-                        </div>
-                        <div class="ue_box">
-                            <a class="thumb-img" href="javascript:;"><img src="images/space/3.jpg" /></a>
-                            <h1><a href="#">由你音乐榜：冬天很冷，给你让你听点热的</a></h1>
-                            <div class="txt nowrap">
-                                “路灯看久了，总觉得没有老家的星星亮”
-                                </div>
-                            <div class="f-bartool clearfix"><a href="javascript:;"><i class="icon-heart"></i><span>99</span></a><a href="javascript:;"><i class="icon-thumbs"></i><span>36</span></a><a href="javascript:;"><i class="icon-comment"></i><span>51</span></a></div>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="ue_info">
-                            <a href="#" class="face">
-                                <img src="css/images/1x1.png" />
-                            </a>
-                            <div class="alt clearfix">
-                                <a href="#" class="j_name">布谷云</a>
-                                <span class="dot"></span>
-                                <span>12月07日  20:45</span>
-                            </div>
-                            <div class="bat">文章栏目</div>
-                        </div>
-                        <div class="ue_box">
-                            <a class="thumb-img" href="javascript:;"><img src="images/space/3.jpg" /></a>
-                            <h1><a href="#">由你音乐榜：冬天很冷，给你让你听点热的</a></h1>
-                            <div class="txt nowrap">
-                                “路灯看久了，总觉得没有老家的星星亮”
-                                </div>
-                            <div class="f-bartool clearfix"><a href="javascript:;"><i class="icon-heart"></i><span>99</span></a><a href="javascript:;"><i class="icon-thumbs"></i><span>36</span></a><a href="javascript:;"><i class="icon-comment"></i><span>51</span></a></div>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="ue_info">
-                            <a href="#" class="face">
-                                <img src="css/images/1x1.png" />
-                            </a>
-                            <div class="alt clearfix">
-                                <a href="#" class="j_name">布谷云</a>
-                                <span class="dot"></span>
-                                <span>12月07日  20:45</span>
-                            </div>
-                            <div class="bat">文章栏目</div>
-                        </div>
-                        <div class="ue_box">
-                            <a class="thumb-img" href="javascript:;"><img src="images/space/3.jpg" /></a>
-                            <h1><a href="#">由你音乐榜：冬天很冷，给你让你听点热的</a></h1>
-                            <div class="txt nowrap">
-                                “路灯看久了，总觉得没有老家的星星亮”
-                                </div>
-                            <div class="f-bartool clearfix"><a href="javascript:;"><i class="icon-heart"></i><span>99</span></a><a href="javascript:;"><i class="icon-thumbs"></i><span>36</span></a><a href="javascript:;"><i class="icon-comment"></i><span>51</span></a></div>
-                        </div>
-                    </li> */}
                 </ul>
+                {
+                    data && data.list && (
+                        <Pagination key="Pagination" className="u-pages" current={this.state.curPage} onChange={this.handlePageChange} total={data && data.count} pageSize={PAGESIZE} itemRender={(page, type, originalElement) => {
+                            switch (type) {
+                                case 'prev':
+                                    return [<a key={type} href="javascript:;">{type}</a>,
+                                    <a href="javascript:;" ><i className="fa-angle-double-left"></i></a>]
+                                case 'next':
+                                    return [
+                                        <a key={type} href="javascript:;" ><i className="fa-angle-double-right"></i></a>,
+                                        <a href="javascript:;">{type}</a>
+                                    ]
+                                default:
+                                    return <a key={page} href="javascript:;">{page}</a>;
+
+                            }
+                        }} />
+                    )
+                }
                 {/* <div class="u-pages">
                     <div class="box clearfix">
                         <a href="javascript:;">Prev</a>

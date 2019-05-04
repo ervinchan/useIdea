@@ -202,10 +202,10 @@ const App = () => (
             <Route exact path="/Bookstore" breadcrumbName="蜗牛翻书" component={Bookstore} />
             <Route exact path="/Bookstore/NewBooks/:tid?" breadcrumbName="书单上新" component={Bookstore} />
             <Route exact path="/Bookstore/Bookbuy/:id" breadcrumbName="书单详情" component={Bookbuy} />
-            <Route exact path="/ReadingTime" breadcrumbName="阅读场景" component={ReadingTime} />
+            <Route exact path="/Bookstore/ReadingTime" breadcrumbName="阅读场景" component={ReadingTime} />
             <Route exact path="/Inspiration" breadcrumbName="见识灵感" component={Bigidea} />
             <Route exact path="/Inspiration/Interview/:tid?" breadcrumbName="专访幕后" component={Interview} />
-            <Route exact path="/Inspiration/Viewpoint" breadcrumbName="醒来再读" component={Viewpoint} />
+            <Route exact path="/Viewpoint" breadcrumbName="醒来再读" component={Viewpoint} />
             <Route exact path="/Inspiration/Tool" breadcrumbName="工具包" component={Tool} />
             <Route exact path="/Inspiration/Article/:aid?" breadcrumbName="文章" component={Article} />
             <Route exact path="/GoodCopy" breadcrumbName="口吃文案" component={GoodCopy} />
@@ -224,11 +224,11 @@ const App = () => (
             <Route exact path="/LoginQy" breadcrumbName="企业登录" component={LoginQy} />
             <Route exact path="/RegQy" breadcrumbName="企业注册" component={RegQy} />
             <Route exact path="/RegInfo" breadcrumbName="企业注册信息" component={RegInfo} />
-            <Route exact path="/RegFinish" breadcrumbName="注册成功" component={RegFinish} />
+            <Route exact path="/RegFinish/:user?" breadcrumbName="注册成功" component={RegFinish} />
 
             {/* <Route exact path="/newMessage/:uid?" component={newMessage} />
             <Route exact path="/QyWork/:uid?" component={QyWork} /> */}
-            <Route exact path="/QyJob/:uid?" component={QyJob} />
+            {/* <Route exact path="/QyJob/:uid?" component={QyJob} /> */}
             <Route exact path="/QyInfo/:uid?" component={QyInfo} />
             <Route exact path="/QyAd/:uid?" component={QyAd} />
             <Route exact path="/QyHome/:uid?" component={QyHome} />

@@ -749,3 +749,29 @@ input {
 .upload-btn {
     position: relative;
 }
+
+.isError {
+    input {
+        border-color: @color;
+    }
+
+    &:after {
+        content: " ";
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        .absolute();
+        top: 15px;
+        right: 10px;
+        background: url(images/icon-x1.png) -180px -200px no-repeat;
+        cursor: pointer;
+    }
+
+    .tip {
+        display: none;
+    }
+
+    .tipError {
+        display: inline-block;
+    }
+}

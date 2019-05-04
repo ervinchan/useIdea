@@ -9,16 +9,18 @@ import Swiper from 'swiper/dist/js/swiper.min.js'
 import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
 import Service from '../../service/api.js'
+import Utils from '../../static/js/utils/utils.js'
 import 'swiper/dist/css/swiper.min.css'
 import '../../static/less/u.icenter.less'
 import 'antd/lib/tabs/style/index.less';
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
-import userImg from "../../static/images/user/userTx.jpg"
+import defaultPhoto from "../../static/images/user/default.png"
 import MyWork from './MyWork.js';
 import MyHeart from './MyHeart.js';
 const TabPane = Tabs.TabPane;
 
+const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
 export default class UserCenter extends Component {
     /* global $ */
     tabDom = null
@@ -28,7 +30,8 @@ export default class UserCenter extends Component {
             listData: [],
             activeKey: 'news',
             fileList: [],
-            collectList: []
+            collectList: [],
+            userPhoto: [],
         };
     }
 
@@ -107,30 +110,34 @@ export default class UserCenter extends Component {
                 console.log(error)
             })
     }
+
+    setUploadPorps = (files, handleImg) => {
+        return Utils.uploadProps(files, (file, newUrl) => {
+            handleImg(file, newUrl)
+        });
+    }
+
+    setUserPhoto = (file, newUrl) => {
+        this.setState(state => ({
+            userPhoto: [...state.userPhoto, file],
+            userImg: newUrl
+        }), () => {
+            $(".userTx").find("input[type=file]").css({
+                position: "absolute",
+                left: 0,
+                top: 0,
+                width: "100%",
+                height: "100%",
+                opacity: 0,
+                zIndex: 1,
+                display: "block"
+            })
+
+        })
+    };
     render() {
-        const { fileList } = this.state;
-        const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
+        const { userPhoto } = this.state;
         const tabTit = `来信中心`;
-        const props = {
-            onRemove: (file) => {
-                this.setState((state) => {
-                    const index = state.fileList.indexOf(file);
-                    const newFileList = state.fileList.slice();
-                    newFileList.splice(index, 1);
-                    return {
-                        fileList: newFileList,
-                    };
-                });
-            },
-            beforeUpload: (file) => {
-                this.setState(state => ({
-                    fileList: [...state.fileList, file],
-                }));
-                return false;
-            },
-            fileList,
-            showUploadList: false
-        };
         return (
             <div className="">
                 {/* 头部 */}
@@ -138,24 +145,29 @@ export default class UserCenter extends Component {
                 <div className="ue-head">
                     <div className="wrapper">
                         <div className="userTx">
-                            <Upload className="upload-btn" {...props}>
-                                <a href="javascript:;" onClick={this.handleChangePhoto}>
-                                    <img src={userImg} />
+                            {/* <Upload
+                                name="userPhoto"
+                                className="avatar-uploader"
+                                {...this.setUploadPorps(userPhoto, this.setUserPhoto)}
+                            >
+                                <a href="javascript:;">
+                                    <img src={userImg || userInfo.photo} />
                                     <p><i className="icon-user-img"></i><span>更新个人头像</span></p>
                                 </a>
-                            </Upload>
+                            </Upload> */}
+                            <img src={userInfo.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
                         </div>
                         <div className="nick-name">
-                            <h1><b>{userInfo.name}</b></h1>
+                            <h1><b>{userInfo && userInfo.name}</b></h1>
                         </div>
                         <div className="nick-data">
                             <p>
-                                <span>作品</span><a href="javascript:;">{userInfo.attentionNum}</a>
-                                <span>关注</span><a href="javascript:;" onClick={() => this.gotoRouter(`/MyFans/${userInfo.id}`)}>{userInfo.attentionNum}</a>
-                                <span>粉丝</span><a href="javascript:;" onClick={() => this.gotoRouter(`/MyFans/${userInfo.id}`)}>{userInfo.attention2Num}</a>
+                                <span>作品</span><a href="javascript:;">{userInfo && userInfo.attentionNum}</a>
+                                <span>关注</span><a href={`/#/MyFans/${userInfo && userInfo.id}`} >{userInfo && userInfo.attentionNum}</a>
+                                <span>粉丝</span><a href={`/#/MyFans/${userInfo && userInfo.id}`}>{userInfo && userInfo.attention2Num}</a>
                             </p>
                         </div>
-                        <div className="address"><i className="icon-address-w"></i>{userInfo.city}</div>
+                        <div className="address"><i className="icon-address-w"></i>{userInfo.provence}  {userInfo.city}</div>
                         <a href="javascript:;" className="add_upload" onClick={() => this.gotoRouter(`/ArticleEditor`)}>发表作品/经验</a>
                     </div>
                 </div>
@@ -168,7 +180,7 @@ export default class UserCenter extends Component {
                             
                         </ul> */}
                         <Tabs ref={e => this.tabDom = e} className="clearfix" onChange={this.handleTabChange}>
-                            <TabPane tab={["来信中心", <i className="badge">99+</i>]} key="news" className="qj-news"><MyWork /></TabPane>
+                            <TabPane tab={["来信中心", <i className="badge">{userInfo.attentionNum}</i>]} key="news" className="qj-news"><MyWork /></TabPane>
                             <TabPane tab="我的作品" key="reco"><MyWork data={this.state.listData} history={this.props.history} /></TabPane>
                             <TabPane tab="我的心选" key="reply"><MyHeart data={this.state.collectList} history={this.props.history} /></TabPane>
                         </Tabs>

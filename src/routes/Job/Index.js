@@ -15,12 +15,12 @@ import 'swiper/dist/css/swiper.min.css'
 
 import 'antd/lib/pagination/style/index.css';
 import '../../static/less/jobs.less';
-
 import defaultPhoto from "../../static/images/user/default.png"
 const PAGESIZE = 3;
 
+const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
 export default class Job extends Component {
-
+    categoryIds = global.constants.categoryIds['招聘']
     constructor(props) {
         super(props);
         this.state = {
@@ -80,7 +80,7 @@ export default class Job extends Component {
     getHotCompany = (categoryId) => {
         Service.GetAllArticle({
             hits: 1,
-            categoryId: "981892a5c2394fe7b01ce706d917699e"
+            categoryId: this.categoryIds.id
         }).then((response) => {
             let hotCompanyList = response.data.data
             this.setState({ hotCompanyList })
@@ -114,7 +114,7 @@ export default class Job extends Component {
 
     getJobLists = () => {
         Service.GetAllArticle({
-            categoryId: "981892a5c2394fe7b01ce706d917699e",
+            categoryId: this.categoryIds.id,
             pageNo: this.state.curPage || 1
         }).then((response) => {
             global.constants.loading = false
@@ -124,8 +124,8 @@ export default class Job extends Component {
         })
     }
 
-    gotoRouter = () => {
-
+    gotoRouter = (router) => {
+        this.props.history.push(router)
     }
 
     createJobList = () => {
@@ -133,13 +133,13 @@ export default class Job extends Component {
         return jobList.list && jobList.list.map((item, index) => {
             let Time = FormatDate.formatTime(item.updateDate)
             return (
-                <li>
-                    <a className="thumb-img" href="javascript:;" onClick={this.gotoRouter(item.id)}>
+                <li onClick={() => this.gotoRouter(`/QyspaceJobInfo/${item.id}`)}>
+                    <a className="thumb-img" href="javascript:;">
                         <img src={item.image} />
                     </a>
-                    <h1><a href="javascript:;" onClick={this.gotoRouter(item.id)}>{item.title}</a></h1>
+                    <h1><a href="javascript:;">{item.title}</a></h1>
                     <h3>{Time}</h3>
-                    <div className="bar"><a href="javascript:;" onClick={this.gotoRouter(item.id)}><i className="icon-qiye"></i>{item.company}</a><span><i className="icon-money"></i>{item.pay}</span></div>
+                    <div className="bar"><a href="javascript:;"><i className="icon-qiye"></i>{item.company}</a><span><i className="icon-money"></i>{item.pay}</span></div>
                     <span className="cost"><i className="icon-address"></i>{item.jcity}</span>
                 </li>
             )
@@ -150,12 +150,12 @@ export default class Job extends Component {
         const { hotCompanyList } = this.state;
         return hotCompanyList.map((item, index) => {
             return (
-                <li>
+                <li onClick={() => this.gotoRouter(item.id)}>
                     <div className="infos">
-                        <a className="thumb-img" href="javascript:;" onClick={this.gotoRouter(item.id)}>
-                            <img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
+                        <a className="thumb-img" href="javascript:;">
+                            <img src={userInfo && (userInfo.photo || defaultPhoto)} />
                         </a>
-                        <h1><a href="javascript:;" onClick={this.gotoRouter(item.id)}>{item.company}</a></h1>
+                        <h1><a href="javascript:;">{item.company}</a></h1>
                         <div className="bar">
                             <span><i className="icon-address-o"></i>{item.jcity}</span><span><i className="icon-large"></i>{item.hits}个</span>
                         </div>
@@ -168,7 +168,7 @@ export default class Job extends Component {
 
     getHotPost = () => {
         Service.GetHotPost({
-            categoryId: "981892a5c2394fe7b01ce706d917699e"
+            categoryId: this.categoryIds.id
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -185,7 +185,7 @@ export default class Job extends Component {
     }
     getBannerA = () => {
         Service.GetADList({
-            categoryId: "981892a5c2394fe7b01ce706d917699e",
+            categoryId: this.categoryIds.id,
             id: "588e4f30e9634523b34b5c913bfa4cd2"
         }).then((response) => {
             if (response.data.status === 1) {
@@ -195,7 +195,7 @@ export default class Job extends Component {
     }
     getBannerB = () => {
         Service.GetADList({
-            categoryId: "981892a5c2394fe7b01ce706d917699e",
+            categoryId: this.categoryIds.id,
             id: "243e981b6d30424c8f3fac513382483a"
         }).then((response) => {
             if (response.data.status === 1) {

@@ -13,6 +13,7 @@ import Service from '../../service/api.js'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
 import HotRead from '../../common/hotRead/Index'
+import Pager from '../../common/pager'
 import 'swiper/dist/css/swiper.min.css'
 import '../../static/less/question.less'
 import 'antd/lib/tabs/style/index.less';
@@ -109,7 +110,7 @@ export default class Question extends Component {
             id: "588e4f30e9634523b34b5c913bfa4cd2"
         }).then((response) => {
             if (response.data.status === 1) {
-                this.setState({ bannerFList: response.data.data })
+                this.setState({ bannerAList: response.data.data })
             }
         })
     }
@@ -126,7 +127,7 @@ export default class Question extends Component {
             id: "b3653c6c1da841569e04ccccd5c0a776"
         }).then((response) => {
             if (response.data.status === 1) {
-                this.setState({ bannerFList: response.data.data })
+                this.setState({ bannerBList: response.data.data })
             }
         })
     }
@@ -134,10 +135,10 @@ export default class Question extends Component {
         const { bannerAList } = this.state
         return bannerAList.map((item, index) => {
             return (
-                <div className="swiper-slide">
-                    <h1>{item.title}</h1>
+                <div className="swiper-slide" >
+                    <h1>{item.name}</h1>
                     <div className="txt">
-                        {item.discript}
+                        {item.description}
                     </div>
                     <div className="tag">
                         <a href={item.url} >#文案经验</a>
@@ -207,10 +208,10 @@ export default class Question extends Component {
             if (item.isNewRecord) {
                 return (
                     <div className="item">
-                        <a href="javascript:;" onClick={() => this.gotoRouter(item.contentId)} className="thumb-img">
+                        <a href="javascript:;" onClick={() => this.gotoRouter(item.id)} className="thumb-img">
                             <img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
                         </a>
-                        <h1><a href="javascript:;" onClick={() => this.gotoRouter(item.contentId)}>{item.title}</a></h1>
+                        <h1><a href="javascript:;" onClick={() => this.gotoRouter(item.id)}>{item.title}</a></h1>
                         <div className="alt"><span>{Time}</span></div>
                         {item.isNewRecord && <a href="javascript:;" className="sponsor">赞助商提供</a>}
                     </div>
@@ -218,17 +219,17 @@ export default class Question extends Component {
             } else {
                 return (
                     <div class="item">
-                        <a href="javascript:;" class="thumb-img" onClick={() => this.gotoRouter(item.contentId)}>
+                        <a href="javascript:;" class="thumb-img" onClick={() => this.gotoRouter(item.id)}>
                             <img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
                         </a>
-                        <h1><a href="javascript:;" onClick={() => this.gotoRouter(item.contentId)}>{item.title}</a></h1>
+                        <h1><a href="javascript:;" onClick={() => this.gotoRouter(item.id)}>{item.title}</a></h1>
                         <div class="alt">
                             <span>{Time}</span>
                             {item.isTop !== "0" && <span class="icon-top"></span>}
                             {item.isRecommend !== "0" && <span class="icon-jian"></span>}
                         </div>
                         <div class="txt" dangerouslySetInnerHTML={{ __html: item.content }}></div>
-                        <div class="f-bartool clearfix"><a href="javascript:;" onClick={() => this.gotoRouter(item.contentId)}><i class="icon-comment"></i><span>{item.commentNum}</span></a></div>
+                        <div class="f-bartool clearfix"><a href="javascript:;" onClick={() => this.gotoRouter(item.id)}><i class="icon-comment"></i><span>{item.commentNum}</span></a></div>
                     </div>
                 )
             }
@@ -275,7 +276,7 @@ export default class Question extends Component {
     submitQuestion = () => {
         const { questionTit, questionTxt, fileList, addCategoryId, userInfo } = this.state;
         var oMyForm = new FormData();
-        oMyForm.append("userId", userInfo.id);
+        oMyForm.append("userId", userInfo && userInfo.id);
         oMyForm.append("categoryId", "4812062598ec4b10bedfb38b59ea3e94");
         oMyForm.append("classifying", addCategoryId);
         oMyForm.append("title", questionTit);
@@ -383,6 +384,7 @@ export default class Question extends Component {
                         </div>
                     </div>
                     <div className="u-pagination wide"></div>
+                    <em style={{ background: 'url(images/jingjiao/banner.jpg) center no-repeat' }}></em>
                 </div>
 
                 {/* <!--广告位--> */}
@@ -448,25 +450,7 @@ export default class Question extends Component {
                             </div>
                         </div>
                         {/* <!--J进度条--> */}
-                        {
-                            questionList.count > global.constants.PAGESIZE && (
-                                <Pagination className="u-pages" current={this.state.curPage} onChange={this.handlePageChange} total={questionList && questionList.count} pageSize={global.constants.PAGESIZE} itemRender={(page, type, originalElement) => {
-                                    switch (type) {
-                                        case 'prev':
-                                            return [<a href="javascript:;">{type}</a>,
-                                            <a href="javascript:;" ><i className="fa-angle-double-left"></i></a>]
-                                        case 'next':
-                                            return [
-                                                <a href="javascript:;" ><i className="fa-angle-double-right"></i></a>,
-                                                <a href="javascript:;">{type}</a>
-                                            ]
-                                        default:
-                                            return <a href="javascript:;">{page}</a>;
-
-                                    }
-                                }} />
-                            )
-                        }
+                        <Pager getData={this.getQuestionList} data={questionList} />
 
                         {/* <!--/J进度条--> */}
                     </div>

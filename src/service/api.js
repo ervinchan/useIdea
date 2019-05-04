@@ -45,7 +45,7 @@ class API {
     //获取文章内容
     static GetArticleContent(data) {
         return POST({
-            url: "/zsl/a/cms/article/filter/getArticleContent?",
+            url: "/a/cms/article/filter/getArticleContent?",
             opts: data
         })
     }
@@ -112,9 +112,9 @@ class API {
     }
     //请教提交
     static QuestionBuild(data) {
-        return POST({
+        return FormData({
             url: "/a/cms/article/filter/consultationSave?",
-            opts: data
+            opts: data.form
         })
     }
     //投诉
@@ -200,6 +200,24 @@ class API {
         })
     }
 
+    //文章分类
+    static FindAllClassify(data) {
+        return POST({
+            url: "/a/articleclassify/cmsArticleClassify/filter/findAllClassify?",
+            opts: data
+        })
+    }
+
+    //同类好书
+    static SameBooks(data) {
+        return POST({
+            url: "/a/book/bookManager/filter/sameBookType?",
+            opts: data
+        })
+    }
+
+
+
     //文章发布分类
     static ArticleClassify(data) {
         return POST({
@@ -235,6 +253,14 @@ class API {
     static GetADList(data) {
         return POST({
             url: "/a/ad/adInfomation/filter/findAdWindowAdInfomationList?",
+            opts: data
+        })
+    }
+
+    //广告管理接口-投放列表   
+    static getADHistoryList(data) {
+        return POST({
+            url: "/a/cms/article/filter/adhistoryList?",
             opts: data
         })
     }
@@ -276,16 +302,94 @@ class API {
             opts: data
         })
     }
-    //最新动态
-    static GetLatestAction(data) {
+
+    //企业注册
+    static companyReg(data) {
+        return FormData({
+            url: "/filter/email?",
+            opts: data.form
+        })
+    }
+
+    //验证用户是否存在
+    static validateLoginName(data) {
         return POST({
-            url: "/a/cms/article/filter/latestAction?",
+            url: "/filter/ValidateLoginName?",
             opts: data
         })
     }
 
+    //获取用户信息    
+    static getUserInfo(data) {
+        return POST({
+            url: "/a/sys/sysOfficeInformation/filter/findOfficeInfomation?",
+            opts: data
+        })
+    }
 
+    //获取用户信息    
+    static updateInformation(data) {
+        return FormData({
+            url: "/a/sys/user/filter/updateInformation?",
+            opts: data.form
+        })
+    }
 
+    //获取地区列表
+    static getArea(data) {
+        return POST({
+            url: "/filter/getArea?",
+            opts: data
+        })
+    }
 
+    //获取用户详细信息
+    static getUserInfoDetail(data) {
+        return POST({
+            url: "/a/sys/user/filter/findInformation1?",
+            opts: data
+        })
+    }
+
+    //获取企业详细信息
+    static getQyInfoDetail(data) {
+        return POST({
+            url: "/a/sys/user/filter/findOfficeInformation1?",
+            opts: data
+        })
+    }
+
+    //退出登錄
+    static Logout(data) {
+        return POST({
+            url: "/a/sys/user/filter/clearCache?",
+            opts: data
+        })
+    }
+
+    //发布招聘
+
+    static addJob(data) {
+        return FormData({
+            url: "/a/cms/article/filter/saveJob?",
+            opts: data.form
+        })
+    }
+
+    //广告投放
+    static adRequirement(data) {
+        return FormData({
+            url: "/a/ad/adRequirement/filter/findADRequirement?",
+            opts: data.form
+        })
+    }
+
+    //站内消息
+    static GetSysNews(data) {
+        return POST({
+            url: "/a/sysinfo/sysSendInformation/filter/findSysInformation?",
+            opts: data
+        })
+    }
 }
 export default API

@@ -19,10 +19,10 @@ import '../../static/less/bookstore.less';
 
 const Search = Input.Search;
 const TabPane = Tabs.TabPane;
-const PAGESIZE = 3;
+const PAGESIZE = 20;
 
 export default class Bookstore extends Component {
-
+    categoryIds = global.constants.categoryIds['书单上新']
     constructor(props) {
         super(props);
         this.state = {
@@ -251,7 +251,7 @@ export default class Bookstore extends Component {
                         <em><img src={bookImagUrl} /></em>
                         <h1>{item.bookName}</h1>
                         <h3> {item.author}</h3>
-                        <div className="txt">{item.authorIntroduce}</div>
+                        <div className="txt">{item.editorRecommend}</div>
                     </a>
                 </li>
             )
@@ -277,7 +277,7 @@ export default class Bookstore extends Component {
                         </ul>
                     </div>
                 </div> */}
-                <WheelBanner categoryId={"9b45b13afc954595a3065bb0ef84dacd"} />
+                <WheelBanner categoryId={this.categoryIds.id} />
 
                 <div className="g-fanshu wrapper">
                     <div className="g-left">
@@ -325,7 +325,7 @@ export default class Bookstore extends Component {
                         }
                         <div className="u-title3">
                             <b>阅读场景</b>
-                            <a href="/#/ReadingTime" className="more"><i className="fa-reorder"></i> 查看全部</a>
+                            <a href="/#/Bookstore/ReadingTime" className="more"><i className="fa-reorder"></i> 查看全部</a>
                         </div>
                         <div className="fs-read">
                             <ul className="clearfix">
@@ -334,7 +334,7 @@ export default class Bookstore extends Component {
                             </ul>
                         </div>
                     </div>
-                    <BookMenu />
+                    <BookMenu categoryid={this.categoryIds.id} />
                 </div>
                 {/* 底部 */}
                 <Footer />

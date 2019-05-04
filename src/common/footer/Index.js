@@ -48,7 +48,7 @@ export default class Footer extends Component {
                             <h3>
                                 商务合作及媒介沟通请联系：ideazhu@gmail.com
                                 </h3>
-                            <h5>Copyright©响创意2018-2019  浙ICP备13019248号</h5>
+                            <h5>Copyright©响创意2018-2019  沪ICP备18048586号</h5>
                         </div>
                     </div>
                 </div>

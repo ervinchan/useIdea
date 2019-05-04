@@ -5,10 +5,7 @@ import { StickyContainer, Sticky } from 'react-sticky';
 
 //import $ from 'jquery'
 import Swiper from 'swiper/dist/js/swiper.min.js'
-import axios from 'axios'
-
-import Header from '../../common/header/Index.js'
-import Footer from '../../common/footer/Index.js'
+import Service from '../../service/api.js'
 import QyHead from './qyHead'
 import 'swiper/dist/css/swiper.min.css'
 import '../../static/less/u.icenter.less'
@@ -22,7 +19,7 @@ import Home from './Home.js';
 import AdManage from './Ad.js'
 import News from '../User/newMessage.js'
 const TabPane = Tabs.TabPane;
-
+const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
 export default class CoverModal extends Component {
     /* global $ */
     tabDom = null
@@ -89,7 +86,7 @@ export default class CoverModal extends Component {
         POST({
             url: "/a/artuser/articleCollect/collectList?",
             opts: {
-                userId: JSON.parse(sessionStorage.getItem("userInfo")).id
+                userId: userInfo && userInfo.id
             }
         }).then((response) => {
             global.constants.loading = false
@@ -105,7 +102,7 @@ export default class CoverModal extends Component {
         POST({
             url: "/a/cms/article/latestAction?",
             opts: {
-                userId: JSON.parse(sessionStorage.getItem("userInfo")).id
+                userId: userInfo && userInfo.id
             }
         }).then((response) => {
             global.constants.loading = false

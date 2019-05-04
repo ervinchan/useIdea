@@ -13,14 +13,15 @@ import Footer from '../../common/footer/Index.js'
 import 'swiper/dist/css/swiper.min.css'
 import '../../static/less/u.myaccount.less'
 import 'antd/lib/tabs/style/index.less';
-import { POST } from '../../service/service'
+import Service from '../../service/api.js'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
 
 import defaultPhoto from "../../static/images/user/default.png"
 import Item from 'antd/lib/list/Item';
+import JobList from '../Job/List.js';
 const TabPane = Tabs.TabPane;
-
+const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
 export default class UserCenter extends Component {
     /* global $ */
     tabDom = null
@@ -29,7 +30,46 @@ export default class UserCenter extends Component {
         this.state = {
             myFocusList: [],
             myFansList: [],
-            activeKey: 'news'
+            activeKey: 'news',
+            info: {},
+            keywords: [],
+            experienceList: [
+                { name: "不限" },
+                { name: "实习生" },
+                { name: "应届毕业生" },
+                { name: "1-3年" },
+                { name: "3-5年" },
+                { name: "5-8年" },
+                { name: "8年以上" },
+
+            ],
+            payList: [
+                { name: "不限" },
+                { name: "3K以下" },
+                { name: "3-5K" },
+                { name: "5-8K" },
+                { name: "8-10K" },
+                { name: "10-15K" },
+                { name: "15-20K" },
+                { name: "20-30K" },
+                { name: "30-50K" },
+                { name: "50K以上" },
+
+            ],
+            educationList: [
+                { name: "不限" },
+                { name: "中专" },
+                { name: "高中" },
+                { name: "大专" },
+                { name: "本科" },
+                { name: "硕士" },
+                { name: "博士及以上" }
+
+            ],
+            payItem: {},
+            educationItem: {},
+            experienceItem: {},
+            JobList: {}
         };
     }
 
@@ -69,141 +109,197 @@ export default class UserCenter extends Component {
             $(".u-select [role=menu]").hide();
             $(this).next().show();
         });
-        this.getMyFans();
-        this.getMyFocus();
-    }
-
-    createList = (name) => {
-        const listData = [];
-        const IconText = ({ type, text }) => (
-            <span>
-                <Icon type={type} style={{ marginRight: 8 }} />
-                {text}
-            </span>
-        );
-        return (
-            <div className="item">
-                <a href="javascript:;" className="thumb-img">
-                    <img src="css/images/1x1.png" />
-                </a>
-                <h1><a href="/#/Question/Article">请问大家有没有好用的微信排版工具？</a></h1>
-                <div className="alt"><span>昨天 21:32</span></div>
-                <a href="javascript:;" className="sponsor">赞助商提供</a>
-            </div>
-        )
-    }
-    handleTabChange = (key) => {
-        console.log(key);
-    }
-
-    getMyFocus = () => {
-        POST({
-            url: "/a/attention/userAttentionUserids/attentionList?",
-            opts: {
-                userId: JSON.parse(sessionStorage.getItem("userInfo")).id
-            }
-        }).then((response) => {
-            global.constants.loading = false
-            if (response.data.status === 1) {
-                this.setState({ myFocusList: response.data.data.userList })
-            }
-        })
-            .catch((error) => {
-                console.log(error)
-            })
-    }
-    getMyFans = () => {
-        POST({
-            url: "/a/attention/userAttentionUserids/attention2List?",
-            opts: {
-                userId: JSON.parse(sessionStorage.getItem("userInfo")).id
-            }
-        }).then((response) => {
-            global.constants.loading = false
-            if (response.data.status === 1) {
-                this.setState({ myFansList: response.data.data })
-            }
-        })
-            .catch((error) => {
-                console.log(error)
-            })
+        this.getRegionDatas();
+        this.getJobList();
+        this.getUserInfoDetail(userInfo && userInfo.id);
     }
     gotoRouter = (router) => {
         this.props.history.push(router)
     }
 
-    createMyFocus = () => {
-        const { myFocusList } = this.state;
-        return myFocusList.map((item, index) => {
-            return (
-                <li>
-                    <div class="lx-item">
-                        <a href="javascript:;" class="face">
-                            <img src={item.photo  || defaultPhoto} />
-                        </a>
-                        <h1><a href="javascript:;" class="j_name">{item.name}</a></h1>
-                        <div class="lx_txt">
-                            {item.description}
-                        </div>
-                        <div class="lx_alt clearfix">
-                            <a href="javascript:;" onClick={() => { this.gotoRouter(`/UserNews/${item.id}`) }}>作品<span>{item.attention2Num}</span></a>
-                            <a href="javascript:;" onClick={() => { this.gotoRouter(`/MyFans/${item.id}`) }}>粉丝<span>{item.attention2Num}</span></a>
-                        </div>
-                        <a href="javascript:;" class="a_follow" onClick={() => this.handleFoucs(item.id)}>关注</a>
-                    </div>
-                </li>
-            )
+    getUserInfoDetail = (userId) => {
+        Service.getUserInfoDetail({
+            userId: userId
         })
-
+            .then((response) => {
+                let userInfoDetail = response.data.data;
+                Object.assign(userInfo, userInfoDetail);
+                this.setState({ info: userInfo });
+                console.log(userInfo)
+            })
+            .catch((error) => {
+                console.log(error)
+            })
     }
-    handleFoucs = (uid) => {
-        const { articleInfo } = this.state;
-        POST({
-            url: "/a/attention/userAttentionUserids/attention?",
-            opts: {
-                attention2UserId: uid,
-                userId: JSON.parse(sessionStorage.getItem("userInfo")).id
-            }
+
+    getRegionDatas = () => {
+        Service.getArea()
+            .then((response) => {
+                if (response.data.status === 1) {
+                    let regionDatas = response.data.data
+                    this.setState({ regionDatas })
+                }
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+
+    getJobList = () => {
+        Service.GetAllArticle({
+            userId: userInfo.id,
+            categoryId: global.constants.categorys[8].id,
+            createTimeSort: 1
+        })
+            .then((response) => {
+                if (response.data.status === 1) {
+                    let JobList = response.data.data
+                    this.setState({ JobList })
+                }
+            })
+    }
+
+    createRegion = () => {
+        const { regionDatas } = this.state;
+        return regionDatas && regionDatas.map((item) => {
+            return <li onClick={() => this.setCity(item)}>{item.name}</li>
+        })
+    }
+    setCity = (item) => {
+        let city = item.childList
+        let province = item
+        this.setState({ city, province, district: [], cityItem: null, districtItem: null })
+    }
+
+    createCity = () => {
+        const { city } = this.state;
+        return city && city.map((item) => {
+            return <li onClick={() => this.setDistrict(item)}>{item.name}</li>
+        })
+    }
+
+    setDistrict = (item) => {
+        let district = item.childList
+        let cityItem = item
+        this.setState({ cityItem, district, districtItem: null })
+    }
+    createDistrict = () => {
+        const { district } = this.state;
+        return district && district.map((item) => {
+            return <li onClick={() => this.onSelectedDistrict(item)}>{item.name}</li>
+        })
+    }
+    onSelectedDistrict = (item) => {
+        this.setState({ districtItem: item })
+    }
+
+    createEducationList = () => {
+        const { educationList } = this.state;
+        return educationList && educationList.map((item) => {
+            return <li onClick={() => this.onSelectedEducation(item)}>{item.name}</li>
+        })
+    }
+    onSelectedEducation = (item) => {
+        this.setState({ educationItem: item })
+    }
+
+    createExperienceList = () => {
+        const { experienceList } = this.state;
+        return experienceList && experienceList.map((item) => {
+            return <li onClick={() => this.onSelectedExperience(item)}>{item.name}</li>
+        })
+    }
+    onSelectedExperience = (item) => {
+        this.setState({ experienceItem: item })
+    }
+
+    createPayList = () => {
+        const { payList } = this.state;
+        return payList && payList.map((item) => {
+            return <li onClick={() => this.onSelectedPay(item)}>{item.name}</li>
+        })
+    }
+    onSelectedPay = (item) => {
+        this.setState({ payItem: item })
+    }
+
+    addJob = () => {
+        const { info, payItem, experienceItem, educationItem, province, cityItem, districtItem, keywords } = this.state;
+        let params = {
+            pay: payItem.name || "",
+            experience: info.experience || "",
+            education: educationItem.name || "",
+            jobNum: experienceItem.name || "",
+            area: province.name || "",
+            city: cityItem.name || "",
+            district: districtItem.name || "",
+            email: info.email || "",
+            keywords: keywords || "",
+            description: info.description || "",
+            jobDescription: info.jobDescription || "",
+            content: info.content || "",
+            title: info.title || "",
+            company: info.company || "",
+            phone: info.phone || "",
+            categoryId: global.constants.categorys[0].id || "",
+            userId: (userInfo && userInfo.id) || "",
+        }
+        var oMyForm = new FormData();
+
+        for (let key in params) {
+            oMyForm.append(key, params[key]);
+        }
+        Service.addJob({
+            form: oMyForm
         }).then((response) => {
-            global.constants.loading = false
-            if (response.data.status === 1) {
 
-                this.setState({ isFans: response.data.status })
-            }
-
-            /* global layer */
-            layer.msg(response.data.message)
         })
             .catch((error) => {
                 console.log(error)
             })
     }
-    createMyFans = () => {
-        const { myFansList } = this.state;
-        return myFansList.map((item, index) => {
-            return (
-                <li>
-                    <div class="lx-item">
-                        <a href="javascript:;" class="face">
-                            <img src={item.photo  || defaultPhoto} />
-                        </a>
-                        <h1><a href="javascript:;" class="j_name">{item.name}</a></h1>
-                        <div class="lx_txt">
-                            {item.description}
-                        </div>
-                        <div class="lx_alt clearfix">
-                            <a href="javascript:;">作品<span>{item.attention2Num}</span></a>
-                            <a href="javascript:;">粉丝<span>{item.attention2Num}</span></a>
-                        </div>
-                        <a href="javascript:;" class="a_follow" onClick={() => this.handleFoucs(item.id)}>关注</a>
-                    </div>
-                </li>
-            )
+
+    setKeywords = (item) => {
+        const { keywords } = this.state;
+        if (item.keywords) {
+            keywords.push(item.keywords)
+        } else if (item.target.value) {
+            keywords.push(item.target.value)
+        }
+        this.setState({ keywords: keywords, keyword: "" })
+    }
+    createKeywords = () => {
+        const { keywords } = this.state;
+        return keywords.slice(0, 8).map((item, index) => {
+            return <li><span>{item}</span><i className="icon-close" onClick={() => this.deleteKeywords(index)}></i></li>
         })
+    }
+    deleteKeywords = (index) => {
+        const { keywords } = this.state;
+        keywords.splice(index, 1)
+        this.setState({ keywords: keywords })
+    }
+    handleChangeKeyword = (e) => {
+        this.setState({ keyword: e.target.value })
+    }
+
+    changeInfo = (e, field) => {
+        const { info } = this.state;
+        info[field] = e.target.value
+        this.setState({ info: info }, () => {
+
+        })
+    }
+    createJobList = () => {
+        const { JobList } = this.state;
+        JobList.list && JobList.list.map((item) => {
+            return <li><a href="javascript:;" onClick={this.gotoRouter(`/QyspaceJobInfo/${item.id}`)}>{item.name}</a></li>
+        })
+
     }
 
     render() {
-        const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
+        const { province, cityItem, districtItem, info, keyword, payItem, educationItem, experienceItem } = this.state;
         return (
             <div className="">
                 < Header />
@@ -216,25 +312,16 @@ export default class UserCenter extends Component {
                                 <div class="u-inline width-full">
                                     <label class="u-form-label"><i>*</i>职位名称</label>
                                     <div class="u-form-input width-180">
-                                        <input type="text" class="u-input" placeholder="请填入职位名称" />
+                                        <input type="text" class="u-input" placeholder="请填入职位名称" value={info.information} onChange={(e) => this.changeInfo(e, 'information')} />
                                     </div>
                                 </div>
                                 <div class="u-inline width-v5">
                                     <label class="u-form-label"><i>*</i>薪资范围</label>
                                     <div class="u-select">
-                                        <div class="in_province1" role="note">请选择薪资范围</div>
+                                        <div class="in_province1" role="note">{payItem.name || "请选择薪资范围"}</div>
                                         <div data-for=".in_province1" role="menu">
                                             <ul>
-                                                <li>不限</li>
-                                                <li>3K以下</li>
-                                                <li>3-5K</li>
-                                                <li>5-8K</li>
-                                                <li>8-10K</li>
-                                                <li>10-15K</li>
-                                                <li>15-20K</li>
-                                                <li>20-30K</li>
-                                                <li>30-50K</li>
-                                                <li>50K以上</li>
+                                                {this.createPayList()}
                                             </ul>
                                         </div>
                                     </div>
@@ -242,16 +329,11 @@ export default class UserCenter extends Component {
                                 <div class="u-inline width-v5">
                                     <label class="u-form-label"><i>*</i>工作年限</label>
                                     <div class="u-select">
-                                        <div class="in_province2" role="note">请选择工作经验年限</div>
+                                        <div class="in_province2" role="note">{experienceItem.name || "请选择工作经验年限"}</div>
                                         <div data-for=".in_province2" role="menu">
                                             <ul>
-                                                <li>不限</li>
-                                                <li>实习生</li>
-                                                <li>应届毕业生</li>
-                                                <li>1-3年</li>
-                                                <li>3-5年</li>
-                                                <li>5-8年</li>
-                                                <li>8年以上</li>
+                                                {this.createExperienceList()}
+
                                             </ul>
                                         </div>
                                     </div>
@@ -259,16 +341,10 @@ export default class UserCenter extends Component {
                                 <div class="u-inline width-v5">
                                     <label class="u-form-label"><i>*</i>学历要求</label>
                                     <div class="u-select">
-                                        <div class="in_province3" role="note">请选择学历要求</div>
+                                        <div class="in_province3" role="note">{educationItem.name || "请选择学历要求"}</div>
                                         <div data-for=".in_province3" role="menu">
                                             <ul>
-                                                <li>不限</li>
-                                                <li>中专</li>
-                                                <li>高中</li>
-                                                <li>大专</li>
-                                                <li>本科</li>
-                                                <li>硕士</li>
-                                                <li>博士及以上</li>
+                                                {this.createEducationList()}
                                             </ul>
                                         </div>
                                     </div>
@@ -276,62 +352,38 @@ export default class UserCenter extends Component {
                                 <div class="u-inline width-v5">
                                     <label class="u-form-label"><i>*</i>招聘人数</label>
                                     <div class="u-form-input">
-                                        <input type="text" class="u-input" placeholder="请填入招聘人数" />
+                                        <input type="text" class="u-input" placeholder="请填入招聘人数" value={info.jobNum} onChange={(e) => this.changeInfo(e, 'jobNum')} />
                                     </div>
                                 </div>
                                 <div class="u-inline width-full">
                                     <label class="u-form-label"><i>*</i>工作地点</label>
                                     <ul class="select-group clearfix">
                                         <li>
-                                            <div class="u-select">
-                                                <div class="in_province" role="note">四川</div>
+                                            <div className="u-select">
+                                                <div className="in_province" role="note">{(province && province.name) || info.provence || "省份"}</div>
                                                 <div data-for=".in_province" role="menu">
                                                     <ul>
-                                                        <li>河南</li>
-                                                        <li>河北</li>
-                                                        <li>北京</li>
-                                                        <li>天津</li>
-                                                        <li>山西</li>
-                                                        <li>黑龙江</li>
-                                                        <li>吉林</li>
-                                                        <li>辽宁</li>
-                                                        <li>浙江</li>
-                                                        <li>上海</li>
-                                                        <li>四川</li>
-                                                        <li>湖南</li>
+                                                        {this.createRegion()}
                                                     </ul>
                                                 </div>
                                             </div>
                                         </li>
                                         <li>
-                                            <div class="u-select">
-                                                <div class="in_city" role="note">成都</div>
+                                            <div className="u-select">
+                                                <div className="in_city" role="note">{(cityItem && cityItem.name) || info.city || "城市"}</div>
                                                 <div data-for=".in_city" role="menu">
                                                     <ul>
-                                                        <li>成都</li>
-                                                        <li>绵阳</li>
-                                                        <li>德阳</li>
-                                                        <li>都江堰</li>
-                                                        <li>广元</li>
-                                                        <li>泸州</li>
-                                                        <li>南充</li>
-                                                        <li>广安</li>
+                                                        {this.createCity()}
                                                     </ul>
                                                 </div>
                                             </div>
                                         </li>
                                         <li>
-                                            <div class="u-select">
-                                                <div class="in_area" role="note">锦江区</div>
+                                            <div className="u-select">
+                                                <div className="in_area" role="note">{(districtItem && districtItem.name) || info.district || "县区"}</div>
                                                 <div data-for=".in_area" role="menu">
                                                     <ul>
-                                                        <li>成华区</li>
-                                                        <li>武候区</li>
-                                                        <li>金牛区</li>
-                                                        <li>新都区</li>
-                                                        <li>青白江区</li>
-                                                        <li>高新区</li>
-                                                        <li>天府新区</li>
+                                                        {this.createDistrict()}
                                                     </ul>
                                                 </div>
                                             </div>
@@ -341,7 +393,7 @@ export default class UserCenter extends Component {
                                 <div class="u-inline width-full">
                                     <label class="u-form-label"><i>*</i>HR邮箱</label>
                                     <div class="u-form-input width-350">
-                                        <input type="text" class="u-input" placeholder="请填入简历接收邮箱" />
+                                        <input type="text" class="u-input" placeholder="请填入简历接收邮箱" value={info.email} onChange={(e) => this.changeInfo(e, 'email')} />
                                     </div>
                                 </div>
                                 <div class="u-inline width-full">
@@ -350,7 +402,10 @@ export default class UserCenter extends Component {
                                         <div class="u-add">
                                             <div class="editbox" data-tag="带薪年假,五险一金,年底双薪,团建旅游,在职培训,不限量下午茶">
                                                 <ul>
-
+                                                    {this.createKeywords()}
+                                                    {
+                                                        <li className="in_add"><input type="text" value={keyword} onChange={this.handleChangeKeyword} onBlur={this.setKeywords} /></li>
+                                                    }
                                                 </ul>
                                             </div>
                                         </div>
@@ -363,7 +418,7 @@ export default class UserCenter extends Component {
                                 <div class="u-inline width-full">
                                     <label class="u-form-label">一句描述</label>
                                     <div class="u-form-input">
-                                        <input type="text" class="u-input" />
+                                        <input type="text" class="u-input" value={info.description} onChange={(e) => this.changeInfo(e, 'description')} />
                                     </div>
                                 </div>
                             </div>
@@ -373,39 +428,34 @@ export default class UserCenter extends Component {
                                 <div class="u-inline width-full">
                                     <label class="u-form-label">岗位描述<br /><span>Job Description</span></label>
                                     <div class="u-form-input">
-                                        <textarea class="u-textarea" placeholder="岗位描述"></textarea>
+                                        <textarea class="u-textarea" placeholder="岗位描述" value={info.jobDescription} onChange={(e) => this.changeInfo(e, 'jobDescription')}></textarea>
                                     </div>
                                 </div>
                                 <div class="u-inline width-full">
                                     <label class="u-form-label">岗位要求<br /><span>Job Requirement</span></label>
                                     <div class="u-form-input">
-                                        <textarea class="u-textarea" placeholder="岗位要求"></textarea>
+                                        <textarea class="u-textarea" placeholder="岗位要求" value={info.content} onChange={(e) => this.changeInfo(e, 'content')}></textarea>
                                     </div>
                                 </div>
 
                             </div>
                         </div>
-                        <div class="f-right"><a href="javascript:;" class="ac-submit">确认发布</a></div>
+                        <div class="f-right"><a href="javascript:;" class="ac-submit" onClick={this.addJob}>确认发布</a></div>
                     </div>
                     <div class="g-right">
                         <div class="jb-qyinfo">
                             <div class="jname">
-                                <img src="css/images/1x1.png" />
-                                VML上海
-                        </div>
+                                <img src={userInfo && (userInfo.photo || defaultPhoto)} />
+                                {userInfo.name || userInfo.loginName}
+                            </div>
                             <div class="jtxt">
-                                壹娱观察想做中国电影产业和泛娱乐产业的望远镜和声呐——面对产业，除了要发们还想探索那些…
-                            <a href="javascript:;">回到首页</a>
+                                {userInfo.subscription}
+                                <a href="/">回到首页</a>
                             </div>
                             <ul class="qy-rjob">
-                                <li><a href="javascript:;">美术指导/Art Director </a></li>
-                                <li><a href="javascript:;">Art Director </a></li>
-                                <li><a href="javascript:;">美术指导/Art Director </a></li>
-                                <li><a href="javascript:;">美术指导/Art Director </a></li>
-                                <li><a href="javascript:;">美术指导/Art Director </a></li>
-                                <li><a href="javascript:;">Art Director </a></li>
+                                {this.createJobList()}
                             </ul>
-                            <a href="qy_myjob.html" class="more-a active">查看更多</a>
+                            <a href="javascrip:;" class="more-a active">查看更多</a>
                         </div>
                     </div>
                 </div>

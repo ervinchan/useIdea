@@ -17,7 +17,7 @@ import 'antd/lib/pagination/style/index.css';
 import '../../static/less/goodcopy.less';
 import defaultPhoto from "../../static/images/user/default.png"
 import Utils from "../../static/js/utils/utils"
-const PAGESIZE = 3;
+const PAGESIZE = 20;
 
 export default class GoodCopy extends Component {
 
@@ -50,7 +50,8 @@ export default class GoodCopy extends Component {
     getDatas = (categoryId, page) => {
         Service.GetAllArticle({
             categoryId: categoryId || '',
-            pageNo: page
+            pageNo: page,
+            pageSize: PAGESIZE
         }).then((response) => {
             if (categoryId) {
                 let goodcopyList = response.data.data
@@ -111,7 +112,7 @@ export default class GoodCopy extends Component {
         return goodcopyList.list && goodcopyList.list.map((item, index) => {
             return (
                 <li>
-                    <a className="thumb-img" href={`/#/Inspiration/Article/${item.id}`}><img src={item.image} /><span>{item.category.name}</span></a>
+                    <a className="thumb-img" href={`/#/Inspiration/Article/${item.id}`} /*onClick={() => Utils.gotoRouter('/Inspiration/Article/', { aid: item.id }, this.props.history)}*/><img src={item.image} /><span>{item.category.name}</span></a>
                     <h1><a href={`/#/Inspiration/Article/${item.id}`}>{item.title}</a></h1>
                     <div className="alt clearfix">
                         <a href={`/#/Inspiration/Article/${item.id}`} className="j_name"><img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />{item.user.name}</a>
@@ -127,7 +128,7 @@ export default class GoodCopy extends Component {
         const { HotKeywords } = this.state
         return HotKeywords && HotKeywords.slice(0, 12).map((item, index) => {
             return (
-                <a href="javascript:;" onClick={() => this.handleSearch(item.title)}>{item.title}</a>
+                <a href="javascript:;" onClick={() => this.handleSearch(item.brand)}>{item.brand}</a>
             )
         })
     }

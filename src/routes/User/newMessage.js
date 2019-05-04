@@ -11,7 +11,7 @@ import Footer from '../../common/footer/Index.js'
 import WheelBanner from '../../common/wheelBanner/Index'
 import HotRead from '../../common/hotRead/Index'
 import ArticleList from './ArticleList'
-import { POST } from '../../service/service'
+import Service from '../../service/api.js'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
 import 'swiper/dist/css/swiper.min.css'
@@ -22,16 +22,25 @@ import '../../static/less/u.laixin.less'
 
 import defaultPhoto from "../../static/images/user/default.png"
 const PAGESIZE = 3;
-
-export default class MyWork extends Component {
+const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
+export default class NewMessage extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
             sortType: 0,
             curPage: 1,
-            banner: [],
-            toolList: []
+            newCommentList: [],
+            collectList: [],
+            questionList: [],
+            fans: [],
+            focus: [],
+            sysNews: {
+                allNews: [],
+                sysNews: [],
+                editorNews: []
+            }
+
         };
     }
 
@@ -65,74 +74,82 @@ export default class MyWork extends Component {
             $(this).addClass("active").siblings().removeClass("active");
             $(tabfor).addClass("active").siblings().removeClass("active")
         })
-        this.getArticleInfo("7a8bbb7d262142cbb7ae5bf884935e81")
+        this.getNewComment();
+        this.getCollect();
+        this.getQuestion();
+        this.getFans();
+        this.getFocus();
+        this.getSysNews('', 'allNews');
+        this.getSysNews('1', 'sysNews');
+        this.getSysNews('2', 'editorNews');
     }
 
-    getArticleInfo = (categoryId) => {
-        let url = '/zsl/a/cms/article/getAllArticle?'
-        let opts = {
-            hits: 1,
-            categoryId: categoryId || ''
-        }
-        for (var key in opts) {
-            opts[key] && (url += "&" + key + "=" + opts[key])
-        }
-        axios.post(url, opts)
+    getNewComment = () => {
+        Service.GetCommentList({
+            categoryIdFlag: 1,
+            userId: userInfo.id
+        })
             .then((response) => {
-                if (categoryId) {
-                    let toolList = response.data.data
-                    this.setState({ toolList })
-                } else {
-                    let hotBooks = response.data.data
-                    this.setState({ hotBooks }, () => {
-                        var swiper_read = new Swiper('.m-read-fade .swiper-container', {
-                            effect: 'fade',
-                            pagination: {
-                                el: '.m-read-fade .u-pagination',
-                                bulletclassName: 'bull',
-                                bulletActiveclassName: 'active',
-                                clickable: true
-                            }
-                        });
-                    })
+                let newCommentList = response.data.data
+                this.setState({ newCommentList })
+            })
+    }
+
+    getCollect = () => {
+        Service.GetCollectList({
+            userId: userInfo.id
+        })
+            .then((response) => {
+                let collectList = response.data.data
+                this.setState({ collectList })
+            })
+    }
+
+    getQuestion = () => {
+        Service.GetQuestion({
+            categoryId: global.constants.categoryIds['请教'].id,
+            userId: userInfo.id
+        })
+            .then((response) => {
+                let questionList = response.data.data
+                this.setState({ questionList })
+            })
+    }
+
+    getFans = () => {
+        Service.GetFansList({
+            userId: userInfo.id
+        })
+            .then((response) => {
+                let fans = response.data.data
+                this.setState({ fans })
+            })
+    }
+
+    getFocus = () => {
+        Service.GetCollectList({
+            userId: userInfo.id,
+            updateTime: 1
+        })
+            .then((response) => {
+                let focus = response.data.data
+                this.setState({ focus })
+            })
+    }
+
+    getSysNews = (type, name) => {
+        Service.GetSysNews({
+            userId: userInfo.id,
+            type
+        })
+            .then((response) => {
+                if (response.data.status === 1) {
+                    const { sysNews } = this.state;
+                    sysNews[name] = response.data.data
+                    this.setState({ sysNews })
                 }
 
             })
-            .catch((error) => {
-                console.log(error)
-            })
-    }
-
-    createToolList = () => {
-        const { toolList } = this.state
-        return toolList && toolList.map((item, index) => {
-            return (
-                <li>
-                    <div className="item">
-                        <a className="thumb-img" href={`/#/Bookstore/Bookbuy/${item.id}`}><img src={item.image} /></a>
-                        <div className="tag">{item.category.name}</div>
-                        <h1><a href={`/#/Bookstore/Bookbuy/${item.id}`}>{item.title}</a></h1>
-                        <div className="alt clearfix">
-                            <a href="#" className="j_name"><img src={item.user.img} className="thumb-img" />{item.user.name}</a>
-                            <span className="dot"></span>
-                            <span>{item.description}</span>
-                        </div>
-                    </div>
-                </li>
-            )
-        })
-    }
-
-    handleFavorite = (index) => {
-        const { readList } = this.state;
-        readList[index].favorite++;
-        this.setState(readList);
-    }
-
-    handleLikes = (index) => {
-        const { readList } = this.state;
-        readList[index].like++;
-        this.setState(readList);
     }
 
     handlePageChange = (page, pageSize) => {
@@ -141,11 +158,8 @@ export default class MyWork extends Component {
         this.getBooksList(this.props.match.params.tid, this.state.sortType, page)
     }
     handleLike = (item) => {
-        POST({
-            url: "/a/cms/article/like?",
-            opts: {
-                id: item.id
-            }
+        Service.AddLike({
+            id: item.id
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -160,12 +174,9 @@ export default class MyWork extends Component {
             })
     }
     handleCollect = (item) => {
-        POST({
-            url: "/a/artuser/articleCollect/collectArticle?",
-            opts: {
-                userId: 1,
-                articleId: item.id
-            }
+        Service.AddCollect({
+            userId: 1,
+            articleId: item.id
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -183,12 +194,12 @@ export default class MyWork extends Component {
     gotoRouter = (router) => {
         this.props.history.push(router)
     }
+
     createList = () => {
-        const { data } = this.props
+        const { focus } = this.state
         const categorys = global.constants.categorys
-        return data && data.map((item, index) => {
-            let Hours = FormatDate.apartHours(item.updateDate)
-            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`;
+        return focus && focus.map((item, index) => {
+            let Time = FormatDate.formatTime(item.updateDate)
             let router = ``
             switch (item.category.id) {
                 case categorys[0].id:
@@ -207,7 +218,7 @@ export default class MyWork extends Component {
                 <li>
                     <div class="ue_info">
                         <a href="javascript:;" class="face" onClick={() => this.gotoRouter(`${router}${item.id}`)}>
-                            <img src={item.user.photo  || defaultPhoto} />
+                            <img src={item.user.photo || defaultPhoto} />
                         </a>
                         <div class="alt clearfix">
                             <a href="javascript:;" class="j_name">{item.user.name}</a>
@@ -229,10 +240,54 @@ export default class MyWork extends Component {
         })
     }
 
+    createFansList = () => {
+        const { fans } = this.state;
+        fans.map(item => {
+            return (
+                <li>
+                    <div class="lx-item">
+                        <a href="javascript:;" class="face">
+                            <img src="images/user/userTx.jpg" />
+                        </a>
+                        <h1><a href="javascript:;" class="j_name">Vinvinvy</a></h1>
+                        <div class="lx_txt">
+                            食一碗人間煙火，品幾杯人生起落~
+                    </div>
+                        <div class="lx_alt clearfix">
+                            <a href="javascript:;">作品<span>7</span></a>
+                            <a href="javascript:;">粉丝<span>136</span></a>
+                        </div>
+                        <a href="javascript:;" class="a_follow">关注</a>
+                        <a href="javascript:;" class="a_follow">已关注<span>取消关注</span></a>
+                    </div>
+                </li>
+            )
+        })
+
+    }
+
+    createMessage = (data) => {
+        return data.list && data.list.map(item => {
+            let Time = FormatDate.formatTime(item.updateDate)
+            return (
+                <li>
+                    <h1><a href="javascript:;">{item.title}</a></h1>
+                    <span class="mdate">{Time}</span>
+                    <div class="mbox">
+                        {item.content}<br />
+                        帐号：{item.user.name}<br />
+                        名称：{item.userName}<br />
+                        到期时间：{item.timeOut}<br />
+                        <a href="javascript:;">查看原文</a>
+                    </div>
+                </li>
+            )
+        })
+
+    }
+
     render() {
-        const { discussList, collectList, questionList, } = this.state;
-
-
+        const { newCommentList, collectList, questionList, fans, focus, sysNews } = this.state;
         return (
             <div className="">
                 <div class="ue-minav">
@@ -240,106 +295,27 @@ export default class MyWork extends Component {
                         <li tabfor=".tab-discuss" className="active">
                             <a href="javascript:;">新评论</a>
                         </li>
-                        <li tabfor=".tab-collection"><a href="javascript:;">收藏<span>13</span></a>
+                        <li tabfor=".tab-collection"><a href="javascript:;">收藏<span>{collectList.length}</span></a>
                         </li>
                         <li tabfor=".tab-consult"><a href="javascript:;">请教</a>
                         </li>
-                        <li tabfor=".tab-fans"><a href="javascript:;">粉丝<span>99+</span></a>
+                        <li tabfor=".tab-fans"><a href="javascript:;">粉丝<span>{fans.length}</span></a>
                         </li>
-                        <li tabfor=".ue-article"><a href="javascript:;">关注更新<span>10</span></a>
+                        <li tabfor=".ue-article"><a href="javascript:;">关注更新<span>{focus.length}</span></a>
                         </li>
-                        <li tabfor=".tab-msg"><a href="javascript:;">站内消息<i class="badge">5</i></a>
+                        <li tabfor=".tab-msg"><a href="javascript:;">站内消息<i class="badge" style={{ display: sysNews.allNews.length ? 'block' : 'none' }}>{sysNews.allNews.length}</i></a>
                         </li>
                     </ul>
                 </div>
                 <div className="tab-cont">
-                    <ArticleList data={discussList} className="tab-item tab-discuss active" />
-                    <ArticleList data={collectList} className="tab-item tab-collection" />
-                    <ArticleList data={questionList} className="tab-item tab-consult" />
+                    <ArticleList data={newCommentList} dataType="评论文章" className="tab-item tab-discuss active" />
+                    <ArticleList data={collectList} dataType="收藏文章" className="tab-item tab-collection" />
+                    <ArticleList data={questionList} dataType="请教回应" className="tab-item tab-consult" />
                     <div class="tab-item tab-fans">
                         <ul class="lx-fans clearfix">
-                            <li>
-                                <div class="lx-item">
-                                    <a href="javascript:;" class="face">
-                                        <img src="images/user/userTx.jpg" />
-                                    </a>
-                                    <h1><a href="javascript:;" class="j_name">Vinvinvy</a></h1>
-                                    <div class="lx_txt">
-                                        食一碗人間煙火，品幾杯人生起落~
-                                </div>
-                                    <div class="lx_alt clearfix">
-                                        <a href="javascript:;">作品<span>7</span></a>
-                                        <a href="javascript:;">粉丝<span>136</span></a>
-                                    </div>
-                                    <a href="javascript:;" class="a_follow">关注</a>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="lx-item">
-                                    <a href="javascript:;" class="face">
-                                        <img src="images/user/userTx.jpg" />
-                                    </a>
-                                    <h1><a href="javascript:;" class="j_name">Vinvinvy</a></h1>
-                                    <div class="lx_txt">
-                                        食一碗人間煙火，品幾杯人生起落~
-                                </div>
-                                    <div class="lx_alt clearfix">
-                                        <a href="javascript:;">作品<span>7</span></a>
-                                        <a href="javascript:;">粉丝<span>136</span></a>
-                                    </div>
-                                    <a href="javascript:;" class="a_follow">关注</a>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="lx-item">
-                                    <a href="javascript:;" class="face">
-                                        <img src="images/user/userTx.jpg" />
-                                    </a>
-                                    <h1><a href="javascript:;" class="j_name">Vinvinvy</a></h1>
-                                    <div class="lx_txt">
-                                        食一碗人間煙火，品幾杯人生起落~
-                                </div>
-                                    <div class="lx_alt clearfix">
-                                        <a href="javascript:;">作品<span>7</span></a>
-                                        <a href="javascript:;">粉丝<span>136</span></a>
-                                    </div>
-                                    <a href="javascript:;" class="a_follow">已关注<span>取消关注</span></a>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="lx-item">
-                                    <a href="javascript:;" class="face">
-                                        <img src="images/user/userTx.jpg" />
-                                    </a>
-                                    <h1><a href="javascript:;" class="j_name">Vinvinvy</a></h1>
-                                    <div class="lx_txt">
-                                        食一碗人間煙火，品幾杯人生起落~
-                                </div>
-                                    <div class="lx_alt clearfix">
-                                        <a href="javascript:;">作品<span>7</span></a>
-                                        <a href="javascript:;">粉丝<span>136</span></a>
-                                    </div>
-                                    <a href="javascript:;" class="a_follow">关注</a>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="lx-item">
-                                    <a href="javascript:;" class="face">
-                                        <img src="images/user/userTx.jpg" />
-                                    </a>
-                                    <h1><a href="javascript:;" class="j_name">Vinvinvy</a></h1>
-                                    <div class="lx_txt">
-                                        食一碗人間煙火，品幾杯人生起落~
-                                </div>
-                                    <div class="lx_alt clearfix">
-                                        <a href="javascript:;">作品<span>7</span></a>
-                                        <a href="javascript:;">粉丝<span>136</span></a>
-                                    </div>
-                                    <a href="javascript:;" class="a_follow">已关注<span>取消关注</span></a>
-                                </div>
-                            </li>
+                            {this.createFansList()}
                         </ul>
-                        <div class="more-b">
+                        <div class="more-b" style={{ display: fans.length < 20 ? 'none' : 'block' }}>
                             <a href="javascript:;">更多动态</a>
                         </div>
                     </div>
@@ -348,89 +324,34 @@ export default class MyWork extends Component {
                     </ul>
                     <div class="tab-item tab-msg">
                         <ul class="msg-tab u-tabs1 clearfix">
-                            <li tabfor=".msg-all">全部消息</li>
+                            <li tabfor=".msg-all" className='active'>全部消息</li>
                             <li tabfor=".msg-sys">系统提醒</li>
                             <li tabfor=".msg-edit">编辑来信</li>
                         </ul>
                         <div className="tab-cont">
                             <div class="tab-item msg-all active">
                                 <ul class="msg-table clearfix">
-                                    <li>
-                                        <h1><a href="javascript:;">恭喜！您的文章已通过编辑审核，将于近日发布至相关专栏。</a></h1>
-                                        <span class="mdate">12月11日</span>
-                                        <div class="mbox">
-                                            您管理的帐号ideazhu@gmail.com已进入年审期，请登录mp.weixin.qq.com提交认证申请。<br />
-                                            帐号：ideazhu@gmail.com<br />
-                                            名称：文案圈周刊<br />
-                                            到期时间：2019年01月19日<br />
-                                            <a href="javascript:;">查看原文</a>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <h1><a href="javascript:;">恭喜！您的文章已通过编辑审核，将于近日发布至相关专栏。</a></h1>
-                                        <span class="mdate">12月11日</span>
-                                        <div class="mbox">
-                                            您管理的帐号ideazhu@gmail.com已进入年审期，请登录mp.weixin.qq.com提交认证申请。<br />
-                                            帐号：ideazhu@gmail.com<br />
-                                            名称：文案圈周刊<br />
-                                            到期时间：2019年01月19日<br />
-                                            <a href="javascript:;">查看原文</a>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <h1><a href="javascript:;">恭喜！您的文章已通过编辑审核，将于近日发布至相关专栏。</a></h1>
-                                        <span class="mdate">12月11日</span>
-                                        <div class="mbox">
-                                            您管理的帐号ideazhu@gmail.com已进入年审期，请登录mp.weixin.qq.com提交认证申请。<br />
-                                            帐号：ideazhu@gmail.com<br />
-                                            名称：文案圈周刊<br />
-                                            到期时间：2019年01月19日<br />
-                                            <a href="javascript:;">查看原文</a>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <h1><a href="javascript:;">恭喜！您的文章已通过编辑审核，将于近日发布至相关专栏。</a></h1>
-                                        <span class="mdate">12月11日</span>
-                                        <div class="mbox">
-                                            您管理的帐号ideazhu@gmail.com已进入年审期，请登录mp.weixin.qq.com提交认证申请。<br />
-                                            帐号：ideazhu@gmail.com<br />
-                                            名称：文案圈周刊<br />
-                                            到期时间：2019年01月19日<br />
-                                            <a href="javascript:;">查看原文</a>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <h1><a href="javascript:;">恭喜！您的文章已通过编辑审核，将于近日发布至相关专栏。</a></h1>
-                                        <span class="mdate">12月11日</span>
-                                        <div class="mbox">
-                                            您管理的帐号ideazhu@gmail.com已进入年审期，请登录mp.weixin.qq.com提交认证申请。<br />
-                                            帐号：ideazhu@gmail.com<br />
-                                            名称：文案圈周刊<br />
-                                            到期时间：2019年01月19日<br />
-                                            <a href="javascript:;">查看原文</a>
-                                        </div>
-                                    </li>
-                                    <li class="visited">
-                                        <h1><a href="javascript:;">恭喜！您的文章已通过编辑审核，将于近日发布至相关专栏。</a></h1>
-                                        <span class="mdate">12月11日</span>
-                                        <div class="mbox">
-                                            您管理的帐号ideazhu@gmail.com已进入年审期，请登录mp.weixin.qq.com提交认证申请。<br />
-                                            帐号：ideazhu@gmail.com<br />
-                                            名称：文案圈周刊<br />
-                                            到期时间：2019年01月19日<br />
-                                            <a href="javascript:;">查看原文</a>
-                                        </div>
-                                    </li>
+                                    {this.createMessage(sysNews.allNews)}
                                 </ul>
+                                <div class="nolist" style={{ display: sysNews.allNews.length ? 'none' : 'block' }}>
+                                    <i class="icon-no-new"></i>
+                                    <span>· 暂无消息 ·</span>
+                                </div>
                             </div>
                             <div class="tab-item msg-sys">
-                                <div class="nolist">
+                                <ul class="msg-table clearfix">
+                                    {this.createMessage(sysNews.sysNews)}
+                                </ul>
+                                <div class="nolist" style={{ display: sysNews.sysNews.length ? 'none' : 'block' }}>
                                     <i class="icon-no-new"></i>
                                     <span>· 暂无系统消息 ·</span>
                                 </div>
                             </div>
                             <div class="tab-item msg-edit">
-                                <div class="nolist">
+                                <ul class="msg-table clearfix">
+                                    {this.createMessage(sysNews.editorNews)}
+                                </ul>
+                                <div class="nolist" style={{ display: sysNews.editorNews.length ? 'none' : 'block' }}>
                                     <i class="icon-no-new"></i>
                                     <span>· 暂无编辑来信 ·</span>
                                 </div>

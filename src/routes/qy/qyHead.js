@@ -1,12 +1,7 @@
 import React, { Component } from 'react';
 import { Menu, Icon, Badge, Tabs, Upload, Modal } from 'antd';
 //import $ from 'jquery'
-import Swiper from 'swiper/dist/js/swiper.min.js'
-import axios from 'axios'
-
-import Header from '../../common/header/Index.js'
-import Footer from '../../common/footer/Index.js'
-
+import Service from '../../service/api.js'
 import 'swiper/dist/css/swiper.min.css'
 import '../../static/less/u.icenter.less'
 import 'antd/lib/modal/style/index';
@@ -15,9 +10,9 @@ import '../../Constants'
 import Loading from '../../common/Loading/Index'
 import CoverModal from './coverModal'
 import userImg from "../../static/images/user/userTx.jpg"
-
+import Utils from '../../static/js/utils/utils.js'
 const TabPane = Tabs.TabPane;
-
+const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
 export default class QyHead extends Component {
     /* global $ */
     constructor(props) {
@@ -27,7 +22,8 @@ export default class QyHead extends Component {
             activeKey: 'news',
             fileList: [],
             collectList: [],
-            visibleCover: false
+            visibleCover: false,
+            userImg: ""
         };
     }
 
@@ -37,22 +33,6 @@ export default class QyHead extends Component {
     }
     gotoRouter = (router) => {
         this.props.history.push(router)
-    }
-    getMyWork = () => {
-        POST({
-            url: "/a/cms/article/latestAction?",
-            opts: {
-                userId: JSON.parse(sessionStorage.getItem("userInfo")).id
-            }
-        }).then((response) => {
-            global.constants.loading = false
-            if (response.data.status === 1) {
-                this.setState({ listData: response.data.data })
-            }
-        })
-            .catch((error) => {
-                console.log(error)
-            })
     }
     editSkin = () => {
         //this.setState({ visibleCover: true })
@@ -70,9 +50,15 @@ export default class QyHead extends Component {
         });
     }
 
+    setUploadPorps = (files, handleImg) => {
+        return Utils.uploadProps(files, (file, newUrl) => {
+            handleImg(file, newUrl)
+        }, this);
+    }
+
     render() {
         const { fileList } = this.state;
-        const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
+        const { info, userPhoto, setUserPhoto, userImg } = this.props;
         const tabTit = `来信中心`;
         const props = {
             onRemove: (file) => {
@@ -98,24 +84,28 @@ export default class QyHead extends Component {
             <div className="ue-head">
                 <div className="wrapper">
                     <div className="userTx">
-                        <Upload className="upload-btn" {...props}>
+                        <Upload
+                            name="userPhoto"
+                            className="avatar-uploader"
+                            {...this.setUploadPorps(userPhoto, setUserPhoto)}
+                        >
                             <a href="javascript:;">
-                                <img src={userImg} />
-                                <p><i className="icon-user-img"></i><span>更新机构头像</span></p>
+                                <img src={userImg || (info && info.photo)} />
+                                <p><i className="icon-user-img"></i><span>更新个人头像</span></p>
                             </a>
                         </Upload>
                     </div>
                     <div className="nick-name">
-                        <h1><b className="rank">{userInfo.name}<i className="icon-rank"></i></b></h1>
+                        <h1><b className="rank">{userInfo && userInfo.name}<i className="icon-rank"></i></b></h1>
                     </div>
                     <div className="nick-data">
                         <p>
-                            <span>作品</span><a href="javascript:;">{userInfo.attentionNum}</a>
-                            <span>关注</span><a href="javascript:;" href={`/#/MyFans/${userInfo.id}`} >{userInfo.attentionNum}</a>
-                            <span>粉丝</span><a href="javascript:;" href={`/#/MyFans/${userInfo.id}`}>{userInfo.attention2Num}</a>
+                            <span>作品</span><a href={`/#/MyFans/${userInfo && userInfo.id}`} >{userInfo && userInfo.attentionNum}</a>
+                            <span>关注</span><a href={`/#/MyFans/${userInfo && userInfo.id}`} >{userInfo && userInfo.attentionNum}</a>
+                            <span>粉丝</span><a href={`/#/MyFans/${userInfo && userInfo.id}`}>{userInfo && userInfo.attention2Num}</a>
                         </p>
                     </div>
-                    <div className="address"><i className="icon-address-w"></i>{userInfo.city}</div>
+                    <div className="address"><i className="icon-address-w"></i>{info.provence}  {info.city}</div>
                     <a href="javascript:;" className="add_upload" onClick={() => this.gotoRouter(`/ArticleEditor`)}>发表作品/经验</a>
 
                 </div>

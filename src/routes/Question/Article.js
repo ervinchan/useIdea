@@ -21,9 +21,9 @@ import '../../static/less/question.less'
 
 import defaultPhoto from "../../static/images/user/default.png"
 const PAGESIZE = 3;
-
+const userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
 export default class QuestionArticle extends Component {
-    editor = new ed('#editorContainer')
+    editor = new ed('#qeditorContainer')
     constructor(props) {
         super(props);
         this.state = {
@@ -36,13 +36,15 @@ export default class QuestionArticle extends Component {
             commentList: [],
             articleInfo: {},
             commentRenderLen: 2,
-            userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
             replyId: ''
         };
     }
 
     componentWillReceiveProps(nextProps) {
-
+        this.getArticleInfo("4812062598ec4b10bedfb38b59ea3e94")
+        this.getSpecialCol()
+        this.getQuestionList()
+        this.getCommentList()
     }
 
     componentDidMount() {
@@ -148,7 +150,11 @@ export default class QuestionArticle extends Component {
     }
 
     getQuestionList = () => {
-        Service.GetQuestion().then((response) => {
+        Service.GetQuestion({
+            categoryId: "4812062598ec4b10bedfb38b59ea3e94",
+            isRecommend: 0,
+            CommentNum: 0
+        }).then((response) => {
             if (response.data.status === 1) {
                 global.constants.loading = false
                 let questionList = response.data.data
@@ -207,7 +213,7 @@ export default class QuestionArticle extends Component {
     //     })
     // }
     createCommentList = (data) => {
-        const userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+
         return data.list && data.list.map((item, index) => {
             let Time = FormatDate.formatTime(item.createDate)
             return (
@@ -242,7 +248,7 @@ export default class QuestionArticle extends Component {
                             {this.createCommentList(item.childComments)}
                         </div>
                     }
-                    <div class="replyfrom" style={{ display: (item.id === this.state.replyId ? "" : "none") }}><textarea placeholder="我来补充两句。"></textarea><a href="javascript:;" class="thumb"><img src={userInfo.photo || defaultPhoto} onError={Utils.setDefaultPhoto} /></a><a href="javascript:;" class="artbtn" onClick={() => this.submitComment(item.id)}>留 言</a><a href="javascript:;" class="escbtn" data-el="replyesc">稍后再说</a></div>
+                    <div class="replyfrom" style={{ display: (item.id === this.state.replyId ? "" : "none") }}><textarea placeholder="我来补充两句。"></textarea><a href="javascript:;" class="thumb"><img src={(userInfo && userInfo.photo) || defaultPhoto} onError={Utils.setDefaultPhoto} /></a><a href="javascript:;" class="artbtn" onClick={() => this.submitComment(item.id)}>留 言</a><a href="javascript:;" class="escbtn" data-el="replyesc">稍后再说</a></div>
                 </div>
                 // <div className="disc-item">
                 //     <a href="javascript:;" className="thumb"><img src={item.user.photo  || defaultPhoto} /></a>
@@ -303,7 +309,7 @@ export default class QuestionArticle extends Component {
     handleReply = (item) => {
         this.setState({ replyId: item.id })
     }
-    //热门专栏
+    //热门排行
     getSpecialCol = () => {
 
         Service.GetNav({
@@ -327,7 +333,7 @@ export default class QuestionArticle extends Component {
                             <img src={item.image} />
                         </a>
                         <h1><a href="javascript:;">{item.name}</a></h1>
-                        <h3>{item.user.name}</h3>
+                        <h3>{item.user && item.user.name}</h3>
                     </li>
                 )
             } else {
@@ -338,7 +344,7 @@ export default class QuestionArticle extends Component {
                             <img src={item.image} />
                         </a>
                         <h1><a href="#">{item.name}</a></h1>
-                        <h3>{item.user.name}</h3>
+                        <h3>{item.user && item.user.name}</h3>
                         <div className="alt">
                             {
                                 item.user &&
@@ -409,13 +415,13 @@ export default class QuestionArticle extends Component {
     }
 
     submitComment = () => {
-        const { userInfo, articleInfo } = this.state;
+        const { articleInfo } = this.state;
         Service.SubmitComment({
             title: articleInfo.title,
             categoryId: "4812062598ec4b10bedfb38b59ea3e94",
             contentId: this.props.match.params.qid,
             replyId: '',
-            name: userInfo.id,
+            name: userInfo && userInfo.id,
             isValidate: "0",
             content: this.state.EditorVal
         }).then((response) => {
@@ -444,37 +450,33 @@ export default class QuestionArticle extends Component {
         const { toolList, articleInfo, commentList, commentRenderLen } = this.state;
         let Time = articleInfo ? FormatDate.formatTime(articleInfo.createDate) : null;
         let commentRenderList = commentList.list && commentList.list.slice(0, commentRenderLen)
-
         return (
             <div className="">
                 {/* 头部 */}
                 < Header />
                 <div class="wrapper g-qingjiao2">
                     <div class="g-left">
-                        {
-                            articleInfo &&
-                            <div class="qj-article">
-                                <h1>{articleInfo.title}</h1>
-                                <div class="alt clearfix">
-                                    <a href="javascript:;" class="j_name"><img src={articleInfo.user && (articleInfo.user.photo || defaultPhoto)} class="thumb-img" />{articleInfo.user.name}</a>
-                                    <span>▪</span>
-                                    <span>{Time}</span>
-                                    <a href="javascript:;" class="tag">文案技巧</a>
-                                </div>
-                                <div class="txt clearfix">
-                                    <img src={articleInfo.image} class="thumb-img" />
-                                    <div class="box">
-                                        {articleInfo.articleData && articleInfo.articleData.content}
-                                        <a href="javascript:;">显示全部 <i class="fa-angle-down"></i></a>
-                                    </div>
-                                </div>
-                                <div class="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(articleInfo)}><i className="icon-heart"></i><span>{articleInfo.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(articleInfo)}><i className="icon-thumbs"></i><span>{articleInfo.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{articleInfo.commentNum}</span></a></div>
-
+                        <div class="qj-article">
+                            <h1>{articleInfo.title}</h1>
+                            <div class="alt clearfix">
+                                <a href="javascript:;" class="j_name"><img src={articleInfo.user && (articleInfo.user.photo || defaultPhoto)} class="thumb-img" />{articleInfo.user && articleInfo.user.name}</a>
+                                <span>▪</span>
+                                <span>{Time}</span>
+                                <a href="javascript:;" class="tag">文案技巧</a>
                             </div>
-                        }
+                            <div class="txt clearfix">
+                                <img src={articleInfo.image} class="thumb-img" />
+                                <div class="box">
+                                    <div dangerouslySetInnerHTML={{ __html: articleInfo.articleData && articleInfo.articleData.content }} />
+                                    <a href="javascript:;">显示全部 <i class="fa-angle-down"></i></a>
+                                </div>
+                            </div>
+                            <div class="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(articleInfo)}><i className="icon-heart"></i><span>{articleInfo.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(articleInfo)}><i className="icon-thumbs"></i><span>{articleInfo.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{articleInfo.commentNum}</span></a></div>
+
+                        </div>
 
                         <div class="u-editor">
-                            <div id="editorContainer" ref="editorElem" />
+                            <div id="qeditorContainer" ref="editorElem" />
                             {/* <Editor customConfig={{
                                 // "uploadImgShowBase64": true,
                                 "height": 325,
@@ -583,7 +585,7 @@ export default class QuestionArticle extends Component {
                     </div>
                     <div class="g-right">
                         {this.createBannerA()}
-                        {this.createBannerC()}
+                        {/* {this.createBannerC()} */}
                         <div class="u-title4">
                             <b>相关问题</b>
                         </div>
@@ -611,7 +613,7 @@ export default class QuestionArticle extends Component {
                             </div> */}
                         </div>
                         <div class="u-title4">
-                            <b>热门专栏</b>
+                            <b>热门排行</b>
                         </div>
                         <ul class="hot-article suite active">
                             {this.createSpecialCol()}

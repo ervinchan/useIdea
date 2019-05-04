@@ -31,17 +31,19 @@ class Utils {
             return _arr;
         }
     }
-    static uploadProps(fileList, callback) {
+    static uploadProps(fileList, callback, that = null) {
         return {
             onRemove: (file) => {
-                this.setState((state) => {
-                    const index = state.fileList.indexOf(file);
-                    const newFileList = state.fileList.slice();
+                that.setState((state) => {
+                    const index = state.officeEnvi.indexOf(file);
+                    const newFileList = state.officeEnvi.slice();
                     newFileList.splice(index, 1);
                     return {
-                        fileList: newFileList,
+                        // fileList: newFileList,
+                        officeEnvi: newFileList
                     };
                 });
+
             },
             beforeUpload: (file) => {
                 var newUrl = ""
@@ -62,6 +64,9 @@ class Utils {
     }
     static setDefaultPhoto(e) {
         e.target.src = defaultPhoto
+    }
+    static gotoRouter(router, params, history) {
+        history.push({ pathname: router, state: params })
     }
 }
 

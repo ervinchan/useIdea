@@ -5,10 +5,7 @@ import { StickyContainer, Sticky } from 'react-sticky';
 
 //import $ from 'jquery'
 import Swiper from 'swiper/dist/js/swiper.min.js'
-import axios from 'axios'
-
-import Header from '../../common/header/Index.js'
-import Footer from '../../common/footer/Index.js'
+import Service from '../../service/api.js'
 import qyHead from './qyHead'
 import 'swiper/dist/css/swiper.min.css'
 import '../../static/less/u.icenter.less'
@@ -18,7 +15,7 @@ import '../../Constants'
 import Loading from '../../common/Loading/Index'
 import userImg from "../../static/images/user/userTx.jpg"
 const TabPane = Tabs.TabPane;
-
+const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
 export default class qyHome extends Component {
     /* global $ */
     tabDom = null
@@ -49,6 +46,21 @@ export default class qyHome extends Component {
         });
         this.getCollectList();
         this.getMyWork();
+        this.getUserInfo();
+        this.getUserInfoDetail(userInfo.id);
+    }
+
+    getUserInfoDetail = (userId) => {
+        Service.getUserInfoDetail({
+            userId: userId
+        })
+            .then((response) => {
+                let userInfoDetail = response.data.data;
+                Object.assign(userInfo, userInfoDetail);
+            })
+            .catch((error) => {
+                console.log(error)
+            })
     }
     handleTabChange = (key) => {
         console.log(key);
@@ -59,12 +71,19 @@ export default class qyHome extends Component {
     gotoRouter = (router) => {
         this.props.history.push(router)
     }
+    getUserInfo = () => {
+        Service.getUserInfo({
+            userId: userInfo && userInfo.id
+        }).then((response) => {
+
+        })
+    }
 
     getCollectList = () => {
         POST({
             url: "/a/artuser/articleCollect/collectList?",
             opts: {
-                userId: JSON.parse(sessionStorage.getItem("userInfo")).id
+                userId: userInfo && userInfo.id
             }
         }).then((response) => {
             global.constants.loading = false
@@ -80,7 +99,7 @@ export default class qyHome extends Component {
         POST({
             url: "/a/cms/article/latestAction?",
             opts: {
-                userId: JSON.parse(sessionStorage.getItem("userInfo")).id
+                userId: userInfo && userInfo.id
             }
         }).then((response) => {
             global.constants.loading = false
@@ -94,7 +113,6 @@ export default class qyHome extends Component {
     }
     render() {
         const { fileList } = this.state;
-        const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
         const tabTit = `来信中心`;
         const props = {
             onRemove: (file) => {
@@ -121,24 +139,31 @@ export default class qyHome extends Component {
                 {/* 头部 */}
                 <div class="g-left">
                     <div class="qy-info">
+                        <p>{userInfo.subscription}</p>
                         <p>
-                        In 1949, three enterprising gentlemen, Bill Bernbach, Ned Doyle and Maxwell Dane gave the advertising industry a wake-up call. In short, they said: Let’s stop talking at people and instead start conversations that lead to action and mutual benefit.</p>
-                        <p><br /></p>
-                        <p>This heritage tells us who we are, what we believe and how we should behave. It inspires us to continually challenge standard convention. From Bill Bernbach to Keith Reinhard to the present generation of DDB leaders.From Bill Bernbach to Keith Reinhard  DDB leaders
                             <a href="javascript:;">展开</a>
-                        </p>                     
+                        </p>
                     </div>
                     <div class="qy-envi">
                         <h1><b>创作环境</b></h1>
                         <div class="swiper-container">
                             <div class="swiper-wrapper">
-                                <div class="swiper-slide">
-                                    <a href="javascript:;"><img src="images/user/4.jpg" /></a>
-                                </div>
-                                <div class="swiper-slide">
-                                    <a href="javascript:;"><img src="images/user/4.jpg" /></a></div>
-                                <div class="swiper-slide">
-                                    <a href="javascript:;"><img src="images/user/4.jpg" /></a></div>
+                                {
+                                    userInfo.file1 &&
+                                    <div class="swiper-slide">
+                                        <a href="javascript:;"><img src={userInfo.file1} /></a>
+                                    </div>
+                                }
+                                {
+                                    userInfo.file2 &&
+                                    <div class="swiper-slide">
+                                        <a href="javascript:;"><img src={userInfo.file2} /></a></div>
+                                }
+                                {
+                                    userInfo.file3 &&
+                                    <div class="swiper-slide">
+                                        <a href="javascript:;"><img src={userInfo.file3} /></a></div>
+                                }
                             </div>
                         </div>
                         <div class="u-pagination wide"></div>
@@ -150,12 +175,12 @@ export default class qyHome extends Component {
                         <i class="icon-no-art"></i>
                         <span>· 暂未发表文章 ·</span>
                     </div>
-                </div>       
+                </div>
                 <div class="g-right">
                     <div class="qy-r-team">
                         <div class="qy-title">近期合作机构</div>
                         <ul class="hot-team clearfix">
-                            <li>
+                            {/* <li>
                                 <a href="javascript:;"><img src="css/images/1x1.png" /></a>
                             </li>
                             <li>
@@ -184,19 +209,19 @@ export default class qyHome extends Component {
                             </li>
                             <li>
                                 <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                            </li>  
+                            </li> */}
                         </ul>
                     </div>
                     <div class="nolist">
                         <span>· 合作机构暂未更新 ·</span>
                     </div>
-                    <div class="qy-r-jobs clearfix"> 
-                        <div class="qy-title">最新招聘 <a href="javascript:;" class="add">发布招聘+</a></div> 
+                    <div class="qy-r-jobs clearfix">
+                        <div class="qy-title">最新招聘 <a href="javascript:;" class="add" onClick={() => this.gotoRouter(`/QyJobAdd/${userInfo.id}`)}>发布招聘+</a></div>
                         <div class="nolist">
                             <span>· 暂未发布招聘 ·</span>
                         </div>
                     </div>
-                </div> 
+                </div>
             </div>
         );
     }

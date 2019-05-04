@@ -12,7 +12,7 @@ import 'swiper/dist/css/swiper.min.css'
 import 'antd/lib/pagination/style/index.css';
 import '../../static/less/bigidea.less';
 
-const PAGESIZE = 3;
+const PAGESIZE = 20;
 
 export default class Interview extends Component {
 
@@ -36,9 +36,11 @@ export default class Interview extends Component {
 
     }
 
-    getInterViews = (categoryId) => {
+    getInterViews = (categoryId, page) => {
         Service.GetAllArticle({
-            categoryId: categoryId || ''
+            categoryId: categoryId || '',
+            pageNo: page || 1,
+            pageSize: PAGESIZE
         })
             .then((response) => {
                 if (categoryId) {
@@ -64,7 +66,7 @@ export default class Interview extends Component {
                         <a class="thumb-img" href={`/#/Inspiration/Article/${item.id}`}><img src={item.image} /></a>
                         <div class="tag">{item.category.name}</div>
                         <h1><a href={`/#/Inspiration/Article/${item.id}`}>{item.title}</a></h1>
-                        <div class="author">{item.user.name}</div>
+                        <div class="author">{item.brand}</div>
                         <a class="more" href={`/#/Inspiration/Article/${item.id}`}>MORE<i class="fa-angle-right"></i></a>
                     </div>
                 </li>
@@ -76,11 +78,11 @@ export default class Interview extends Component {
     handlePageChange = (page, pageSize) => {
         console.log(page, pageSize)
         this.setState({ curPage: page })
-        this.getBooksList(this.props.match.params.tid, this.state.sortType, page)
+        this.getInterViews(this.props.match.params.tid, page)
     }
 
     render() {
-        const { readList } = this.state;
+        const { inrerviewList } = this.state;
 
         return (
             <div className="">
@@ -96,7 +98,27 @@ export default class Interview extends Component {
                     <ul class="clearfix">
                         {this.createInterViewList()}
                     </ul>
+
                 </div>
+                {
+                    inrerviewList && inrerviewList.list && (
+                        <Pagination key="Pagination" className="u-pages" current={this.state.curPage} onChange={this.handlePageChange} total={inrerviewList && inrerviewList.count} pageSize={PAGESIZE} itemRender={(page, type, originalElement) => {
+                            switch (type) {
+                                case 'prev':
+                                    return [<a key={type} href="javascript:;">{type}</a>,
+                                    <a href="javascript:;" ><i className="fa-angle-double-left"></i></a>]
+                                case 'next':
+                                    return [
+                                        <a key={type} href="javascript:;" ><i className="fa-angle-double-right"></i></a>,
+                                        <a href="javascript:;">{type}</a>
+                                    ]
+                                default:
+                                    return <a key={page} href="javascript:;">{page}</a>;
+
+                            }
+                        }} />
+                    )
+                }
                 <HotRead />
                 {/* 底部 */}
                 <Footer />

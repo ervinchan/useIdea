@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
 
 import $ from 'jquery'
-import axios from 'axios'
 import Utils from '../../static/js/utils/utils.js'
 import Swiper from 'swiper/dist/js/swiper.min.js'
 import Validate from '../../static/js/utils/validate.js'
-
+import Service from '../../service/api.js'
 import '../../static/less/reg.less';
 
 import regBanner from '../../static/images/reg/1.jpg';
@@ -69,26 +68,25 @@ export default class Reg extends Component {
         } else if (!agree) {
             return layer.msg("请先阅读网站用户协议并同意")
         }
-        let url = '/zsl/email?'
-        let opts = {
-            email: regEmail,
-            password: regPsw,
-            loginName: regEmail,
-            passwordConfirm: regPswConfirm,
-            isCompany: false
-        }
-        for (var key in opts) {
-            opts[key] && (url += "&" + key + "=" + opts[key])
-        }
-        axios.post(url, opts)
-            .then((response) => {
-                if (response.data.status === 1) {
-                    this.props.history.push("/regFinish")
+        Service.validateLoginName({
+            loginName: regEmail
+        }).then((response) => {
+            console.log(response)
+            if (response.data.status === 1) {
+                let opts = {
+                    password: regPsw,
+                    loginName: regEmail,
+                    passwordConfirm: regPswConfirm,
+                    isCompany: "true"
                 }
-            })
-            .catch((error) => {
-                console.log(error)
-            })
+                sessionStorage.setItem("regInfo", JSON.stringify(opts))
+                this.props.history.push("/RegInfo")
+            } else {
+                return layer.msg(response.data.message)
+            }
+        })
+
+
     }
 
     checkAgree = () => {

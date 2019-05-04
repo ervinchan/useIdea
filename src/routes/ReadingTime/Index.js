@@ -18,7 +18,7 @@ import '../../static/less/bookstore.less';
 const PAGESIZE = 3;
 
 export default class Bookstore extends Component {
-
+    categoryIds = global.constants.categoryIds['阅读场景']
     constructor(props) {
         super(props);
         this.state = {
@@ -79,7 +79,7 @@ export default class Bookstore extends Component {
     getHotBooks = (categoryId) => {
         Service.GetAllArticle({
             hits: 1,
-            categoryId: categoryId || ''
+            categoryId: categoryId || '',
         })
             .then((response) => {
                 if (categoryId) {
@@ -224,7 +224,7 @@ export default class Bookstore extends Component {
                             )
                         }
                     </div>
-                    <BookMenu />
+                    <BookMenu categoryid={this.categoryIds.id} />
                 </div>
                 <div className="fixed_bottom"></div>
                 <HotRead />

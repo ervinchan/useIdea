@@ -4,6 +4,7 @@ import axios from 'axios'
 import $ from 'jquery'
 import Swiper from 'swiper/dist/js/swiper.min.js'
 import FormatDate from '../../static/js/utils/formatDate.js'
+import Service from '../../service/api.js'
 import Utils from '../../static/js/utils/utils.js'
 
 import Header from '../../common/header/Index.js'
@@ -20,8 +21,8 @@ import '../../static/less/question.less'
 
 import defaultPhoto from "../../static/images/user/default.png"
 const PAGESIZE = 3;
-
-export default class MyWork extends Component {
+const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
+export default class SpaceArticle extends Component {
 
     constructor(props) {
         super(props);
@@ -29,7 +30,8 @@ export default class MyWork extends Component {
             sortType: 0,
             curPage: 1,
             banner: [],
-            toolList: []
+            toolList: [],
+            hitsArticleList: []
         };
     }
 
@@ -51,8 +53,9 @@ export default class MyWork extends Component {
         $(".jq-hidden").on("click", function (e) {
             $($(this).data("for")).toggleClass("hidden");
         });
-
+        let uid = this.props.match.params.uid
         this.getArticleInfo("7a8bbb7d262142cbb7ae5bf884935e81")
+        this.getHitsArticle(uid)
     }
 
     getArticleInfo = (categoryId) => {
@@ -174,8 +177,7 @@ export default class MyWork extends Component {
         const { data } = this.props
         const categorys = global.constants.categorys
         return data && data.map((item, index) => {
-            let Hours = FormatDate.apartHours(item.updateDate)
-            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`;
+            let Time = FormatDate.formatTime(item.updateDate)
             let router = ``
             switch (item.category.id) {
                 case categorys[0].id:
@@ -194,7 +196,7 @@ export default class MyWork extends Component {
                 <li>
                     <div class="ue_info">
                         <a href="javascript:;" class="face" onClick={() => this.gotoRouter(`${router}${item.id}`)}>
-                            <img src={item.user.photo  || defaultPhoto} />
+                            <img src={item.user.photo || defaultPhoto} />
                         </a>
                         <div class="alt clearfix">
                             <a href="javascript:;" class="j_name">{item.user.name}</a>
@@ -216,6 +218,114 @@ export default class MyWork extends Component {
         })
     }
 
+    createList = () => {
+        const { data } = this.props
+        const categorys = global.constants.categorys
+        return data && data.list && data.list.map((item, index) => {
+            let Time = FormatDate.formatTime(item.updateDate)
+            let router = ``
+            switch (item.category.id) {
+                case categorys[0].id:
+                    router = `/Question/Article/`
+                    break;
+                case categorys[1].id:
+
+                case categorys[1].id:
+                    router = `/Bookstore/Bookbuy/`
+                    break;
+                default:
+                    router = `/Inspiration/Article/`
+                    break;
+            }
+            return (
+                <li>
+                    <div class="ue_info">
+                        <a href="javascript:;" class="face" onClick={() => this.gotoRouter(`${router}${item.id}`)}>
+                            <img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
+                        </a>
+                        <div class="alt clearfix">
+                            <a href="javascript:;" class="j_name">{item.user.name}</a>
+                            <span class="dot"></span>
+                            <span>发表文章</span>
+                        </div>
+                        <div class="bat">{item.category.name}</div>
+                    </div>
+                    <div class="ue_box">
+                        <a class="thumb-img" href="javascript:;"><img src={item.image} /></a>
+                        <h1><a href="javascript:;" onClick={() => this.gotoRouter(`${router}${item.id}`)}>{item.title}</a></h1>
+                        <div class="txt nowrap">
+                            {item.description}
+                        </div>
+                        <div class="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{item.commentNum}</span></a></div>
+                    </div>
+                </li>
+            )
+        })
+    }
+
+    handleLike = (item) => {
+        Service.AddLike({
+            id: item.id
+        }).then((response) => {
+            global.constants.loading = false
+            if (response.data.status === 1) {
+                item.likeNum++
+                this.setState({})
+            }
+            /* global layer */
+            layer.msg(response.data.message)
+        })
+    }
+    handleCollect = (item) => {
+        Service.AddCollect({
+            userId: 1,
+            articleId: item.id
+        }).then((response) => {
+            global.constants.loading = false
+            if (response.data.status === 1) {
+                item.collectNum++
+                this.setState({})
+            }
+
+            /* global layer */
+            layer.msg(response.data.message)
+        })
+    }
+    gotoRouter = (router) => {
+        this.props.history.push(router)
+    }
+    getHitsArticle = (uid) => {
+        Service.GetAllArticle({
+            hits: 1,
+            userId: uid
+        }).then((response) => {
+            if (response.data.status === 1) {
+                let hitsArticleList = response.data.data
+                this.setState({ hitsArticleList })
+            }
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+
+    createHitArticle = () => {
+        const { hitsArticleList } = this.state;
+        return hitsArticleList && hitsArticleList.slice(0, 10).map((item, index) => {
+
+            return (
+
+                <li key={index} onClick={() => this.gotoRouter(`/Inspiration/Article/${item.id}`)}>
+                    <a href="javascript:;" className="thumb-img">
+                        <span>{index + 1}</span>
+                        <img src={item.image} />
+                    </a>
+                    <h1><a href="javascript:;">{item.title}</a></h1>
+                </li>
+            )
+        })
+    }
+
     render() {
         const { toolList } = this.state;
 
@@ -231,52 +341,10 @@ export default class MyWork extends Component {
                 </div> */}
                 <div class="g-left">
                     <ul class="ue-article clearfix">
-                        <li>
-                            <div class="ue_info">
-                                <a href="#" class="face">
-                                    <img src="css/images/1x1.png" />
-                                </a>
-                                <div class="alt clearfix">
-                                    <a href="#" class="j_name">网易云音乐</a>
-                                    <span class="dot"></span>
-                                    <span>发表文章</span>
-                                </div>
-                                <div class="date">12月07日  20:45</div>
-                            </div>
-                            <div class="ue_box">
-                                <a class="thumb-img" href="javascript:;"><img src="images/user/3.jpg" /></a>
-                                <h1><a href="#">专访网易云音乐副总裁李茵：做营销要想感动别人</a></h1>
-                                <div class="txt nowrap">
-                                    今年618被世界杯的声量压过去了，但依然挡不住年中的消费狂欢，618当天京东的销售额再创新高，达到了1592亿。这得益于京东多年来的。
-                                </div>
-                                <div class="f-bartool clearfix"><a href="javascript:;"><i class="icon-heart"></i><span>99</span></a><a href="javascript:;"><i class="icon-thumbs"></i><span>36</span></a><a href="javascript:;"><i class="icon-comment"></i><span>51</span></a></div>
+                        {this.createList()}
 
-                            </div>
-                        </li>
-                        <li>
-                            <div class="ue_info">
-                                <a href="#" class="face">
-                                    <img src="css/images/1x1.png" />
-                                </a>
-                                <div class="alt clearfix">
-                                    <a href="#" class="j_name">网易云音乐</a>
-                                    <span class="dot"></span>
-                                    <span>发表文章</span>
-                                </div>
-                                <div class="date">12月07日  20:45</div>
-                            </div>
-                            <div class="ue_box">
-                                <a class="thumb-img" href="javascript:;"><img src="images/user/3.jpg" /></a>
-                                <h1><a href="#">专访网易云音乐副总裁李茵：做营销要想感动别人</a></h1>
-                                <div class="txt nowrap">
-                                    今年618被世界杯的声量压过去了，但依然挡不住年中的消费狂欢，618当天京东的销售额再创新高，达到了1592亿。这得益于京东多年来的。
-                                </div>
-                                <div class="f-bartool clearfix"><a href="javascript:;"><i class="icon-heart"></i><span>99</span></a><a href="javascript:;"><i class="icon-thumbs"></i><span>36</span></a><a href="javascript:;"><i class="icon-comment"></i><span>51</span></a></div>
-
-                            </div>
-                        </li>
                     </ul>
-                    <div class="u-pages">
+                    {/* <div class="u-pages">
                         <div class="box clearfix">
                             <a href="javascript:;">Prev</a>
                             <a href="javascript:;"><i class="fa-angle-double-left"></i></a>
@@ -294,13 +362,13 @@ export default class MyWork extends Component {
                             <a href="javascript:;"><i class="fa-angle-double-right"></i></a>
                             <a href="javascript:;">Next</a>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
                 <div class="g-right">
                     <div class="qy-r-team">
                         <div class="qy-title">近期合作机构</div>
                         <ul class="hot-team clearfix">
-                            <li>
+                            {/* <li>
                                 <a href="javascript:;"><img src="css/images/1x1.png" /></a>
                             </li>
                             <li>
@@ -329,34 +397,13 @@ export default class MyWork extends Component {
                             </li>
                             <li>
                                 <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                            </li>
+                            </li> */}
                         </ul>
                     </div>
                     <div class="qy-r-hotart">
                         <div class="qy-title">机构热文排行</div>
                         <ul class="qy-hotart">
-                            <li>
-                                <a href="#" class="thumb-img">
-                                    <span>1</span>
-                                    <img src="images/r1.jpg" />
-                                </a>
-                                <h1><a href="#">天猫拾光之旅：双11十年，都藏在这些彩蛋里了！</a></h1>
-                            </li>
-                            <li>
-                                <a href="#" class="thumb-img">
-                                    <span>2</span>
-                                    <img src="images/r2.jpg" />
-                                </a>
-                                <h1><a href="#">《风味人间》的画面，每一帧都写着馋</a></h1>
-
-                            </li>
-                            <li>
-                                <a href="#" class="thumb-img">
-                                    <span>3</span>
-                                    <img src="css/images/95x65.png" />
-                                </a>
-                                <h1><a href="#">100多年来，广告如何操控你对“颜值”的认知？</a></h1>
-                            </li>
+                            {this.createHitArticle()}
                         </ul>
                     </div>
                 </div>

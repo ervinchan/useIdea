@@ -126,7 +126,7 @@ export default class BookMenu extends Component {
                         </li>
                         <li>
                             <i className="icon-star"></i>
-                            <a href="/#/ReadingTime">阅读场景</a>
+                            <a href="/#/Bookstore/ReadingTime">阅读场景</a>
                         </li>
                     </ul>
                     <div className="scroll"></div>

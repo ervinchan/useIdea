@@ -4,9 +4,12 @@ import $ from 'jquery'
 import Service from '../../service/api.js'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
+import Collect from '../../common/collect'
+import Like from '../../common/like'
+import Comment from '../../common/comment'
 import Swiper from 'swiper/dist/js/swiper.min.js'
 import 'swiper/dist/css/swiper.min.css'
-
+import LazyLoad from 'react-lazyload';
 export default class HotRead extends Component {
 
     constructor(props) {
@@ -54,10 +57,15 @@ export default class HotRead extends Component {
             let slide = null
             itemDom.push(
                 <div class="item">
-                    <a class="thumb-img" href={`/#/Inspiration/Article/${item.id}`}><img src={item.image} />
+                    <a class="thumb-img" href={`/#/Inspiration/Article/${item.id}`}>
+                        <LazyLoad><img src={item.image} /></LazyLoad>
                     </a>
                     <h1><a href={item.link}>{item.title}</a></h1>
-                    <div className="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{item.commentNum}</span></a></div>
+                    <div className="f-bartool clearfix">
+                        <Collect fn={this.handleCollect} item={item} />
+                        <Like fn={this.handleLike} item={item} />
+                        <Comment fn={this.handleLike} item={item} />
+                    </div>
 
                 </div>
             )

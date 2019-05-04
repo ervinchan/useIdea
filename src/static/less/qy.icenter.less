@@ -35,7 +35,7 @@
     max-width: 1100px;
 
     .ant-tabs-bar {
-        margin-bottom: 60px;
+        margin-bottom: 50px;
     }
 
     .ant-tabs-content {
@@ -45,8 +45,28 @@
     .g-left {
         width: 750px;
 
+        .ant-tabs-bar {
+            text-align: left;
+            border: none;
+
+            .ant-tabs-tab {
+                font-size: 16px;
+                margin: 0;
+            }
+
+            .ant-tabs-ink-bar {
+                display: none !important;
+            }
+        }
+
         .u-title {
             margin-bottom: 30px;
+        }
+    }
+
+    .work-job {
+        .g-right {
+            margin-top: 97px;
         }
     }
 
@@ -117,8 +137,34 @@
 }
 
 .ad-tab {
-    position: relative;
+
     margin-bottom: 30px;
+    position: relative;
+
+    .ad-addto {
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 100;
+    }
+
+    .ant-tabs {
+        padding-top: 70px;
+    }
+
+    .ant-tabs-bar {
+        text-align: left;
+        border: none;
+
+        .ant-tabs-tab {
+            font-size: 16px;
+            margin: 0;
+        }
+
+        .ant-tabs-ink-bar {
+            display: none !important;
+        }
+    }
 
     >a {
         display: inline-block;
@@ -136,14 +182,14 @@
         }
     }
 
-    ul {
+    .ant-tabs-bar {
         .absolute();
         right: 0;
-        top: 50%;
+        top: 20px;
         height: 34px;
         margin-top: -17px;
 
-        li {
+        .ant-tabs-tab {
             float: left;
             height: 34px;
             line-height: 34px;
@@ -153,8 +199,9 @@
             color: #666;
             .border-radius(4px 4px 0 0);
             cursor: pointer;
+            font-size: 13px;
 
-            &.active {
+            &.ant-tabs-tab-active {
                 color: #fff;
                 background-color: #4595ea;
             }
@@ -180,6 +227,26 @@
             font-size: 13px;
             min-width: 80px;
             font-weight: bold;
+
+            &.index {
+                width: 80px;
+            }
+
+            &.type {
+                width: 180px;
+            }
+
+            &.cycle {
+                width: 130px;
+            }
+
+            &.stateTime {
+                width: 160px;
+            }
+
+            &.endTime {
+                width: 160px;
+            }
 
             &:first-child {
                 border: none;

@@ -14,12 +14,14 @@ export default class Reg extends Component {
         super(props);
         this.state = {
             Nav: [],
+            userName: "",
             regEmail: "",
             regPsw: "",
             regPswConfirm: "",
             emailError: false,
             pswError: false,
             pswConfirmError: false,
+            userNameError: false,
             agree: false,
             displayPsw: true
         }
@@ -42,6 +44,9 @@ export default class Reg extends Component {
         });
     }
 
+    handleUserName = (e) => {
+        this.setState({ 'regUserName': e.target.value })
+    }
     handleEmail = (e) => {
         this.setState({ 'regEmail': e.target.value })
     }
@@ -55,10 +60,13 @@ export default class Reg extends Component {
     }
 
     RegConfirm = () => {
-        const { regEmail, regPsw, regPswConfirm, agree } = this.state;
+        const { regUserName, regEmail, regPsw, regPswConfirm, agree } = this.state;
         this.setState({ emailError: false, pswError: false, pswConfirmError: false })
         /*global layer */
-        if (!regEmail || !Validate.checkEmail(regEmail)) {
+        if (!regUserName) {
+            return this.setState({ userNameError: true })
+        }
+        else if (!regEmail || !Validate.checkEmail(regEmail)) {
             return this.setState({ emailError: true })
         } else if (!regPsw) {
             return this.setState({ pswError: true })
@@ -67,14 +75,16 @@ export default class Reg extends Component {
         } else if (!agree) {
             return layer.msg("请先阅读网站用户协议并同意")
         }
-        Service.UserReg({
+        let params = {
+            userName: regUserName,
             email: regEmail,
             password: regPsw,
             loginName: regEmail,
             isCompany: "false"
-        }).then((response) => {
+        }
+        Service.UserReg(params).then((response) => {
             if (response.data.status === 1) {
-                this.props.history.push("/regFinish")
+                this.props.history.push({ pathname: "/regFinish", state: { user: params } })
             } else {
                 layer.msg(response.data.message)
             }
@@ -93,7 +103,7 @@ export default class Reg extends Component {
     }
 
     render() {
-        const { Nav, emailError, pswError, pswConfirmError, agree, displayPsw } = this.state
+        const { Nav, userNameError, emailError, pswError, pswConfirmError, agree, displayPsw } = this.state
         return (
             <div className="reg-body">
                 <div className="r-banner">
@@ -118,6 +128,14 @@ export default class Reg extends Component {
                             终于等到你一起做件够酷的事儿。USEIDEA响创意立足华语创意圈，以联络、发掘、记录、传播创造者的闪现灵感、精准洞见为主旨，邀你合力参与营造属于创造者的独立创意社区，一同雕刻华语创造人生长轨迹的时代年轮。
                         </div>
                         <div className="reg-section">
+                            <div className="r-lable">User Name</div>
+                            <div className={"r-input " + (userNameError ? "isError" : "")}>
+                                <i className="ico icon-mail-r"></i>
+                                <input type="text" placeholder="请输入用户名" onChange={this.handleUserName} />
+                                <div className="tipError">
+                                    用户名为必填项
+                                </div>
+                            </div>
                             <div className="r-lable">E-mall  address</div>
                             <div className={"r-input " + (emailError ? "isError" : "")}>
                                 <i className="ico icon-mail-r"></i>

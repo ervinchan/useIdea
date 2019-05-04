@@ -74,7 +74,7 @@ export default class ActicleEditor extends Component {
             'redo'  // 重复
         ]
         this.editor.customConfig.onchange = this.setEditorVal
-        this.editor.customConfig.uploadImgServer = '/zsl/a/cms/article/uploadArticleSave'
+        this.editor.customConfig.uploadImgServer = '/zsl/a/cms/article/filter/uploadArticleSave'
         this.editor.customConfig.uploadImgParams = {
             userId: JSON.parse(sessionStorage.getItem("userInfo")).id,
             categoryId: "ce009ff186fa4203ab07bd1678504228"

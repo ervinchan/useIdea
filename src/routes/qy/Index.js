@@ -14,6 +14,7 @@ import 'swiper/dist/css/swiper.min.css'
 import '../../static/less/u.icenter.less'
 import 'antd/lib/tabs/style/index.less';
 import { POST } from '../../service/service'
+import Service from '../../service/api.js'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
 import userImg from "../../static/images/user/userTx.jpg"
@@ -22,7 +23,7 @@ import Home from './Home.js';
 import AdManage from './Ad.js'
 import News from '../User/newMessage.js'
 const TabPane = Tabs.TabPane;
-
+const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
 export default class UserCenter extends Component {
     /* global $ */
     tabDom = null
@@ -32,7 +33,9 @@ export default class UserCenter extends Component {
             listData: [],
             activeKey: 'news',
             fileList: [],
-            collectList: []
+            collectList: [],
+            userPhoto: [],
+            userImg: ""
         };
     }
 
@@ -74,6 +77,19 @@ export default class UserCenter extends Component {
         });
         this.getCollectList();
         this.getMyWork();
+        this.getUserInfoDetail(userInfo.id)
+    }
+    getUserInfoDetail = (userId) => {
+        Service.getUserInfoDetail({
+            userId: userId
+        })
+            .then((response) => {
+                let userInfoDetail = response.data.data;
+                Object.assign(userInfo, userInfoDetail);
+            })
+            .catch((error) => {
+                console.log(error)
+            })
     }
     handleTabChange = (key) => {
         console.log(key);
@@ -89,7 +105,7 @@ export default class UserCenter extends Component {
         POST({
             url: "/a/artuser/articleCollect/collectList?",
             opts: {
-                userId: JSON.parse(sessionStorage.getItem("userInfo")).id
+                userId: userInfo && userInfo.id
             }
         }).then((response) => {
             global.constants.loading = false
@@ -105,7 +121,7 @@ export default class UserCenter extends Component {
         POST({
             url: "/a/cms/article/latestAction?",
             opts: {
-                userId: JSON.parse(sessionStorage.getItem("userInfo")).id
+                userId: userInfo && userInfo.id
             }
         }).then((response) => {
             global.constants.loading = false
@@ -117,9 +133,27 @@ export default class UserCenter extends Component {
                 console.log(error)
             })
     }
+    setUserPhoto = (file, newUrl) => {
+        this.setState(state => ({
+            userPhoto: [...state.userPhoto, file],
+            userImg: newUrl
+        }), () => {
+            $(".avatar-uploader").find("input[type=file]").css({
+                position: "absolute",
+                left: 0,
+                top: 0,
+                width: "100%",
+                height: "100%",
+                opacity: 0,
+                zIndex: 1,
+                display: "block"
+            })
+
+        })
+    }
     render() {
-        const { fileList } = this.state;
-        const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
+        const { fileList, userPhoto, userImg } = this.state;
+
         const tabTit = `来信中心`;
         const props = {
             onRemove: (file) => {
@@ -145,7 +179,7 @@ export default class UserCenter extends Component {
             <div className="">
                 {/* 头部 */}
                 < Header />
-                < QyHead />
+                < QyHead info={userInfo} setUserPhoto={this.setUserPhoto} userPhoto={userPhoto} userImg={userImg} history={this.props.history} />
                 <div class="wrapper g-icenter minpage">
                     <div class="uc-tabnav">
                         {/* <ul class="clearfix">
@@ -156,11 +190,11 @@ export default class UserCenter extends Component {
                         </ul> */}
                         <Tabs ref={e => this.tabDom = e} className="clearfix" onChange={this.handleTabChange}>
                             <TabPane tab="我的首页" key="home"><Home data={this.state.listData} history={this.props.history} /></TabPane>
-                            <TabPane tab={["来信中心", <i className="badge">99+</i>]} key="news" className="qj-news"><News data={this.state.listData} /></TabPane>
+                            <TabPane tab={["来信中心", <i className="badge" style={{ display: 'none' }}>99+</i>]} key="news" className="qj-news"><News data={this.state.listData} /></TabPane>
                             <TabPane tab="作品/职位" key="work"><Work data={this.state.listData} history={this.props.history} /></TabPane>
                             <TabPane tab="广告管理" key="ad"><AdManage data={this.state.collectList} history={this.props.history} /></TabPane>
                         </Tabs>
-                        <a href="javascript:;" class="edit" onClick={() => this.gotoRouter(`/InfoUpDate/${userInfo.id}`)}>完善机构资料</a>
+                        <a href="javascript:;" class="edit" onClick={() => this.gotoRouter(`/QyInfo/${userInfo && userInfo.id}`)}>完善机构资料</a>
                     </div>
 
                 </div>

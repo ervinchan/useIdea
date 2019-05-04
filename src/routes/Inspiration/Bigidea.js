@@ -15,7 +15,7 @@ import 'swiper/dist/css/swiper.min.css'
 import 'antd/lib/pagination/style/index.css';
 import '../../static/less/bigidea.less';
 
-const PAGESIZE = 3;
+const PAGESIZE = 20;
 
 export default class Bigidea extends Component {
 
@@ -30,7 +30,7 @@ export default class Bigidea extends Component {
             specialCol: [],
             bannerCList: [],
             bannerDList: [],
-            bannerEList: []
+            recommendArticle: []
         };
     }
 
@@ -45,7 +45,8 @@ export default class Bigidea extends Component {
         this.getBigIdeaMenu('b49c9133960c4700b253b7a3283dcbef');
         this.getSpecialCol();
         this.getBannerC();
-        this.getBannerE();
+        this.getBannerD();
+        this.getRecommendArticle();
     }
 
     getBannerC = () => {
@@ -62,13 +63,13 @@ export default class Bigidea extends Component {
             })
 
     }
-    getBannerE = () => {
+    getBannerD = () => {
         Service.GetADList({
             categoryId: "b49c9133960c4700b253b7a3283dcbef",
             id: "df2c63345f9b42beb860f9150d4002f7"
         }).then((response) => {
             if (response.data.status === 1) {
-                this.setState({ bannerEList: response.data.data })
+                this.setState({ bannerDList: response.data.data })
             }
         })
             .catch((error) => {
@@ -76,23 +77,33 @@ export default class Bigidea extends Component {
             })
 
     }
+
+    //主编推荐
+    getRecommendArticle = () => {
+        Service.GetAllArticle({
+            isRecommend: 1,
+            pageNo: 1,
+            pageSize: 4
+        }).then((response) => {
+            if (response.data.status === 1) {
+                const recommendArticle = response.data.data
+                this.setState({ recommendArticle })
+            }
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
     createBannerC = () => {
         const { bannerCList } = this.state
-        return bannerCList.slice(0, 3).map((item, index) => {
-            return <a href={item.url} className="seat-x315 lighten"><img src={item.image} /></a>
+        return bannerCList.map((item, index) => {
+            return <a href={item.link} target="_blank" className="seat-x110 lighten"><img src={item.image} /></a>
         })
     }
     createBannerD = () => {
-        const { bannerCList } = this.state
-        let bannerDList = bannerCList.slice(3)
+        const { bannerDList } = this.state
         return bannerDList.map((item, index) => {
-            return <a href={item.url} className="seat-x315 lighten"><img src={item.image} /></a>
-        })
-    }
-    createBannerE = () => {
-        const { bannerEList } = this.state
-        return bannerEList.map((item, index) => {
-            return <a href={item.url} className="seat-h110 lighten"><img src={item.image} /></a>
+            return <a href={item.link} target="_blank" className="seat-x315 lighten"><img src={item.image} /></a>
         })
     }
 
@@ -173,7 +184,7 @@ export default class Bigidea extends Component {
     //         })
     // }
 
-    //热门专栏
+    //热门排行
     getSpecialCol = () => {
         Service.GetNav({
             subscriber: 0
@@ -208,17 +219,17 @@ export default class Bigidea extends Component {
         })
     }
 
-    createMenus = () => {
-        const { menus } = this.state
-        return menus && menus.map((item, index) => {
+    createRecommendArticle = () => {
+        const { recommendArticle } = this.state
+        return recommendArticle.list && recommendArticle.list.map((item, index) => {
             return (
                 <li key={index}>
                     <a className="thumb-img" href="javascript:;">
                         <img src={item.image} />
-                        <span>{item.name}</span>
+                        <span>{item.category.name}</span>
                     </a>
                     <h1><a href="#">{item.description}</a></h1>
-                    <div className="f-bartool clearfix"><a href="javascript:;"><i className="icon-heart"></i><span>99</span></a><a href="javascript:;"><i className="icon-thumbs"></i><span>36</span></a><a href="javascript:;"><i className="icon-comment"></i><span>51</span></a></div>
+                    <div className="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{item.commentNum}</span></a></div>
 
                 </li>
             )
@@ -310,7 +321,7 @@ export default class Bigidea extends Component {
                 <div className="m-chartlist background">
                     <div className="wrapper">
                         <ul className="clearfix">
-                            {this.createMenus()}
+                            {this.createRecommendArticle()}
 
                         </ul>
                     </div>
@@ -322,7 +333,7 @@ export default class Bigidea extends Component {
                         </div>
                         {
                             BigIdeaDatas && BigIdeaDatas.list && (
-                                <Pagination key="Pagination" className="u-pages" current={this.state.curPage} onChange={this.handlePageChange} total={BigIdeaDatas && BigIdeaDatas.count} pageSize={PAGESIZE} itemRender={(page, type, originalElement) => {
+                                <Pagination key="Pagination" className="u-pages" current={this.state.curPage} onChange={this.handlePageChange} total={BigIdeaDatas && BigIdeaDatas.count} pageSize={global.constants.PAGESIZE} itemRender={(page, type, originalElement) => {
                                     switch (type) {
                                         case 'prev':
                                             return [<a key={type} href="javascript:;">{type}</a>,
@@ -344,7 +355,7 @@ export default class Bigidea extends Component {
                         {this.createBannerC()}
                         {this.createBannerD()}
                         <div className="u-title4">
-                            <b>热门专栏</b>
+                            <b>热门排行</b>
                         </div>
                         <ul className="hot-article suite active">
                             {this.createSpecialCol()}

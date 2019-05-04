@@ -49,18 +49,64 @@ export default class ArticleList extends Component {
         $(".jq-hidden").on("click", function (e) {
             $($(this).data("for")).toggleClass("hidden");
         });
-
-        this.getArticleInfo("7a8bbb7d262142cbb7ae5bf884935e81")
     }
 
-    getArticleInfo = (categoryId) => {
-        let url = '/zsl/a/cms/article/getAllArticle?'
-        let opts = {
-            hits: 1,
-            categoryId: categoryId || ''
-        }
-        for (var key in opts) {
-            opts[key] && (url += "&" + key + "=" + opts[key])
+    createList = () => {
+        const { data, dataType } = this.props;
+        if (dataType === "评论文章" || dataType === "请教回应") {
+            return data && data.list && data.list.map(item => {
+                let Time = FormatDate.formatTime(item.createDate);
+                return (
+                    <li>
+                        <a href="javascript:;" class="face" onClick={() => this.gotoRouter(`/Qyspace/${item.user.id}`)}>
+                            <img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
+                        </a>
+                        <div class="lx_alt clearfix">
+                            <a href="javascript:;" class="j_name">{item.user.name}</a>
+                            <span>{dataType}</span>
+                            <span class="dot"></span>
+                            <span>{Time}</span>
+                        </div>
+                        <div class="lx_box">
+                            <a class="thumb-img" href="javascript:;"><img src="images/user/u1.png" /></a>
+                            <h1><a href="javascript:;">{item.title}</a></h1>
+                            <p>{Time}</p>
+                        </div>
+                        <div class="lx_txt">
+                            {item.content}
+                        </div>
+                        <div class="lx-bar f-right">
+                            <a href="javascript:;" class="reply" onClick={() => this.handleLike(item)}><i class="icon-reply"></i>回复</a>
+                            {/* <a href="javascript:;" class="thumbs"><i class="icon-thumbs"></i>赞</a> */}
+                            <a href="javascript:;" class="thumbs" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a>
+                        </div>
+                    </li>
+
+                )
+            })
+        } else if (dataType === "收藏文章") {
+            return data && data.map(item => {
+                let Time = FormatDate.formatTime(item.createDate);
+                return (
+                    <li>
+                        <a href="javascript:;" class="face" onClick={() => this.gotoRouter(`/Qyspace/${item.user.id}`)}>
+                            <img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
+                        </a>
+                        <div class="lx_alt clearfix">
+                            <a href="javascript:;" class="j_name">{item.user.name}</a>
+                            <span>{dataType}</span>
+                            <span class="dot"></span>
+                            <span>{Time}</span>
+                        </div>
+                        <div class="lx_box">
+                            <a class="thumb-img" href="javascript:;"><img src="images/user/u1.png" /></a>
+                            <h1><a href="javascript:;">{item.title}</a></h1>
+                            <p>{Time}</p>
+                        </div>
+                    </li>
+
+                )
+            })
         }
 
     }
@@ -77,58 +123,13 @@ export default class ArticleList extends Component {
 
     render() {
         const { toolList } = this.state;
-        const { className } = this.props;
+        const { className, data } = this.props;
         return (
             <div class={className}>
                 <ul class="lx-article clearfix">
-                    <li>
-                        <a href="javascript:;" class="face">
-                            <img src="images/user/userTx.jpg" />
-                        </a>
-                        <div class="lx_alt clearfix">
-                            <a href="javascript:;" class="j_name">Vinvinvy</a>
-                            <span>评论文章</span>
-                            <span class="dot"></span>
-                            <span>12月07日  20:45</span>
-                        </div>
-                        <div class="lx_box">
-                            <a class="thumb-img" href="javascript:;"><img src="images/user/u1.png" /></a>
-                            <h1><a href="javascript:;">最全案例合集：一个不够酷的品牌该怎样变酷？</a></h1>
-                            <p>2018-06-19 16:09</p>
-                        </div>
-                        <div class="lx_txt">
-                            台湾的行销很少靠所谓的社交媒体 因为很好的内容就会引发受众的转发 即使是最传统TVC 也能触动人心。
-                            </div>
-                        <div class="lx-bar f-right">
-                            <a href="javascript:;" class="reply" data-el="lx-reply"><i class="icon-reply"></i>回复</a>
-                            <a href="javascript:;" class="thumbs"><i class="icon-thumbs"></i>赞</a>
-                        </div>
-                    </li>
-                    <li>
-                        <a href="javascript:;" class="face">
-                            <img src="images/user/userTx.jpg" />
-                        </a>
-                        <div class="lx_alt clearfix">
-                            <a href="javascript:;" class="j_name">Vinvinvy</a>
-                            <span>评论文章</span>
-                            <span class="dot"></span>
-                            <span>12月07日  20:45</span>
-                        </div>
-                        <div class="lx_box">
-                            <a class="thumb-img" href="javascript:;"><img src="images/user/u1.png" /></a>
-                            <h1><a href="javascript:;">最全案例合集：一个不够酷的品牌该怎样变酷？》</a></h1>
-                            <p>2018-06-19 16:09</p>
-                        </div>
-                        <div class="lx_txt">
-                            台湾的行销很少靠所谓的社交媒体 因为很好的内容就会引发受众的转发 即使是最传统TVC 也能触动人心。
-                            </div>
-                        <div class="lx-bar f-right">
-                            <a href="javascript:;" class="reply" data-el="lx-reply"><i class="icon-reply"></i>回复</a>
-                            <a href="javascript:;" class="thumbs active"><i class="icon-thumbs"></i>已赞</a>
-                        </div>
-                    </li>
+                    {this.createList()}
                 </ul>
-                <div class="more-b">
+                <div class="more-b" style={{ display: data.list && data.list.length < 20 ? 'none' : 'block' }}>
                     <a href="javascript:;">更多动态</a>
                 </div>
             </div>

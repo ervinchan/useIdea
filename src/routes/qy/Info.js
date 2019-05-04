@@ -9,7 +9,7 @@ import Utils from '../../static/js/utils/utils.js'
 import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
 import QyHead from './qyHead'
-import { POST } from '../../service/service'
+import Service from '../../service/api.js'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
 import 'swiper/dist/css/swiper.min.css'
@@ -18,7 +18,7 @@ import 'antd/lib/pagination/style/index.css';
 import '../../static/less/u.myaccount.less'
 
 const PAGESIZE = 3;
-
+const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
 export default class QyInfo extends Component {
 
     constructor(props) {
@@ -29,7 +29,29 @@ export default class QyInfo extends Component {
             province: null,
             toolList: [],
             fileList: [],
-            coverImgs: []
+            coverImgs: [],
+            officeEnvi: [],
+            imageUrl: [],
+            userPhoto: [],
+            weiXinCode: [],
+            info: {
+                name: "", sex: "", provence: "", city: "", district: "", infomation: "", officeLink: "", subscription: "", douBan: "", zhiHu: "", weiBo: "", email: "", mobile: "", password: "", newPassword: "", teamSize: ""
+            },
+            media: {
+                weiboInput: false,
+                doubanInput: false,
+                zhihuInput: false
+            },
+            teamSize: [
+                { name: "1-10人" },
+                { name: "20-30人" },
+                { name: "30-50人" },
+                { name: "50-70人" },
+                { name: "70-100人" },
+                { name: "100人以上" }
+            ],
+            teamsizeItem: "",
+            pswConfirmError: false
         };
     }
 
@@ -117,44 +139,66 @@ export default class QyInfo extends Component {
                 }
             }
         });
-        this.getArticleInfo("7a8bbb7d262142cbb7ae5bf884935e81")
+        this.getUserInfoDetail(userInfo && userInfo.id)
         this.getRegionDatas()
     }
-
-    getArticleInfo = (categoryId) => {
-        let url = '/zsl/a/cms/article/getAllArticle?'
-        let opts = {
-            hits: 1,
-            categoryId: categoryId || ''
-        }
-        for (var key in opts) {
-            opts[key] && (url += "&" + key + "=" + opts[key])
-        }
-        axios.post(url, opts)
+    getUserInfoDetail = (userId) => {
+        Service.getQyInfoDetail({
+            userId: userId
+        })
             .then((response) => {
-                if (categoryId) {
-                    let toolList = response.data.data
-                    this.setState({ toolList })
-                } else {
-                    let hotBooks = response.data.data
-                    this.setState({ hotBooks }, () => {
-                        var swiper_read = new Swiper('.m-read-fade .swiper-container', {
-                            effect: 'fade',
-                            pagination: {
-                                el: '.m-read-fade .u-pagination',
-                                bulletclassName: 'bull',
-                                bulletActiveclassName: 'active',
-                                clickable: true
-                            }
-                        });
-                    })
-                }
-
+                let userInfoDetail = response.data.data;
+                Object.assign(userInfo, userInfoDetail);
+                this.setState({ info: userInfo });
             })
             .catch((error) => {
                 console.log(error)
             })
     }
+    submitUserInfo = () => {
+        const { info, userPhoto, weiXinCode, teamsizeItem, province, cityItem, districtItem, pswConfirmError, officeEnvi } = this.state;
+        this.setState({ pswConfirmError: false })
+        if (info.newPassword !== info.confirmPassword) {
+            return this.setState({ pswConfirmError: true })
+        }
+        /*global layer */
+        var oMyForm = new FormData();
+        oMyForm.append("name", userInfo.name);
+        oMyForm.append("provence", province.name);
+        oMyForm.append('city', cityItem.name);
+        oMyForm.append('district', districtItem.name);
+        oMyForm.append("subscription", info.subscription);
+        oMyForm.append('teamSize', teamsizeItem.name);
+        oMyForm.append("douBan", info.douBan);
+        oMyForm.append('zhiHu', info.zhiHu);
+        oMyForm.append("weiBo", info.weiBo);
+        oMyForm.append('email', info.email);
+        oMyForm.append('mobile', info.mobile);
+        oMyForm.append('officeLink', info.officeLink);
+        oMyForm.append('password', info.password);
+        oMyForm.append('newPassword', info.newPassword);
+        oMyForm.append('userId', userInfo.id);
+        userPhoto.forEach((file) => {
+            oMyForm.append('headImage', file);
+        });
+        oMyForm.append('weChatCode', weiXinCode);
+        oMyForm.append('file1', officeEnvi[0]);
+        oMyForm.append('file2', officeEnvi[1]);
+        oMyForm.append('file3', officeEnvi[2]);
+        Service.updateInformation({
+            form: oMyForm
+        }).then((response) => {
+            if (response.data.status === 1) {
+                layer.msg("更新成功")
+            } else {
+                layer.msg(response.data.message)
+            }
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+
 
     createToolList = () => {
         const { toolList } = this.state
@@ -177,15 +221,7 @@ export default class QyInfo extends Component {
     }
 
     getRegionDatas = () => {
-        const { } = this.state;
-        let url = '/zsl/getArea?'
-        let opts = {
-
-        }
-        for (var key in opts) {
-            opts[key] && (url += "&" + key + "=" + opts[key])
-        }
-        axios.post(url, opts)
+        Service.getArea()
             .then((response) => {
                 if (response.data.status === 1) {
                     let regionDatas = response.data.data
@@ -230,49 +266,97 @@ export default class QyInfo extends Component {
     onSelectedDistrict = (item) => {
         this.setState({ districtItem: item })
     }
+    createTeamSize = () => {
+        const { teamSize } = this.state;
+        return teamSize && teamSize.map((item) => {
+            return <li onClick={() => this.onSelectedDistrict(item)}>{item.name}</li>
+        })
+    }
+    onSelectedTeamSize = (item) => {
+        this.setState({ teamsizeItem: item })
+    }
 
-    setImg = (e, file, reader) => {
-        // 图片base64化
-        let newUrl = reader.result;
+    setImg = (file, newUrl) => {
+        /** global layer */
+        const { imageUrl } = this.state
+        if (imageUrl.length >= 3) {
+            return layer.msg("最多上传3张")
+        }
         this.setState(state => ({
-            fileList: [...state.fileList, file],
-            coverImgs: newUrl
-        }));
+            officeEnvi: [...state.officeEnvi, file],
+            imageUrl: [...state.imageUrl, newUrl]
+        }), () => {
+
+            // $(".upload-avatar").find("input[type=file]").css({
+            //     position: "absolute",
+            //     left: 0,
+            //     top: 0,
+            //     width: "100%",
+            //     height: "100%",
+            //     opacity: 0,
+            //     zIndex: 1,
+            //     display: "block"
+            // })
+
+        });
     };
 
-    setUploadPorps = (handleImg) => {
-        const { fileList } = this.state;
-        return {
-            onRemove: (file) => {
-                this.setState((state) => {
-                    const index = state.fileList.indexOf(file);
-                    const newFileList = state.fileList.slice();
-                    newFileList.splice(index, 1);
-                    return {
-                        fileList: newFileList,
-                    };
-                });
-            },
-            beforeUpload: (file) => {
+    setUploadPorps = (files, handleImg) => {
+        return Utils.uploadProps(files, (file, newUrl) => {
+            handleImg(file, newUrl)
+        }, this);
+    }
 
-                var reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = (e) => handleImg(e, file, reader)
+    removeOfficeEnvi = (file, index) => {
+        this.refs.officeEnvi.props.onRemove(file);
+        this.state.imageUrl.splice(index, 1)
+        console.log(this.refs.officeEnvi)
+    }
 
-                return false;
-            },
-            fileList,
-            showUploadList: false
-        }
+    setWeChatCode = (file, newUrl) => {
+        this.setState(state => ({
+            weiXinCode: file
+        }))
+    }
+
+    setUserPhoto = (file, newUrl) => {
+        this.setState(state => ({
+            userPhoto: [...state.userPhoto, file],
+            userImg: newUrl
+        }), () => {
+            $(".avatar-uploader").find("input[type=file]").css({
+                position: "absolute",
+                left: 0,
+                top: 0,
+                width: "100%",
+                height: "100%",
+                opacity: 0,
+                zIndex: 1,
+                display: "block"
+            })
+
+        })
+    }
+
+    changeInfo = (e, field) => {
+        const { info } = this.state;
+        info[field] = e.target.value
+        this.setState({ info: info })
+    }
+
+    changeBindUrl = (input) => {
+        const { media } = this.state;
+        media[input] = !media[input];
+        this.setState({ media: media })
     }
 
     render() {
-        const { province, cityItem, districtItem, } = this.state;
+        const { province, cityItem, districtItem, info, officeEnvi, imageUrl, media, weiXinCode, teamsizeItem, pswConfirmError, userPhoto, userImg } = this.state;
 
         return (
             <div className="">
                 <Header />
-                < QyHead />
+                < QyHead info={info} setUserPhoto={this.setUserPhoto} userPhoto={userPhoto} userImg={userImg} history={this.props.history} />
                 <div className="wrapper g-myaccount">
                     <div className="g-left">
                         <ul className="ac-menu">
@@ -291,8 +375,8 @@ export default class QyInfo extends Component {
                                 <div className="u-inline">
                                     <label className="u-form-label">用户昵称</label>
                                     <div className="ac-form-label">
-                                        网易云音乐
-                        </div>
+                                        {userInfo && userInfo.name}
+                                    </div>
                                 </div>
                                 <div className="u-inline">
                                     <label className="u-form-label">办公地点</label>
@@ -334,16 +418,11 @@ export default class QyInfo extends Component {
                                     <ul className="select-group clearfix">
                                         <li>
                                             <div className="u-select">
-                                                <div className="in_province1" role="note">1-10人</div>
+                                                <div className="in_province1" role="note">{teamsizeItem && teamsizeItem.name}</div>
                                                 <div data-for=".in_province1" role="menu">
                                                     <ul>
-                                                        <li>1-10人</li>
-                                                        <li>10-20人</li>
-                                                        <li>20-30人</li>
-                                                        <li>30-50人</li>
-                                                        <li>50-70人</li>
-                                                        <li>70-100人</li>
-                                                        <li>100人以上</li>
+                                                        {this.createTeamSize()}
+
                                                     </ul>
                                                 </div>
                                             </div>
@@ -353,7 +432,7 @@ export default class QyInfo extends Component {
                                 <div className="u-inline">
                                     <label className="u-form-label">官网</label>
                                     <div className="u-form-input">
-                                        <input type="text" className="u-input" name="input1" placeholder="官网选填" />
+                                        <input type="text" className="u-input" name="input1" placeholder="官网选填" value={info.officeLink} onChange={(e) => this.changeInfo(e, 'officeLink')} />
                                     </div>
                                 </div>
                             </div>
@@ -363,22 +442,24 @@ export default class QyInfo extends Component {
                             <div className="u-row">
                                 <ul className="ac-envi clearfix">
                                     <li>
-                                        <img src="css/images/1x1.png" />
-                                        <i className="fa-close"></i>
+                                        <img src={imageUrl && imageUrl[0]} />
+                                        <i className="fa-close" onClick={() => this.removeOfficeEnvi(officeEnvi[0], 0)}></i>
                                     </li>
                                     <li>
-                                        <img src="css/images/1x1.png" />
-                                        <i className="fa-close"></i>
+                                        <img src={imageUrl && imageUrl[1]} />
+                                        <i className="fa-close" onClick={() => this.removeOfficeEnvi(officeEnvi[1], 1)}></i>
                                     </li>
                                     <li>
-                                        <img src="css/images/1x1.png" />
-                                        <i className="fa-close"></i>
+                                        <img src={imageUrl && imageUrl[2]} />
+                                        <i className="fa-close" onClick={() => this.removeOfficeEnvi(officeEnvi[2], 2)}></i>
                                     </li>
                                     <li>
                                         <Upload
                                             name="avatar"
                                             className="avatar-uploader"
-                                            {...this.setUploadPorps(this.setImg)}
+                                            multiple
+                                            ref="officeEnvi"
+                                            {...this.setUploadPorps(officeEnvi, this.setImg)}
                                         >
                                             <a href="javascript:;">+ 添加图片</a>
                                         </Upload>
@@ -391,14 +472,14 @@ export default class QyInfo extends Component {
                             <div className="u-inline">
                                 <label className="u-form-label">登录邮箱</label>
                                 <div className="u-form-input width-250">
-                                    <input type="text" className="u-input" placeholder="ideazhu@gmail.com" />
+                                    <input type="text" className="u-input" placeholder="ideazhu@gmail.com" value={info.email} onChange={(e) => this.changeInfo(e, 'email')} />
                                 </div>
                                 <a href="javascript:;" className="ac-btn1">更换邮箱</a>
                             </div>
                             <div className="u-inline">
                                 <label className="u-form-label">注册手机</label>
                                 <div className="u-form-input width-250">
-                                    <input type="text" className="u-input" placeholder="暂未绑定手机号" />
+                                    <input type="text" className="u-input" placeholder="暂未绑定手机号" value={info.mobile} onChange={(e) => this.changeInfo(e, 'mobile')} />
                                 </div>
                                 <a href="javascript:;" className="ac-btn1">绑定手机</a>
                             </div>
@@ -416,22 +497,34 @@ export default class QyInfo extends Component {
                             <ul className="clearfix">
                                 <li>
                                     <span className="cimg"><i className="icon-wechat"></i></span>
-                                    <span className="alt">* 请在这里上传你的公众平台二维码</span>
-                                    <span className="cbtn"><a href="javascript:;">上传</a></span>
+                                    <span className="alt">{weiXinCode.name || "* 请在这里上传你的公众平台二维码"}</span>
+                                    <span className="cbtn">
+                                        <Upload
+                                            name="weChatCode"
+                                            className="avatar-uploader"
+                                            {...this.setUploadPorps(weiXinCode, this.setWeChatCode)}
+                                        >
+                                            <a href="javascript:;">上传</a>
+                                        </Upload>
+                                    </span>
                                 </li>
                                 <li>
                                     <span className="cimg"><i className="icon-weibo"></i></span>
-                                    <span className="cbtn"><a href="javascript:;">已绑定</a></span>
+                                    <span className={"alt " + (media.weiboInput ? "hide" : "")}>{info.weibo || "* 请在这里上传你微博首页链接"}</span>
+                                    <input type="text" className={"u-input " + (!media.weiboInput ? "hide" : "show")} placeholder="上传你微博首页链接" value={info.weiBo} onChange={(e) => this.changeInfo(e, 'weiBo')} />
+                                    <span className="cbtn"><a href="javascript:;" onClick={() => this.changeBindUrl("weiboInput")}>{!media.weiboInput ? "点击绑定" : "点击提交"}</a></span>
                                 </li>
                                 <li>
                                     <span className="cimg"><i className="icon-zhihu"></i></span>
-                                    <span className="alt">* 请在这里上传你知乎首页链接</span>
-                                    <input type="text" className="u-input" placeholder="上传你知乎首页链接" />
-                                    <span className="cbtn"><a href="javascript:;" className="elclick"><span>点击绑定</span><b>点击提交</b></a></span>
+                                    <span className={"alt " + (media.zhihuInput ? "hide" : "")}>{info.zhiHu || "* 请在这里上传你知乎首页链接"}</span>
+                                    <input type="text" className={"u-input " + (!media.zhihuInput ? "hide" : "show")} placeholder="上传你知乎首页链接" value={info.zhiHu} onChange={(e) => this.changeInfo(e, 'zhiHu')} />
+                                    <span className="cbtn"><a href="javascript:;" onClick={() => this.changeBindUrl("zhihuInput")}>{!media.zhihuInput ? "点击绑定" : "点击提交"}</a></span>
                                 </li>
                                 <li>
                                     <span className="cimg"><i className="icon-dou"></i></span>
-                                    <span className="cbtn"><a href="javascript:;">点击绑定</a></span>
+                                    <span className={"alt " + (media.doubanInput ? "hide" : "")}>{info.douban || "* 请在这里上传你豆瓣首页链接"}</span>
+                                    <input type="text" className={"u-input " + (!media.doubanInput ? "hide" : "show")} placeholder="上传你豆瓣首页链接" value={info.douBan} onChange={(e) => this.changeInfo(e, 'douBan')} />
+                                    <span className="cbtn"><a href="javascript:;" onClick={() => this.changeBindUrl("doubanInput")}>{!media.doubanInput ? "点击绑定" : "点击提交"}</a></span>
                                 </li>
                             </ul>
                         </div>
@@ -440,27 +533,27 @@ export default class QyInfo extends Component {
                             <div className="u-inline">
                                 <label className="u-form-label">验证密码：</label>
                                 <div className="u-form-input width-250">
-                                    <input type="text" className="u-input" placeholder="当前密码" />
+                                    <input type="password" className="u-input" placeholder="当前密码" value={info.password} onChange={(e) => this.changeInfo(e, 'password')} />
                                 </div>
                             </div>
                             <div className="u-inline">
                                 <label className="u-form-label">新的密码：</label>
                                 <div className="u-form-input width-250">
-                                    <input type="text" className="u-input" placeholder="新密码" />
+                                    <input type="password" className="u-input" placeholder="新密码" value={info.newPassword} onChange={(e) => this.changeInfo(e, 'newPassword')} />
                                 </div>
                                 <div className="u-helptxt">密码由6~16位字母（区分大小写）、数字或符号组成</div>
                             </div>
-                            <div className="u-inline">
+                            <div className={"u-inline " + (pswConfirmError ? "isError" : "")}>
                                 <label className="u-form-label">确认密码：</label>
                                 <div className="u-form-input width-250">
-                                    <input type="text" className="u-input" placeholder="再次输入新密码" />
+                                    <input type="password" className="u-input" placeholder="再次输入新密码" value={info.confirmPassword} onChange={(e) => this.changeInfo(e, 'confirmPassword')} />
                                 </div>
-                                <div className="u-helptxt ac-red">
-                                    * 两次密码不一致，请重新输入
-                    </div>
+                                <div className="u-helptxt">
+                                    <span className={pswConfirmError ? "tipError ac-red" : "hide"}>* 两次密码不一致，请重新输入</span>
+                                </div>
                             </div>
                         </div>
-                        <div className="f-right"><a href="javascript:;" className="ac-submit">确认提交</a></div>
+                        <div className="f-right"><a href="javascript:;" className="ac-submit" onClick={this.submitUserInfo}>确认提交</a></div>
                     </div>
                 </div>
                 <Footer />

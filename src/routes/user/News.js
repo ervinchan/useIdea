@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Menu, Icon, Badge, Tabs, List, Avatar, Divider, Button, Card, Popover } from 'antd';
 import Slider from "react-slick";
 import { StickyContainer, Sticky } from 'react-sticky';
-
+import { } from 'redux'
 import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
 import MyWork from './MyWork.js';
@@ -15,8 +15,8 @@ import Loading from '../../common/Loading/Index'
 import Utils from '../../static/js/utils/utils.js'
 import defaultPhoto from "../../static/images/user/default.png"
 const TabPane = Tabs.TabPane;
-
-export default class UserCenter extends Component {
+const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
+export default class UserNews extends Component {
     /* global $ */
     tabDom = null
     constructor(props) {
@@ -67,7 +67,6 @@ export default class UserCenter extends Component {
     }
 
     render() {
-        const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
         return (
             <div className="">
                 {/* 头部 */}
@@ -76,12 +75,12 @@ export default class UserCenter extends Component {
                     <div className="wrapper">
                         <div className="userTx">
                             <a href="javascript:;">
-                                <img src={userInfo.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
+                                <img src={(userInfo && userInfo.photo) || defaultPhoto} onError={Utils.setDefaultPhoto} />
                                 {/* <p><i className="icon-user-img"></i><span>更新个人头像</span></p> */}
                             </a>
                         </div>
                         <div className="nick-name">
-                            <h1><b>{userInfo.name}</b></h1>
+                            <h1><b>{userInfo && userInfo.name}</b></h1>
                         </div>
                         <div className="nick-data">
                             <p>

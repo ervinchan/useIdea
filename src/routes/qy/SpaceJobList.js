@@ -11,6 +11,7 @@ import Footer from '../../common/footer/Index.js'
 import WheelBanner from '../../common/wheelBanner/Index'
 import HotRead from '../../common/hotRead/Index'
 import { POST } from '../../service/service'
+import Service from '../../service/api.js'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
 import 'swiper/dist/css/swiper.min.css'
@@ -20,8 +21,8 @@ import '../../static/less/question.less'
 
 import defaultPhoto from "../../static/images/user/default.png"
 const PAGESIZE = 3;
-
-export default class MyWork extends Component {
+let userInfo = {}
+export default class SpaceJobList extends Component {
 
     constructor(props) {
         super(props);
@@ -51,121 +52,26 @@ export default class MyWork extends Component {
                 clickable: true
             }
         });
-
-        this.getArticleInfo("7a8bbb7d262142cbb7ae5bf884935e81")
+        let uid = this.props.match.params.uid
+        this.getHitsArticle(uid)
+        this.getUserInfoDetail(uid)
     }
-
-    getArticleInfo = (categoryId) => {
-        let url = '/zsl/a/cms/article/getAllArticle?'
-        let opts = {
-            hits: 1,
-            categoryId: categoryId || ''
-        }
-        for (var key in opts) {
-            opts[key] && (url += "&" + key + "=" + opts[key])
-        }
-        axios.post(url, opts)
+    getUserInfoDetail = (userId) => {
+        Service.getUserInfoDetail({
+            userId: userId
+        })
             .then((response) => {
-                if (categoryId) {
-                    let toolList = response.data.data
-                    this.setState({ toolList })
-                } else {
-                    let hotBooks = response.data.data
-                    this.setState({ hotBooks }, () => {
-                        var swiper_read = new Swiper('.m-read-fade .swiper-container', {
-                            effect: 'fade',
-                            pagination: {
-                                el: '.m-read-fade .u-pagination',
-                                bulletclassName: 'bull',
-                                bulletActiveclassName: 'active',
-                                clickable: true
-                            }
-                        });
-                    })
-                }
-
+                let userInfoDetail = response.data.data;
+                Object.assign(userInfo, userInfoDetail);
             })
             .catch((error) => {
                 console.log(error)
             })
     }
-
-    createToolList = () => {
-        const { toolList } = this.state
-        return toolList && toolList.map((item, index) => {
-            return (
-                <li>
-                    <div className="item">
-                        <a className="thumb-img" href={`/#/Bookstore/Bookbuy/${item.id}`}><img src={item.image} /></a>
-                        <div className="tag">{item.category.name}</div>
-                        <h1><a href={`/#/Bookstore/Bookbuy/${item.id}`}>{item.title}</a></h1>
-                        <div className="alt clearfix">
-                            <a href="#" className="j_name"><img src={item.user.img} className="thumb-img" />{item.user.name}</a>
-                            <span className="dot"></span>
-                            <span>{item.description}</span>
-                        </div>
-                    </div>
-                </li>
-            )
-        })
-    }
-
-    handleFavorite = (index) => {
-        const { readList } = this.state;
-        readList[index].favorite++;
-        this.setState(readList);
-    }
-
-    handleLikes = (index) => {
-        const { readList } = this.state;
-        readList[index].like++;
-        this.setState(readList);
-    }
-
     handlePageChange = (page, pageSize) => {
         console.log(page, pageSize)
         this.setState({ curPage: page })
         this.getBooksList(this.props.match.params.tid, this.state.sortType, page)
-    }
-    handleLike = (item) => {
-        POST({
-            url: "/a/cms/article/like?",
-            opts: {
-                id: item.id
-            }
-        }).then((response) => {
-            global.constants.loading = false
-            if (response.data.status === 1) {
-                item.likeNum++
-                this.setState({})
-            }
-            /* global layer */
-            layer.msg(response.data.message)
-        })
-            .catch((error) => {
-                console.log(error)
-            })
-    }
-    handleCollect = (item) => {
-        POST({
-            url: "/a/artuser/articleCollect/collectArticle?",
-            opts: {
-                userId: 1,
-                articleId: item.id
-            }
-        }).then((response) => {
-            global.constants.loading = false
-            if (response.data.status === 1) {
-                item.collectNum++
-                this.setState({})
-            }
-
-            /* global layer */
-            layer.msg(response.data.message)
-        })
-            .catch((error) => {
-                console.log(error)
-            })
     }
     gotoRouter = (router) => {
         this.props.history.push(router)
@@ -174,8 +80,7 @@ export default class MyWork extends Component {
         const { data } = this.props
         const categorys = global.constants.categorys
         return data && data.map((item, index) => {
-            let Hours = FormatDate.apartHours(item.updateDate)
-            let Time = Hours > 24 ? FormatDate.customFormat(item.updateDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`;
+            let Time = FormatDate.formatTime(item.updateDate)
             let router = ``
             switch (item.category.id) {
                 case categorys[0].id:
@@ -194,7 +99,7 @@ export default class MyWork extends Component {
                 <li>
                     <div class="ue_info">
                         <a href="javascript:;" class="face" onClick={() => this.gotoRouter(`${router}${item.id}`)}>
-                            <img src={item.user.photo  || defaultPhoto} />
+                            <img src={item.user.photo || defaultPhoto} />
                         </a>
                         <div class="alt clearfix">
                             <a href="javascript:;" class="j_name">{item.user.name}</a>
@@ -216,43 +121,85 @@ export default class MyWork extends Component {
         })
     }
 
+    gotoRouter = (router) => {
+        this.props.history.push(router)
+    }
+    getHitsArticle = (uid) => {
+        Service.GetAllArticle({
+            hits: 1,
+            userId: uid
+        }).then((response) => {
+            if (response.data.status === 1) {
+                let hitsArticleList = response.data.data
+                this.setState({ hitsArticleList })
+            }
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+
+    createHitArticle = () => {
+        const { hitsArticleList } = this.state;
+        return hitsArticleList && hitsArticleList.slice(0, 10).map((item, index) => {
+
+            return (
+
+                <li key={index} onClick={() => this.gotoRouter(`/Inspiration/Article/${item.id}`)}>
+                    <a href="javascript:;" className="thumb-img">
+                        <span>{index + 1}</span>
+                        <img src={item.image} />
+                    </a>
+                    <h1><a href="javascript:;">{item.title}</a></h1>
+                </li>
+            )
+        })
+    }
+    createList = () => {
+        const { data } = this.props
+        const categorys = global.constants.categorys
+        return data.list && data.list.map((item, index) => {
+            let Time = FormatDate.formatTime(item.updateDate)
+            let router = ``
+            switch (item.category.id) {
+                case categorys[0].id:
+                    router = `/Question/Article/`
+                    break;
+                case categorys[1].id:
+
+                case categorys[1].id:
+                    router = `/Bookstore/Bookbuy/`
+                    break;
+                default:
+                    router = `/Inspiration/Article/`
+                    break;
+            }
+            return (
+                <li>
+                    <a class="thumb-img" href="javascript:;">
+                        <img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
+                    </a>
+                    <h1><a href="javascript:;" class="j_name">{item.user.name}</a></h1>
+                    <h3>{Time}</h3>
+                    <div class="bar"><a href="javascript:;"><i class="icon-qiye"></i>{item.user.name}</a><span><i class="icon-money"></i>{item.pay}</span></div>
+                    <span class="cost"><i class="icon-address"></i>{item.penvicen}</span>
+                </li>
+            )
+        })
+    }
     render() {
         const { toolList } = this.state;
 
 
         return (
             <div class="wrapper g-space">
-                {/* <div class="ue-tabnav">
-                    <ul class="clearfix">
-                        <li><a href="qy_space_home.html">机构首页</a></li> 
-                        <li><a href="qy_space_article.html">项目文章</a></li>
-                        <li class="active"><a href="qy_space_job.html">最新招聘</a></li>
-                    </ul>
-                </div>            */}
                 <div class="g-left">
                     <div class="m-joblist">
                         <ul class="clearfix">
-                            <li>
-                                <a class="thumb-img" href="javascript:;">
-                                    <img src="images/user/6.jpg" />
-                                </a>
-                                <h1><a href="javascript:;">资深文案 SCW</a></h1>
-                                <h3>2018/11/09</h3>
-                                <div class="bar"><a href="javascript:;"><i class="icon-qiye"></i>网易云音乐</a><span><i class="icon-money"></i>8K-15K</span></div>
-                                <span class="cost"><i class="icon-address"></i>上海 卢湾</span>
-                            </li>
-                            <li>
-                                <a class="thumb-img" href="javascript:;">
-                                    <img src="images/user/6.jpg" />
-                                </a>
-                                <h1><a href="javascript:;">资深文案 SCW</a></h1>
-                                <h3>2018/11/09</h3>
-                                <div class="bar"><a href="javascript:;"><i class="icon-qiye"></i>网易云音乐</a><span><i class="icon-money"></i>8K-15K</span></div>
-                                <span class="cost"><i class="icon-address"></i>上海 卢湾</span>
-                            </li>
+                            {this.createList()}
                         </ul>
                     </div>
-                    <div class="u-pages">
+                    {/* <div class="u-pages">
                         <div class="box clearfix">
                             <a href="javascript:;">Prev</a>
                             <a href="javascript:;"><i class="fa-angle-double-left"></i></a>
@@ -270,28 +217,35 @@ export default class MyWork extends Component {
                             <a href="javascript:;"><i class="fa-angle-double-right"></i></a>
                             <a href="javascript:;">Next</a>
                         </div>
-                    </div>
+                    </div> */}
                     <div class="qy-envi">
                         <h1><b>创作环境</b></h1>
                         <div class="swiper-container">
                             <div class="swiper-wrapper">
-                                <div class="swiper-slide">
-                                    <a href="javascript:;"><img src="images/user/4.jpg" /></a>
-                                </div>
-                                <div class="swiper-slide">
-                                    <a href="javascript:;"><img src="images/user/4.jpg" /></a></div>
-                                <div class="swiper-slide">
-                                    <a href="javascript:;"><img src="images/user/4.jpg" /></a></div>
+                                {
+                                    userInfo.file1 &&
+                                    <div class="swiper-slide">
+                                        <a href="javascript:;"><img src={userInfo.file1} /></a>
+                                    </div>
+                                }
+                                {
+                                    userInfo.file2 &&
+                                    <div class="swiper-slide">
+                                        <a href="javascript:;"><img src={userInfo.file2} /></a></div>
+                                }
+                                {
+                                    userInfo.file3 &&
+                                    <div class="swiper-slide">
+                                        <a href="javascript:;"><img src={userInfo.file3} /></a></div>
+                                }
                             </div>
                         </div>
                         <div class="u-pagination wide"></div>
                     </div>
                     <div class="qy-info">
+                        <p>{userInfo.subscription}</p>
                         <p>
-                            In 1949, three enterprising gentlemen, Bill Bernbach, Ned Doyle and Maxwell Dane gave the advertising industry a wake-up call. In short, they said: Let’s stop talking at people and instead start conversations that lead to action and mutual benefit.</p>
-                        <p><br /></p>
-                        <p>This heritage tells us who we are, what we believe and how we should behave. It inspires us to continually challenge standard convention. From Bill Bernbach to Keith Reinhard to the present generation of DDB leaders.From Bill Bernbach to Keith Reinhard  DDB leaders
-                                <a href="javascript:;">展开</a>
+                            <a href="javascript:;">展开</a>
                         </p>
                     </div>
                 </div>
@@ -299,7 +253,7 @@ export default class MyWork extends Component {
                     <div class="qy-r-team">
                         <div class="qy-title">近期合作机构</div>
                         <ul class="hot-team clearfix">
-                            <li>
+                            {/* <li>
                                 <a href="javascript:;"><img src="css/images/1x1.png" /></a>
                             </li>
                             <li>
@@ -328,72 +282,13 @@ export default class MyWork extends Component {
                             </li>
                             <li>
                                 <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                            </li>
+                            </li> */}
                         </ul>
                     </div>
                     <div class="qy-r-hotart">
                         <div class="qy-title">机构热文排行</div>
                         <ul class="qy-hotart">
-                            <li>
-                                <a href="#" class="thumb-img">
-                                    <span>1</span>
-                                    <img src="images/r1.jpg" />
-                                </a>
-                                <h1><a href="#">天猫拾光之旅：双11十年，都藏在这些彩蛋里了！</a></h1>
-                            </li>
-                            <li>
-                                <a href="#" class="thumb-img">
-                                    <span>2</span>
-                                    <img src="images/r2.jpg" />
-                                </a>
-                                <h1><a href="#">《风味人间》的画面，每一帧都写着馋</a></h1>
-
-                            </li>
-                            <li>
-                                <a href="#" class="thumb-img">
-                                    <span>3</span>
-                                    <img src="css/images/95x65.png" />
-                                </a>
-                                <h1><a href="#">100多年来，广告如何操控你对“颜值”的认知？</a></h1>
-                            </li>
-                            <li>
-                                <a href="#" class="thumb-img">
-                                    <span>4</span>
-                                    <img src="css/images/95x65.png" />
-                                </a>
-                                <h1><a href="#">100多年来，广告如何操控你对“颜值”的认知？</a></h1>
-
-                            </li>
-                            <li>
-                                <a href="#" class="thumb-img">
-                                    <span>5</span>
-                                    <img src="css/images/95x65.png" />
-                                </a>
-                                <h1><a href="#">100多年来，广告如何操控你对“颜值”的认知？</a></h1>
-
-                            </li>
-                            <li>
-                                <a href="#" class="thumb-img">
-                                    <span>6</span>
-                                    <img src="css/images/95x65.png" />
-                                </a>
-                                <h1><a href="#">100多年来，广告如何操控你对“颜值”的认知？</a></h1>
-                            </li>
-                            <li>
-                                <a href="#" class="thumb-img">
-                                    <span>7</span>
-                                    <img src="css/images/95x65.png" />
-                                </a>
-                                <h1><a href="#">100多年来，广告如何操控你对“颜值”的认知？</a></h1>
-
-                            </li>
-                            <li>
-                                <a href="#" class="thumb-img">
-                                    <span>8</span>
-                                    <img src="css/images/95x65.png" />
-                                </a>
-                                <h1><a href="#">100多年来，广告如何操控你对“颜值”的认知？</a></h1>
-                            </li>
+                            {this.createHitArticle()}
                         </ul>
                     </div>
                 </div>

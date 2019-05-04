@@ -87,7 +87,7 @@ export default class Login extends Component {
         }).then((response) => {
             if (response.data.status === 1) {
                 sessionStorage.setItem('userInfo', JSON.stringify(response.data.data))
-                this.props.history.push("/")
+                setTimeout(this.props.history.push("/"), 300)
             } else {
                 layer.msg(response.data.message)
             }

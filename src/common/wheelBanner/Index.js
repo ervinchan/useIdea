@@ -66,7 +66,7 @@ export default class WheelBanner extends Component {
             return (
                 <a key={index} className="swiper-slide" href={item.link}>
                     <img src={item.image} />
-                    <p>{item.title}</p>
+                    <p>{item.name}</p>
                 </a>
             )
         })
@@ -74,13 +74,13 @@ export default class WheelBanner extends Component {
 
     createBannerList = () => {
         const { bannerBList } = this.state
-        let smallBanner = bannerBList.slice(0, 3)
+        let smallBanner = bannerBList.slice(0, 4)
         return smallBanner.map((item, index) => {
             return (
                 <li key={index}>
                     <a href={item.link}>
                         <img src={item.image} />
-                        <p>{item.title}</p>
+                        <p>{item.name}</p>
                     </a>
                 </li>
             )
