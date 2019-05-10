@@ -1,7 +1,5 @@
 
 import React, { Component } from 'react';
-import $ from 'jquery'
-import codeImg from '../../static/images/code.jpg'
 import '../../Constants'
 
 import { Spin } from 'antd';

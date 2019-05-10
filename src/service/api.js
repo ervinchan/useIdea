@@ -314,7 +314,7 @@ class API {
     //验证用户是否存在
     static validateLoginName(data) {
         return POST({
-            url: "/filter/ValidateLoginName?",
+            url: "/filter/ValidateName?",
             opts: data
         })
     }

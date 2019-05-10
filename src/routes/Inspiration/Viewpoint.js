@@ -7,6 +7,9 @@ import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
 import WheelBanner from '../../common/wheelBanner/Index'
 import HotRead from '../../common/hotRead/Index'
+import Collect from '../../common/collect'
+import Like from '../../common/like'
+import Comment from '../../common/comment'
 import Service from '../../service/api.js'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
@@ -137,7 +140,11 @@ export default class Viewpoint extends Component {
                         <div class="txt">{item.description}</div>
                         <div class="bar">
                             <span>{item.user.name}</span><span class="dot"></span><span>{Time}</span>
-                            <div class="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{item.commentNum}</span></a></div>
+                            <div class="f-bartool clearfix">
+                                <Collect item={item} />
+                                <Like item={item} />
+                                <Comment item={item} />
+                            </div>
 
                         </div>
                     </div>
@@ -156,7 +163,11 @@ export default class Viewpoint extends Component {
                                 <img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
                             </a>
                             <span class="name">{item.user.name}</span>
-                            <div class="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{item.commentNum}</span></a></div>
+                            <div class="f-bartool clearfix">
+                                <Collect item={item} />
+                                <Like item={item} />
+                                <Comment item={item} />
+                            </div>
 
                         </div>
                     </div>
@@ -196,12 +207,16 @@ export default class Viewpoint extends Component {
         return recommendList.list && recommendList.list.map((item, index) => {
             return (
                 <li key={index}>
-                    <a className="thumb-img" href="javascript:;">
+                    <a className="thumb-img" href={`/#/Inspiration/Article/${item.id}`}>
                         <img src={item.image} />
                         <span>{item.category.name}</span>
                     </a>
-                    <h1><a href="#">{item.description}</a></h1>
-                    <div className="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{item.commentNum}</span></a></div>
+                    <h1><a href={`/#/Inspiration/Article/${item.id}`}>{item.description}</a></h1>
+                    <div className="f-bartool clearfix">
+                        <Collect item={item} />
+                        <Like item={item} />
+                        <Comment item={item} />
+                    </div>
 
                 </li>
             )

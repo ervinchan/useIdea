@@ -18,6 +18,7 @@ import Loading from '../../common/Loading/Index'
 import defaultPhoto from "../../static/images/user/default.png"
 import MyWork from './MyWork.js';
 import MyHeart from './MyHeart.js';
+import News from './newMessage.js'
 const TabPane = Tabs.TabPane;
 
 const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
@@ -171,20 +172,20 @@ export default class UserCenter extends Component {
                         <a href="javascript:;" className="add_upload" onClick={() => this.gotoRouter(`/ArticleEditor`)}>发表作品/经验</a>
                     </div>
                 </div>
-                <div class="wrapper g-icenter minpage">
-                    <div class="uc-tabnav">
-                        {/* <ul class="clearfix">
-                            <li><a href="u_mylaixin.html">来信中心<i class="badge">99+</i> </a></li>
-                            <li class="active"><a href="u_mywork.html">我的作品</a></li>
+                <div className="wrapper g-icenter minpage">
+                    <div className="uc-tabnav">
+                        {/* <ul className="clearfix">
+                            <li><a href="u_mylaixin.html">来信中心<i className="badge">99+</i> </a></li>
+                            <li className="active"><a href="u_mywork.html">我的作品</a></li>
                             <li><a href="u_myheart.html">我的心选</a></li>
                             
                         </ul> */}
                         <Tabs ref={e => this.tabDom = e} className="clearfix" onChange={this.handleTabChange}>
-                            <TabPane tab={["来信中心", <i className="badge">{userInfo.attentionNum}</i>]} key="news" className="qj-news"><MyWork /></TabPane>
+                            <TabPane tab={["来信中心", <i className="badge" style={{ display: 'none' }}>99+</i>]} key="news" className="qj-news"><News data={this.state.listData} /></TabPane>
                             <TabPane tab="我的作品" key="reco"><MyWork data={this.state.listData} history={this.props.history} /></TabPane>
                             <TabPane tab="我的心选" key="reply"><MyHeart data={this.state.collectList} history={this.props.history} /></TabPane>
                         </Tabs>
-                        <a href="javascript:;" class="edit" onClick={() => this.gotoRouter(`/InfoUpDate/${userInfo.id}`)}>更新个人资料</a>
+                        <a href="javascript:;" className="edit" onClick={() => this.gotoRouter(`/InfoUpDate/${userInfo.id}`)}>更新个人资料</a>
                     </div>
 
                 </div>

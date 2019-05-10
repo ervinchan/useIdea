@@ -6,6 +6,13 @@ class Validate {
         }
         return false;
     }
+    static checkPhone(str) {
+        var reg = /^1[34578]\d{9}$/;
+        if (reg.test(str)) {
+            return true;
+        }
+        return false;
+    }
 }
 
 export default Validate

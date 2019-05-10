@@ -216,24 +216,24 @@ export default class NewMessage extends Component {
             }
             return (
                 <li>
-                    <div class="ue_info">
-                        <a href="javascript:;" class="face" onClick={() => this.gotoRouter(`${router}${item.id}`)}>
+                    <div className="ue_info">
+                        <a href="javascript:;" className="face" onClick={() => this.gotoRouter(`${router}${item.id}`)}>
                             <img src={item.user.photo || defaultPhoto} />
                         </a>
-                        <div class="alt clearfix">
-                            <a href="javascript:;" class="j_name">{item.user.name}</a>
-                            <span class="dot"></span>
+                        <div className="alt clearfix">
+                            <a href="javascript:;" className="j_name">{item.user.name}</a>
+                            <span className="dot"></span>
                             <span>{Time}</span>
                         </div>
-                        <div class="bat">{item.category.name}</div>
+                        <div className="bat">{item.category.name}</div>
                     </div>
-                    <div class="ue_box">
-                        <a class="thumb-img" href="javascript:;"><img src={item.image} /></a>
+                    <div className="ue_box">
+                        <a className="thumb-img" href="javascript:;"><img src={item.image} /></a>
                         <h1><a href="javascript:;" onClick={() => this.gotoRouter(`${router}${item.id}`)}>{item.title}</a></h1>
-                        <div class="txt nowrap">
+                        <div className="txt nowrap">
                             {item.description}
                         </div>
-                        <div class="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{item.commentNum}</span></a></div>
+                        <div className="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{item.commentNum}</span></a></div>
                     </div>
                 </li>
             )
@@ -245,20 +245,20 @@ export default class NewMessage extends Component {
         fans.map(item => {
             return (
                 <li>
-                    <div class="lx-item">
-                        <a href="javascript:;" class="face">
+                    <div className="lx-item">
+                        <a href="javascript:;" className="face">
                             <img src="images/user/userTx.jpg" />
                         </a>
-                        <h1><a href="javascript:;" class="j_name">Vinvinvy</a></h1>
-                        <div class="lx_txt">
+                        <h1><a href="javascript:;" className="j_name">Vinvinvy</a></h1>
+                        <div className="lx_txt">
                             食一碗人間煙火，品幾杯人生起落~
                     </div>
-                        <div class="lx_alt clearfix">
+                        <div className="lx_alt clearfix">
                             <a href="javascript:;">作品<span>7</span></a>
                             <a href="javascript:;">粉丝<span>136</span></a>
                         </div>
-                        <a href="javascript:;" class="a_follow">关注</a>
-                        <a href="javascript:;" class="a_follow">已关注<span>取消关注</span></a>
+                        <a href="javascript:;" className="a_follow">关注</a>
+                        <a href="javascript:;" className="a_follow">已关注<span>取消关注</span></a>
                     </div>
                 </li>
             )
@@ -272,8 +272,8 @@ export default class NewMessage extends Component {
             return (
                 <li>
                     <h1><a href="javascript:;">{item.title}</a></h1>
-                    <span class="mdate">{Time}</span>
-                    <div class="mbox">
+                    <span className="mdate">{Time}</span>
+                    <div className="mbox">
                         {item.content}<br />
                         帐号：{item.user.name}<br />
                         名称：{item.userName}<br />
@@ -290,8 +290,8 @@ export default class NewMessage extends Component {
         const { newCommentList, collectList, questionList, fans, focus, sysNews } = this.state;
         return (
             <div className="">
-                <div class="ue-minav">
-                    <ul class="u-tabs1 clearfix">
+                <div className="ue-minav">
+                    <ul className="u-tabs1 clearfix">
                         <li tabfor=".tab-discuss" className="active">
                             <a href="javascript:;">新评论</a>
                         </li>
@@ -303,7 +303,7 @@ export default class NewMessage extends Component {
                         </li>
                         <li tabfor=".ue-article"><a href="javascript:;">关注更新<span>{focus.length}</span></a>
                         </li>
-                        <li tabfor=".tab-msg"><a href="javascript:;">站内消息<i class="badge" style={{ display: sysNews.allNews.length ? 'block' : 'none' }}>{sysNews.allNews.length}</i></a>
+                        <li tabfor=".tab-msg"><a href="javascript:;">站内消息<i className="badge" style={{ display: sysNews.allNews.length ? 'block' : 'none' }}>{sysNews.allNews.length}</i></a>
                         </li>
                     </ul>
                 </div>
@@ -311,48 +311,48 @@ export default class NewMessage extends Component {
                     <ArticleList data={newCommentList} dataType="评论文章" className="tab-item tab-discuss active" />
                     <ArticleList data={collectList} dataType="收藏文章" className="tab-item tab-collection" />
                     <ArticleList data={questionList} dataType="请教回应" className="tab-item tab-consult" />
-                    <div class="tab-item tab-fans">
-                        <ul class="lx-fans clearfix">
+                    <div className="tab-item tab-fans">
+                        <ul className="lx-fans clearfix">
                             {this.createFansList()}
                         </ul>
-                        <div class="more-b" style={{ display: fans.length < 20 ? 'none' : 'block' }}>
+                        <div className="more-b" style={{ display: fans.length < 20 ? 'none' : 'block' }}>
                             <a href="javascript:;">更多动态</a>
                         </div>
                     </div>
-                    <ul class="tab-item ue-article clearfix">
+                    <ul className="tab-item ue-article clearfix">
                         {this.createList()}
                     </ul>
-                    <div class="tab-item tab-msg">
-                        <ul class="msg-tab u-tabs1 clearfix">
+                    <div className="tab-item tab-msg">
+                        <ul className="msg-tab u-tabs1 clearfix">
                             <li tabfor=".msg-all" className='active'>全部消息</li>
                             <li tabfor=".msg-sys">系统提醒</li>
                             <li tabfor=".msg-edit">编辑来信</li>
                         </ul>
                         <div className="tab-cont">
-                            <div class="tab-item msg-all active">
-                                <ul class="msg-table clearfix">
+                            <div className="tab-item msg-all active">
+                                <ul className="msg-table clearfix">
                                     {this.createMessage(sysNews.allNews)}
                                 </ul>
-                                <div class="nolist" style={{ display: sysNews.allNews.length ? 'none' : 'block' }}>
-                                    <i class="icon-no-new"></i>
+                                <div className="nolist" style={{ display: sysNews.allNews.length ? 'none' : 'block' }}>
+                                    <i className="icon-no-new"></i>
                                     <span>· 暂无消息 ·</span>
                                 </div>
                             </div>
-                            <div class="tab-item msg-sys">
-                                <ul class="msg-table clearfix">
+                            <div className="tab-item msg-sys">
+                                <ul className="msg-table clearfix">
                                     {this.createMessage(sysNews.sysNews)}
                                 </ul>
-                                <div class="nolist" style={{ display: sysNews.sysNews.length ? 'none' : 'block' }}>
-                                    <i class="icon-no-new"></i>
+                                <div className="nolist" style={{ display: sysNews.sysNews.length ? 'none' : 'block' }}>
+                                    <i className="icon-no-new"></i>
                                     <span>· 暂无系统消息 ·</span>
                                 </div>
                             </div>
-                            <div class="tab-item msg-edit">
-                                <ul class="msg-table clearfix">
+                            <div className="tab-item msg-edit">
+                                <ul className="msg-table clearfix">
                                     {this.createMessage(sysNews.editorNews)}
                                 </ul>
-                                <div class="nolist" style={{ display: sysNews.editorNews.length ? 'none' : 'block' }}>
-                                    <i class="icon-no-new"></i>
+                                <div className="nolist" style={{ display: sysNews.editorNews.length ? 'none' : 'block' }}>
+                                    <i className="icon-no-new"></i>
                                     <span>· 暂无编辑来信 ·</span>
                                 </div>
                             </div>

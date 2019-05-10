@@ -76,10 +76,9 @@ export default class Reg extends Component {
             return layer.msg("请先阅读网站用户协议并同意")
         }
         let params = {
-            userName: regUserName,
             email: regEmail,
             password: regPsw,
-            loginName: regEmail,
+            loginName: regUserName,
             isCompany: "false"
         }
         Service.UserReg(params).then((response) => {

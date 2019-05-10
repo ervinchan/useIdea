@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { Input, Tabs, Pagination } from 'antd';
-import Slider from "react-slick";
-import { StickyContainer, Sticky } from 'react-sticky';
+// import Slider from "react-slick";
+// import { StickyContainer, Sticky } from 'react-sticky';
 import $ from 'jquery'
 import Swiper from 'swiper/dist/js/swiper.min.js'
 import FormatDate from '../../static/js/utils/formatDate.js'
-import Utils from '../../static/js/utils/utils.js'
+// import Utils from '../../static/js/utils/utils.js'
 import Service from '../../service/api.js'
 import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
@@ -17,8 +17,8 @@ import 'antd/lib/pagination/style/index.css';
 import '../../static/less/bookstore.less';
 
 
-const Search = Input.Search;
-const TabPane = Tabs.TabPane;
+// const Search = Input.Search;
+// const TabPane = Tabs.TabPane;
 const PAGESIZE = 20;
 
 export default class Bookstore extends Component {
@@ -49,7 +49,7 @@ export default class Bookstore extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.location.pathname != this.props.location.pathname) {
+        if (nextProps.location.pathname !== this.props.location.pathname) {
             console.log(nextProps)
             this.fetchData(nextProps);
         }
@@ -106,7 +106,7 @@ export default class Bookstore extends Component {
             .then((response) => {
                 let banner = response.data.data
                 this.setState({ banner }, () => {
-                    var swiper_wheel = new Swiper('.u-wheel .swiper-container', {
+                    new Swiper('.u-wheel .swiper-container', {
                         loop: true,
                         effect: 'fade',
                         autoplay: {
@@ -133,7 +133,7 @@ export default class Bookstore extends Component {
         return bigBanner.map((item, index) => {
             return (
                 <a key={index} className="swiper-slide" href={item.link}>
-                    <img src={item.image} />
+                    <img src={item.image} alt={item.title}/>
                     <p>{item.title}</p>
                 </a>
             )
@@ -147,7 +147,7 @@ export default class Bookstore extends Component {
             return (
                 <li key={index}>
                     <a href={item.link}>
-                        <img src={item.image} />
+                        <img src={item.image}  alt={item.title}/>
                         <p>{item.title}</p>
                     </a>
                 </li>
@@ -209,7 +209,7 @@ export default class Bookstore extends Component {
             return (
                 <li key={index}>
                     <div className="swiper-slide">
-                        <a className="thumb-img" href={item.link}><img src={item.image} />
+                        <a className="thumb-img" href={item.link}><img src={item.image}  alt={item.title}/>
                         </a>
                         <h1><a href="#">{item.title}</a></h1>
                         <div className="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleFavorite(index)}><i className="icon-heart"></i><span>{item.favorite}</span></a><a href="javascript:;" onClick={() => this.handleLikes(index)}><i className="icon-thumbs"></i><span>{item.like}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{item.comment}</span></a></div>

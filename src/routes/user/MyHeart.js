@@ -134,24 +134,24 @@ export default class MyHeart extends Component {
             }
             return (
                 <li>
-                    <div class="ue_info">
-                        <a href="javascript:;" class="face" onClick={() => this.gotoRouter(`${router}${item.id}`)}>
+                    <div className="ue_info">
+                        <a href="javascript:;" className="face" onClick={() => this.gotoRouter(`${router}${item.id}`)}>
                             <img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
                         </a>
-                        <div class="alt clearfix">
-                            <a href="javascript:;" class="j_name">{item.user.name}</a>
-                            <span class="dot"></span>
+                        <div className="alt clearfix">
+                            <a href="javascript:;" className="j_name">{item.user.name}</a>
+                            <span className="dot"></span>
                             <span>{Time}</span>
                         </div>
-                        <div class="bat">{item.category.name}</div>
+                        <div className="bat">{item.category.name}</div>
                     </div>
-                    <div class="ue_box">
-                        <a class="thumb-img" href="javascript:;"><img src={item.image} /></a>
+                    <div className="ue_box">
+                        <a className="thumb-img" href="javascript:;"><img src={item.image} /></a>
                         <h1><a href="javascript:;" onClick={() => this.gotoRouter()}>{item.title}</a></h1>
-                        <div class="txt nowrap">
+                        <div className="txt nowrap">
                             {item.description}
                         </div>
-                        <div class="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{item.commentNum}</span></a></div>
+                        <div className="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{item.commentNum}</span></a></div>
                     </div>
                 </li>
             )
@@ -163,55 +163,55 @@ export default class MyHeart extends Component {
 
         return (
             <div className="">
-                <ul class="ue-article clearfix">
+                <ul className="ue-article clearfix">
                     {this.createList()}
                     {/* <li>
-                        <div class="ue_info">
-                            <a href="#" class="face">
+                        <div className="ue_info">
+                            <a href="#" className="face">
                                 <img src="css/images/1x1.png" />
                             </a>
-                            <div class="alt clearfix">
-                                <a href="#" class="j_name">布谷云</a>
-                                <span class="dot"></span>
+                            <div className="alt clearfix">
+                                <a href="#" className="j_name">布谷云</a>
+                                <span className="dot"></span>
                                 <span>12月07日  20:45</span>
                             </div>
-                            <div class="bat">文章栏目</div>
+                            <div className="bat">文章栏目</div>
                         </div>
-                        <div class="ue_box">
-                            <a class="thumb-img" href="javascript:;"><img src="images/space/3.jpg" /></a>
+                        <div className="ue_box">
+                            <a className="thumb-img" href="javascript:;"><img src="images/space/3.jpg" /></a>
                             <h1><a href="#">京东618广告案例最全复盘，销售额1592亿再创新高！</a></h1>
-                            <div class="txt nowrap">
+                            <div className="txt nowrap">
                                 今年618被世界杯的声量压过去了，但依然挡不住年中的消费狂欢。
                             </div>
-                            <div class="f-bartool clearfix"><a href="javascript:;"><i class="icon-heart"></i><span>99</span></a><a href="javascript:;"><i class="icon-thumbs"></i><span>36</span></a><a href="javascript:;"><i class="icon-comment"></i><span>51</span></a></div>
+                            <div className="f-bartool clearfix"><a href="javascript:;"><i className="icon-heart"></i><span>99</span></a><a href="javascript:;"><i className="icon-thumbs"></i><span>36</span></a><a href="javascript:;"><i className="icon-comment"></i><span>51</span></a></div>
                         </div>
                     </li>
                     <li>
-                        <div class="ue_info">
-                            <a href="#" class="face">
+                        <div className="ue_info">
+                            <a href="#" className="face">
                                 <img src="css/images/1x1.png" />
                             </a>
-                            <div class="alt clearfix">
-                                <a href="#" class="j_name">布谷云</a>
-                                <span class="dot"></span>
+                            <div className="alt clearfix">
+                                <a href="#" className="j_name">布谷云</a>
+                                <span className="dot"></span>
                                 <span>12月07日  20:45</span>
                             </div>
-                            <div class="bat">文章栏目</div>
+                            <div className="bat">文章栏目</div>
                         </div>
-                        <div class="ue_box">
-                            <a class="thumb-img" href="javascript:;"><img src="images/space/3.jpg" /></a>
+                        <div className="ue_box">
+                            <a className="thumb-img" href="javascript:;"><img src="images/space/3.jpg" /></a>
                             <h1><a href="#">京东618广告案例最全复盘，销售额1592亿再创新高！</a></h1>
-                            <div class="txt nowrap">
+                            <div className="txt nowrap">
                                 今年618被世界杯的声量压过去了，但依然挡不住年中的消费狂欢。
                             </div>
-                            <div class="f-bartool clearfix"><a href="javascript:;"><i class="icon-heart"></i><span>99</span></a><a href="javascript:;"><i class="icon-thumbs"></i><span>36</span></a><a href="javascript:;"><i class="icon-comment"></i><span>51</span></a></div>
+                            <div className="f-bartool clearfix"><a href="javascript:;"><i className="icon-heart"></i><span>99</span></a><a href="javascript:;"><i className="icon-thumbs"></i><span>36</span></a><a href="javascript:;"><i className="icon-comment"></i><span>51</span></a></div>
                         </div>
                     </li> */}
                 </ul>
-                {/* <div class="u-pages">
-                    <div class="box clearfix">
+                {/* <div className="u-pages">
+                    <div className="box clearfix">
                         <a href="javascript:;">Prev</a>
-                        <a href="javascript:;"><i class="fa-angle-double-left"></i></a>
+                        <a href="javascript:;"><i className="fa-angle-double-left"></i></a>
                         <a href="javascript:;">1</a>
                         <b>2</b>
                         <a href="javascript:;">3</a>
@@ -223,7 +223,7 @@ export default class MyHeart extends Component {
                         <a href="javascript:;">9</a>
                         <a href="javascript:;">10</a>
                         <span>…</span>
-                        <a href="javascript:;"><i class="fa-angle-double-right"></i></a>
+                        <a href="javascript:;"><i className="fa-angle-double-right"></i></a>
                         <a href="javascript:;">Next</a>
                     </div>
                 </div> */}

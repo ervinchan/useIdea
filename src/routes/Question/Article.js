@@ -23,7 +23,9 @@ import defaultPhoto from "../../static/images/user/default.png"
 const PAGESIZE = 3;
 const userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
 export default class QuestionArticle extends Component {
-    editor = new ed('#qeditorContainer')
+    editor = new ed('#qeditorContainer');
+    categoryIds = global.constants.categoryIds['请教']
+    aid = sessionStorage.getItem('aid');
     constructor(props) {
         super(props);
         this.state = {
@@ -41,7 +43,7 @@ export default class QuestionArticle extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        this.getArticleInfo("4812062598ec4b10bedfb38b59ea3e94")
+        this.getArticleInfo()
         this.getSpecialCol()
         this.getQuestionList()
         this.getCommentList()
@@ -82,7 +84,7 @@ export default class QuestionArticle extends Component {
         this.editor.customConfig.onchange = this.setEditorVal
         this.editor.create()
 
-        this.getArticleInfo("4812062598ec4b10bedfb38b59ea3e94")
+        this.getArticleInfo()
         this.getSpecialCol()
         this.getQuestionList()
         this.getCommentList()
@@ -90,7 +92,7 @@ export default class QuestionArticle extends Component {
 
     getBannerA = () => {
         Service.GetADList({
-            categoryId: "4812062598ec4b10bedfb38b59ea3e94",
+            categoryId: this.categoryIds.id,
             id: "588e4f30e9634523b34b5c913bfa4cd2"
         }).then((response) => {
             if (response.data.status === 1) {
@@ -102,32 +104,32 @@ export default class QuestionArticle extends Component {
     createBannerA = () => {
         const { bannerBList } = this.state
         return bannerBList.map((item, index) => {
-            return <a href={item.url} class="seat-x315"><img src={item.image} /></a>
+            return <a href={item.url} className="seat-x315"><img src={item.image} /></a>
         })
     }
     createBannerB = () => {
         const { bannerBList } = this.state
         let bannerList = bannerBList.map((item, index) => {
-            return <a href={item.url} class="swiper-slide seat-x315"><img src={item.image} /></a>
+            return <a href={item.url} className="swiper-slide seat-x315"><img src={item.image} /></a>
         })
         return (
-            <div class="swiper-container">
-                <div class="swiper-wrapper">
+            <div className="swiper-container">
+                <div className="swiper-wrapper">
                     {bannerList}
 
                 </div>
-                <div class="u-pagination wide"></div>
+                <div className="u-pagination wide"></div>
             </div>
         )
     }
     gotoRouter = (router) => {
         this.props.history.push(router)
     }
-    getArticleInfo = (categoryId) => {
+    getArticleInfo = () => {
 
         Service.GetAllArticle({
             id: this.props.match.params.qid,
-            categoryId: "4812062598ec4b10bedfb38b59ea3e94"
+            categoryId: this.categoryIds.id
         }).then((response) => {
             if (response.data.status === 1) {
                 let articleInfo = response.data.data
@@ -136,11 +138,11 @@ export default class QuestionArticle extends Component {
         })
     }
 
-    getCommentList = (categoryId) => {
+    getCommentList = () => {
 
         Service.GetCommentList({
             contentId: this.props.match.params.qid,
-            categoryId: "4812062598ec4b10bedfb38b59ea3e94"
+            categoryId: this.categoryIds.id
         }).then((response) => {
             if (response.data.status === 1) {
                 let commentList = response.data.data
@@ -151,7 +153,7 @@ export default class QuestionArticle extends Component {
 
     getQuestionList = () => {
         Service.GetQuestion({
-            categoryId: "4812062598ec4b10bedfb38b59ea3e94",
+            categoryId: this.categoryIds.id,
             isRecommend: 0,
             CommentNum: 0
         }).then((response) => {
@@ -170,7 +172,7 @@ export default class QuestionArticle extends Component {
         const { questionList } = this.state;
         return questionList.list && questionList.list.slice(0, 10).map((item, index) => {
             return (
-                <li onClick={() => this.gotoRouter(`/Question/Article/${item.id}`)}>
+                <li onClick={() => Utils.gotoRouter(this.props.history, '/Question/Article/', item.id)}>
                     <a href="javascript:;">{item.title}</a><span>{item.commentNum}个回答</span>
                 </li>
             )
@@ -183,30 +185,30 @@ export default class QuestionArticle extends Component {
     //         let Hours = FormatDate.apartHours(item.createDate)
     //         let Time = Hours > 24 ? FormatDate.customFormat(item.createDate, 'yyyy/MM/dd') : `${Hours + 1}小时前`
     //         return (
-    //             <div class="fu_detail hidden" id="item11">
-    //                 <div class="fu_info">
-    //                     <a href="javascript:;" class="face">
+    //             <div className="fu_detail hidden" id="item11">
+    //                 <div className="fu_info">
+    //                     <a href="javascript:;" className="face">
     //                         <img src={item.user.photo  || defaultPhoto} />
     //                     </a>
-    //                     <div class="alt clearfix">
-    //                         <a href="javascript:;" class="j_name">{item.name}</a>
-    //                         <span class="dot"></span>
+    //                     <div className="alt clearfix">
+    //                         <a href="javascript:;" className="j_name">{item.name}</a>
+    //                         <span className="dot"></span>
     //                         <span>{Time}</span>
     //                     </div>
-    //                     <div class="txt">{item.authorDript || '此家伙很懒...'}</div>
+    //                     <div className="txt">{item.authorDript || '此家伙很懒...'}</div>
     //                 </div>
-    //                 <div class="fu_txt clearfix" dangerouslySetInnerHTML={{ __html: item.content }}>
+    //                 <div className="fu_txt clearfix" dangerouslySetInnerHTML={{ __html: item.content }}>
 
     //                 </div>
-    //                 <a href="javascript:;" class="jq-hidden" data-for="#item11"> <i class="fa-angle-up"></i></a>
-    //                 <div class="f-bartool clearfix">
+    //                 <a href="javascript:;" className="jq-hidden" data-for="#item11"> <i className="fa-angle-up"></i></a>
+    //                 <div className="f-bartool clearfix">
     //                     {/* <a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a> */}
     //                     <a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a>
     //                     <a href="javascript:;" onClick={() => this.handleComment(item)}><i className="icon-comment"></i><span>{item.commentNum}</span></a>
-    //                     {/* <a href="javascript:;"><i class="icon-thumbs"></i><span>36</span></a>
-    //                     <a href="javascript:;"><i class="icon-comment"></i><span>51</span></a> */}
-    //                     <a href="javascript:;"><i class="icon-link"></i><span>链接</span></a>
-    //                     <a href="javascript:;" class="tousu" onClick={() => this.handleComplaints(item)}>投诉内容</a>
+    //                     {/* <a href="javascript:;"><i className="icon-thumbs"></i><span>36</span></a>
+    //                     <a href="javascript:;"><i className="icon-comment"></i><span>51</span></a> */}
+    //                     <a href="javascript:;"><i className="icon-link"></i><span>链接</span></a>
+    //                     <a href="javascript:;" className="tousu" onClick={() => this.handleComplaints(item)}>投诉内容</a>
     //                 </div>
     //             </div>
     //         )
@@ -217,30 +219,30 @@ export default class QuestionArticle extends Component {
         return data.list && data.list.map((item, index) => {
             let Time = FormatDate.formatTime(item.createDate)
             return (
-                <div class="fu_detail hidden" id="item11">
-                    <div class="fu_info">
-                        <a href="javascript:;" class="face">
+                <div className="fu_detail hidden" id="item11">
+                    <div className="fu_info">
+                        <a href="javascript:;" className="face">
                             <img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
                         </a>
-                        <div class="alt clearfix">
-                            <a href="javascript:;" class="j_name">{item.name}</a>
-                            <span class="dot"></span>
+                        <div className="alt clearfix">
+                            <a href="javascript:;" className="j_name">{item.name}</a>
+                            <span className="dot"></span>
                             <span>{Time}</span>
                         </div>
-                        <div class="txt">{item.authorDript || '此家伙很懒...'}</div>
+                        <div className="txt">{item.authorDript || '此家伙很懒...'}</div>
                     </div>
-                    <div class="fu_txt clearfix" dangerouslySetInnerHTML={{ __html: item.content }}>
+                    <div className="fu_txt clearfix" dangerouslySetInnerHTML={{ __html: item.content }}>
 
                     </div>
-                    <a href="javascript:;" class="jq-hidden" data-for="#item11"> <i class="fa-angle-up"></i></a>
-                    <div class="f-bartool clearfix">
+                    <a href="javascript:;" className="jq-hidden" data-for="#item11"> <i className="fa-angle-up"></i></a>
+                    <div className="f-bartool clearfix">
                         {/* <a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a> */}
                         <a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a>
                         <a href="javascript:;" /*onClick={() => this.handleReply(item)}*/><i className="icon-comment"></i><span>{item.commentNum}</span></a>
-                        {/* <a href="javascript:;"><i class="icon-thumbs"></i><span>36</span></a>
-                        <a href="javascript:;"><i class="icon-comment"></i><span>51</span></a> */}
-                        <a href="javascript:;"><i class="icon-link"></i><span>链接</span></a>
-                        <a href="javascript:;" class="tousu" onClick={() => this.handleComplaints(item)}>投诉内容</a>
+                        {/* <a href="javascript:;"><i className="icon-thumbs"></i><span>36</span></a>
+                        <a href="javascript:;"><i className="icon-comment"></i><span>51</span></a> */}
+                        <a href="javascript:;"><i className="icon-link"></i><span>链接</span></a>
+                        <a href="javascript:;" className="tousu" onClick={() => this.handleComplaints(item)}>投诉内容</a>
                     </div>
                     {
                         item.childComments &&
@@ -248,7 +250,7 @@ export default class QuestionArticle extends Component {
                             {this.createCommentList(item.childComments)}
                         </div>
                     }
-                    <div class="replyfrom" style={{ display: (item.id === this.state.replyId ? "" : "none") }}><textarea placeholder="我来补充两句。"></textarea><a href="javascript:;" class="thumb"><img src={(userInfo && userInfo.photo) || defaultPhoto} onError={Utils.setDefaultPhoto} /></a><a href="javascript:;" class="artbtn" onClick={() => this.submitComment(item.id)}>留 言</a><a href="javascript:;" class="escbtn" data-el="replyesc">稍后再说</a></div>
+                    <div className="replyfrom" style={{ display: (item.id === this.state.replyId ? "" : "none") }}><textarea placeholder="我来补充两句。"></textarea><a href="javascript:;" className="thumb"><img src={(userInfo && userInfo.photo) || defaultPhoto} onError={Utils.setDefaultPhoto} /></a><a href="javascript:;" className="artbtn" onClick={() => this.submitComment(item.id)}>留 言</a><a href="javascript:;" className="escbtn" data-el="replyesc">稍后再说</a></div>
                 </div>
                 // <div className="disc-item">
                 //     <a href="javascript:;" className="thumb"><img src={item.user.photo  || defaultPhoto} /></a>
@@ -267,7 +269,7 @@ export default class QuestionArticle extends Component {
                 //             {this.createCommentList(item.childComments)}
                 //         </div>
                 //     }
-                //     <div class="replyfrom" style={{ display: (item.id === this.state.replyId ? "" : "none") }}><textarea placeholder="我来补充两句。"></textarea><a href="javascript:;" class="thumb"><img src={userInfo.photo  || defaultPhoto} /></a><a href="javascript:;" class="artbtn" onClick={() => this.submitComment(item.id)}>留 言</a><a href="javascript:;" class="escbtn" data-el="replyesc">稍后再说</a></div>
+                //     <div className="replyfrom" style={{ display: (item.id === this.state.replyId ? "" : "none") }}><textarea placeholder="我来补充两句。"></textarea><a href="javascript:;" className="thumb"><img src={userInfo.photo  || defaultPhoto} /></a><a href="javascript:;" className="artbtn" onClick={() => this.submitComment(item.id)}>留 言</a><a href="javascript:;" className="escbtn" data-el="replyesc">稍后再说</a></div>
                 // </div>
             )
         })
@@ -418,7 +420,7 @@ export default class QuestionArticle extends Component {
         const { articleInfo } = this.state;
         Service.SubmitComment({
             title: articleInfo.title,
-            categoryId: "4812062598ec4b10bedfb38b59ea3e94",
+            categoryId: this.categoryIds.id,
             contentId: this.props.match.params.qid,
             replyId: '',
             name: userInfo && userInfo.id,
@@ -454,28 +456,28 @@ export default class QuestionArticle extends Component {
             <div className="">
                 {/* 头部 */}
                 < Header />
-                <div class="wrapper g-qingjiao2">
-                    <div class="g-left">
-                        <div class="qj-article">
+                <div className="wrapper g-qingjiao2">
+                    <div className="g-left">
+                        <div className="qj-article">
                             <h1>{articleInfo.title}</h1>
-                            <div class="alt clearfix">
-                                <a href="javascript:;" class="j_name"><img src={articleInfo.user && (articleInfo.user.photo || defaultPhoto)} class="thumb-img" />{articleInfo.user && articleInfo.user.name}</a>
+                            <div className="alt clearfix">
+                                <a href="javascript:;" className="j_name"><img src={articleInfo.user && (articleInfo.user.photo || defaultPhoto)} className="thumb-img" />{articleInfo.user && articleInfo.user.name}</a>
                                 <span>▪</span>
                                 <span>{Time}</span>
-                                <a href="javascript:;" class="tag">文案技巧</a>
+                                <a href="javascript:;" className="tag">文案技巧</a>
                             </div>
-                            <div class="txt clearfix">
-                                <img src={articleInfo.image} class="thumb-img" />
-                                <div class="box">
+                            <div className="txt clearfix">
+                                <img src={articleInfo.image} className="thumb-img" />
+                                <div className="box">
                                     <div dangerouslySetInnerHTML={{ __html: articleInfo.articleData && articleInfo.articleData.content }} />
-                                    <a href="javascript:;">显示全部 <i class="fa-angle-down"></i></a>
+                                    <a href="javascript:;">显示全部 <i className="fa-angle-down"></i></a>
                                 </div>
                             </div>
-                            <div class="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(articleInfo)}><i className="icon-heart"></i><span>{articleInfo.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(articleInfo)}><i className="icon-thumbs"></i><span>{articleInfo.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{articleInfo.commentNum}</span></a></div>
+                            <div className="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(articleInfo)}><i className="icon-heart"></i><span>{articleInfo.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(articleInfo)}><i className="icon-thumbs"></i><span>{articleInfo.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{articleInfo.commentNum}</span></a></div>
 
                         </div>
 
-                        <div class="u-editor">
+                        <div className="u-editor">
                             <div id="qeditorContainer" ref="editorElem" />
                             {/* <Editor customConfig={{
                                 // "uploadImgShowBase64": true,
@@ -500,14 +502,14 @@ export default class QuestionArticle extends Component {
                                 ]
                             }} onChange={this.setEditorVal} style={{ height: 325 }} /> */}
                         </div>
-                        <div class="qj-submit">
+                        <div className="qj-submit">
                             <a href="javascript:;" onClick={() => this.submitComment()}>提 交</a>
                         </div>
-                        <div class="u-forum">
-                            <div class="u-title3">
+                        <div className="u-forum">
+                            <div className="u-title3">
                                 <b>{commentList.count || 0}条热心回答</b>
-                                {/* <div class="u-select">
-                                    <div class="in_sort" role="note">热度排行</div>
+                                {/* <div className="u-select">
+                                    <div className="in_sort" role="note">热度排行</div>
                                     <div data-for=".in_sort" role="menu">
                                         <ul>
                                             <li>时间排序</li>
@@ -517,19 +519,19 @@ export default class QuestionArticle extends Component {
                                 </div> */}
                             </div>
                             {this.createCommentList(commentList)}
-                            {/* <div class="fu_detail">
-                                <div class="fu_info">
-                                    <a href="#" class="face">
+                            {/* <div className="fu_detail">
+                                <div className="fu_info">
+                                    <a href="#" className="face">
                                         <img src="css/images/1x1.png" />
                                     </a>
-                                    <div class="alt clearfix">
-                                        <a href="#" class="j_name">AcadeCityLv6</a>
-                                        <span class="dot"></span>
+                                    <div className="alt clearfix">
+                                        <a href="#" className="j_name">AcadeCityLv6</a>
+                                        <span className="dot"></span>
                                         <span>今天 09:32</span>
                                     </div>
-                                    <div class="txt">无业文氓。要想活到99，每天吸猫一大口</div>
+                                    <div className="txt">无业文氓。要想活到99，每天吸猫一大口</div>
                                 </div>
-                                <div class="fu_txt clearfix">
+                                <div className="fu_txt clearfix">
                                     <p>可以理解但是，作为经济学爱好者，我对瓜子二手车平台传递的观念实在不能忍。 瓜子二手车的广告语是这样：车主多卖钱.</p>
                                     <p><br /></p>
                                     <p>买家少花钱，没有中间商赚差价。言下之意，中间商之存在会让买卖双方吃亏。没有中间商赚差价，买卖方都获益。真相是这样吗？当然是胡扯。这种“讲道理的广告”是反经济学的。什么是中间商呢？小贩、中介、经纪、拉皮条的、二道贩子。在许多人的眼中，商品流经他们手里，就要加些价格，卖主少卖，买家多花钱，中间商赚的是盘剥过路的钱。谴责中间商的声音一直都有。中间商损害买卖双方的利益，增加交易成本吗？事实恰恰相反，中间商促进买卖关系，维持交易稳定，减少交易成本的必要环节.</p>
@@ -538,26 +540,26 @@ export default class QuestionArticle extends Component {
                                     <p><br /></p>
                                     <p>没有小商小贩，生产者把商品直接卖给消费者，成本会变得奇高。他们无法经营庞大的销售网络，找不到大量的买家，生产规模也就无法扩大，甚至无法进行。中间商帮他们做到这一点。中间商赚的价差再大，也远远小于他们减少销售成本所创造的价值。</p>
                                 </div>
-                                <div class="f-bartool clearfix">
-                                    <a href="javascript:;"><i class="icon-thumbs"></i><span>36</span></a>
-                                    <a href="javascript:;"><i class="icon-comment"></i><span>51</span></a>
-                                    <a href="javascript:;"><i class="icon-link"></i><span>链接</span></a>
-                                    <a href="javascript:;" class="tousu">投诉内容</a>
+                                <div className="f-bartool clearfix">
+                                    <a href="javascript:;"><i className="icon-thumbs"></i><span>36</span></a>
+                                    <a href="javascript:;"><i className="icon-comment"></i><span>51</span></a>
+                                    <a href="javascript:;"><i className="icon-link"></i><span>链接</span></a>
+                                    <a href="javascript:;" className="tousu">投诉内容</a>
                                 </div>
                             </div>
-                            <div class="fu_detail hidden" id="item11">
-                                <div class="fu_info">
-                                    <a href="#" class="face">
+                            <div className="fu_detail hidden" id="item11">
+                                <div className="fu_info">
+                                    <a href="#" className="face">
                                         <img src="css/images/1x1.png" />
                                     </a>
-                                    <div class="alt clearfix">
-                                        <a href="#" class="j_name">AcadeCityLv6</a>
-                                        <span class="dot"></span>
+                                    <div className="alt clearfix">
+                                        <a href="#" className="j_name">AcadeCityLv6</a>
+                                        <span className="dot"></span>
                                         <span>今天 09:32</span>
                                     </div>
-                                    <div class="txt">无业文氓。要想活到99，每天吸猫一大口</div>
+                                    <div className="txt">无业文氓。要想活到99，每天吸猫一大口</div>
                                 </div>
-                                <div class="fu_txt clearfix">
+                                <div className="fu_txt clearfix">
                                     <p>可以理解但是，作为经济学爱好者，我对瓜子二手车平台传递的观念实在不能忍。</p>
                                     <p>瓜子二手车的广告语是这样：车主多卖钱.</p>
                                     <p>买家少花钱，没有中间商赚差价。言下之意，中间商之存在会让买卖双方吃亏。没有中间商赚差价，买卖方都获益。真相是这样吗？当然是胡扯。这种“讲道理的广告”是反经济学的。什么是中间商呢？小贩、中介、经纪、拉皮条的、二道贩子。在许多人的眼中，商品流经他们手里，就要加些价格，卖主少卖，买家多花钱，中间商赚的是盘剥过路的钱。谴责中间商的声音一直都有。中间商损害买卖双方的利益，增加交易成本吗？事实恰恰相反，中间商促进买卖关系，维持交易稳定，减少交易成本的必要环节.</p>
@@ -570,26 +572,26 @@ export default class QuestionArticle extends Component {
                                     <p>没有小商小贩，生产者把商品直接卖给消费者，成本会变得奇高。他们无法经营庞大的销售网络，找不到大量的买家，生产规模也就无法扩大，甚至无法进行。中间商帮他们做到这一点。中间商赚的价差再大，也远远小于他们减少销售成本所创造的价值。</p>
 
                                 </div>
-                                <a href="javascript:;" class="jq-hidden" data-for="#item11"> <i class="fa-angle-up"></i></a>
-                                <div class="f-bartool clearfix">
-                                    <a href="javascript:;"><i class="icon-thumbs"></i><span>36</span></a>
-                                    <a href="javascript:;"><i class="icon-comment"></i><span>51</span></a>
-                                    <a href="javascript:;"><i class="icon-link"></i><span>链接</span></a>
-                                    <a href="javascript:;" class="tousu">投诉内容</a>
+                                <a href="javascript:;" className="jq-hidden" data-for="#item11"> <i className="fa-angle-up"></i></a>
+                                <div className="f-bartool clearfix">
+                                    <a href="javascript:;"><i className="icon-thumbs"></i><span>36</span></a>
+                                    <a href="javascript:;"><i className="icon-comment"></i><span>51</span></a>
+                                    <a href="javascript:;"><i className="icon-link"></i><span>链接</span></a>
+                                    <a href="javascript:;" className="tousu">投诉内容</a>
                                 </div>
                             </div> */}
 
                         </div>
-                        <a href="javascript:;" class="more-a" onClick={() => this.showAllComment()}>查看剩余答案</a>
+                        <a href="javascript:;" className="more-a" onClick={() => this.showAllComment()}>查看剩余答案</a>
 
                     </div>
-                    <div class="g-right">
+                    <div className="g-right">
                         {this.createBannerA()}
                         {/* {this.createBannerC()} */}
-                        <div class="u-title4">
+                        <div className="u-title4">
                             <b>相关问题</b>
                         </div>
-                        <div class="qj-corre">
+                        <div className="qj-corre">
                             <ul>
                                 {this.createQuestionList()}
                                 {/* <li>
@@ -600,25 +602,25 @@ export default class QuestionArticle extends Component {
                                 </li> */}
                             </ul>
                         </div>
-                        <div class="slide-seat-315">
+                        <div className="slide-seat-315">
                             {this.createBannerB()}
-                            {/* <div class="swiper-container">
-                                <div class="swiper-wrapper">
-                                    <a href="javascript:;" class="swiper-slide seat-x315"><img src="images/d5.jpg" /></a>
-                                    <a href="javascript:;" class="swiper-slide seat-x315"><img src="css/images/315x190.png" /></a>
-                                    <a href="javascript:;" class="swiper-slide seat-x315"><img src="css/images/315x190.png" /></a>
-                                    <a href="javascript:;" class="swiper-slide seat-x315"><img src="css/images/315x190.png" /></a>
+                            {/* <div className="swiper-container">
+                                <div className="swiper-wrapper">
+                                    <a href="javascript:;" className="swiper-slide seat-x315"><img src="images/d5.jpg" /></a>
+                                    <a href="javascript:;" className="swiper-slide seat-x315"><img src="css/images/315x190.png" /></a>
+                                    <a href="javascript:;" className="swiper-slide seat-x315"><img src="css/images/315x190.png" /></a>
+                                    <a href="javascript:;" className="swiper-slide seat-x315"><img src="css/images/315x190.png" /></a>
                                 </div>
-                                <div class="u-pagination wide"></div>
+                                <div className="u-pagination wide"></div>
                             </div> */}
                         </div>
-                        <div class="u-title4">
+                        <div className="u-title4">
                             <b>热门排行</b>
                         </div>
-                        <ul class="hot-article suite active">
+                        <ul className="hot-article suite active">
                             {this.createSpecialCol()}
                             {/* <li>
-                                <a href="#" class="thumb-img">
+                                <a href="#" className="thumb-img">
                                     <span>1</span>
                                     <img src="images/r1.jpg" />
                                 </a>
@@ -626,7 +628,7 @@ export default class QuestionArticle extends Component {
                                 <h3>jrainlau</h3>
                             </li>
                             <li>
-                                <a href="#" class="thumb-img">
+                                <a href="#" className="thumb-img">
                                     <span>2</span>
                                     <img src="images/r2.jpg" />
                                 </a>
@@ -634,18 +636,18 @@ export default class QuestionArticle extends Component {
                                 <h3>jrainlau</h3>
                             </li>
                             <li>
-                                <a href="#" class="thumb-img">
+                                <a href="#" className="thumb-img">
                                     <span>3</span>
                                     <img src="css/images/95x65.png" />
                                 </a>
                                 <h1><a href="#">100多年来，广告如何操控你对“颜值”的认知？</a></h1>
                                 <h3>jrainlau01</h3>
-                                <div class="alt">
+                                <div className="alt">
                                     <img src="css/images/1x1.png" />
                                     <img src="css/images/1x1.png" />
                                     <img src="css/images/1x1.png" />
                                     <img src="css/images/1x1.png" />
-                                    <span class="dot"></span>
+                                    <span className="dot"></span>
                                     <span>473人订阅</span>
                                 </div>
                             </li> */}

@@ -25,6 +25,9 @@ export default class Like extends Component {
             if (response.data.status === 1) {
                 item.likeNum++
                 this.setState({})
+            } else if (response.data.status === 3) {
+                item.likeNum--
+                this.setState({})
             }
             /* global layer */
             layer.msg(response.data.message)

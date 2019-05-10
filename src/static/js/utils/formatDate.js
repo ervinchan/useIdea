@@ -15,7 +15,7 @@ class FormatDate {
             }
             for (var k in o) {
                 if (new RegExp("(" + k + ")").test(fmt)) {
-                    fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+                    fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
                 }
             }
             return fmt;
@@ -26,12 +26,12 @@ class FormatDate {
         let difTime = now.getTime() - new Date(date).getTime();   //时间差的毫秒数 
 
         //计算出相差天数 Math.floor(difTime / (24 * 3600 * 1000))
-        let days = Math.floor(difTime / (24 * 3600 * 1000))
+        //let days = Math.floor(difTime / (24 * 3600 * 1000))
 
         //计算出小时数 Math.floor(difTime / (3600 * 1000))
         //计算出分钟数 Math.floor(difTime / (60 * 1000))
         let minute = Math.floor(difTime / (60 * 1000))
-        let leave1 = difTime % (24 * 3600 * 1000)    //计算天数后剩余的毫秒数
+        //let leave1 = difTime % (24 * 3600 * 1000)    //计算天数后剩余的毫秒数
         // if (24 * 60 < minute > 60) {
         //     return Math.floor(difTime / (3600 * 1000))
         // } else if (minute > 24 * 60) {
@@ -50,12 +50,12 @@ class FormatDate {
         let difTime = now.getTime() - new Date(date).getTime();   //时间差的毫秒数 
 
         //计算出相差天数 Math.floor(difTime / (24 * 3600 * 1000))
-        let days = Math.floor(difTime / (24 * 3600 * 1000))
+        //let days = Math.floor(difTime / (24 * 3600 * 1000))
 
         //计算出小时数 Math.floor(difTime / (3600 * 1000))
         //计算出分钟数 Math.floor(difTime / (60 * 1000))
-        let minute = Math.floor(difTime / (60 * 1000))
-        let leave1 = difTime % (24 * 3600 * 1000)    //计算天数后剩余的毫秒数
+        //let minute = Math.floor(difTime / (60 * 1000))
+        //let leave1 = difTime % (24 * 3600 * 1000)    //计算天数后剩余的毫秒数
         // if (24 * 60 < minute > 60) {
         //     return Math.floor(difTime / (3600 * 1000))
         // } else if (minute > 24 * 60) {

@@ -7,6 +7,7 @@ import Utils from '../../static/js/utils/utils.js'
 import Service from '../../service/api.js'
 import LOGO from "../../static/images/m-logo.png"
 import defaultPhoto from "../../static/images/user/default.png"
+import fixpng from '../../static/images/1x1.png'
 let userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
 export default class Header extends Component {
 
@@ -168,10 +169,10 @@ export default class Header extends Component {
     loopChildren = (parent, items) => {
         let Lis = items.map((item, index) => {
             let url = item.url.split("#")[1];
-            return <li ><i className="fa-angle-right"></i><Link to={{
+            return <li ><i className="fa-angle-right"></i><NavLink to={{
                 pathname: `/${url}`,
                 state: { navId: item.id }
-            }} activeClassName="active" id={item.id}>{item.name}</Link></li>
+            }} activeClassName="active" id={item.id}>{item.name}</NavLink></li>
         })
         return Lis
     }
@@ -246,9 +247,13 @@ export default class Header extends Component {
                                 <h1><a href="/#/Login">未登录</a></h1>
                                 <h3><a href="/#/Reg">新用户请先注册</a></h3>
                             </div>
-                            <div className="inlet clearfix">
+                            {/* <div className="inlet clearfix">
                                 <a href="/#/Login"><Icon type="solution" style={{ fontSize: '26px' }} />个人登录</a>
                                 <a href="/#/LoginQy"><Icon type="reconciliation" style={{ fontSize: '26px' }} />企业登录</a>
+                            </div> */}
+                            <div className="inlet clearfix">
+                                <a href="/#/Login"><img src={fixpng} className="icon-gr" />个人登录</a>
+                                <a href="/#/LoginQy"><img src={fixpng} className="icon-qy" />企业登录</a>
                             </div>
                         </div>
                         {

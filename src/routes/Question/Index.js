@@ -23,7 +23,8 @@ import defaultPhoto from "../../static/images/user/default.png"
 const TabPane = Tabs.TabPane;
 
 export default class Question extends Component {
-    tabDom = null
+    tabDom = null;
+    categoryIds = global.constants.categoryIds['请教'];
     constructor(props) {
         super(props);
         this.state = {
@@ -106,7 +107,7 @@ export default class Question extends Component {
 
     getBannerA = () => {
         Service.GetADList({
-            categoryId: "4812062598ec4b10bedfb38b59ea3e94",
+            categoryId: this.categoryIds.id,
             id: "588e4f30e9634523b34b5c913bfa4cd2"
         }).then((response) => {
             if (response.data.status === 1) {
@@ -123,7 +124,7 @@ export default class Question extends Component {
         //     }
         // })
         Service.GetADList({
-            categoryId: "4812062598ec4b10bedfb38b59ea3e94",
+            categoryId: this.categoryIds.id,
             id: "b3653c6c1da841569e04ccccd5c0a776"
         }).then((response) => {
             if (response.data.status === 1) {
@@ -161,7 +162,7 @@ export default class Question extends Component {
         Service.GetQuestion({
             pageNo: pageNo || 1,
             pageSize: global.constants.PAGESIZE,
-            categoryId: "4812062598ec4b10bedfb38b59ea3e94"
+            categoryId: this.categoryIds.id
         }).then((response) => {
             if (response.data.status === 1) {
                 global.constants.loading = false
@@ -176,7 +177,7 @@ export default class Question extends Component {
     getRecoList = () => {
         Service.GetQuestion({
             isRecommend: 1,
-            categoryId: "4812062598ec4b10bedfb38b59ea3e94"
+            categoryId: this.categoryIds.id
         }).then((response) => {
             if (response.data.status === 1) {
                 let recoList = response.data.data
@@ -190,7 +191,7 @@ export default class Question extends Component {
     getReplyList = () => {
         Service.GetQuestion({
             parentContentId: 1,
-            categoryId: "4812062598ec4b10bedfb38b59ea3e94"
+            categoryId: this.categoryIds.id
         }).then((response) => {
             if (response.data.status === 1) {
                 let replyList = response.data.data
@@ -277,7 +278,7 @@ export default class Question extends Component {
         const { questionTit, questionTxt, fileList, addCategoryId, userInfo } = this.state;
         var oMyForm = new FormData();
         oMyForm.append("userId", userInfo && userInfo.id);
-        oMyForm.append("categoryId", "4812062598ec4b10bedfb38b59ea3e94");
+        oMyForm.append("categoryId", this.categoryIds.id);
         oMyForm.append("classifying", addCategoryId);
         oMyForm.append("title", questionTit);
         oMyForm.append("content", questionTxt);
@@ -317,7 +318,7 @@ export default class Question extends Component {
         const { searchTxt } = this.state;
         Service.GetAllArticle({
             title: searchTxt || this.props.match.params.txt,
-            categoryId: "4812062598ec4b10bedfb38b59ea3e94"
+            categoryId: this.categoryIds.id
         }).then((response) => {
             /*global layer */
             global.constants.loading = false

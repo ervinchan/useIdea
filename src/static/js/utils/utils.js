@@ -65,8 +65,10 @@ class Utils {
     static setDefaultPhoto(e) {
         e.target.src = defaultPhoto
     }
-    static gotoRouter(router, params, history) {
-        history.push({ pathname: router, state: params })
+    static gotoRouter(history, router, params) {
+        // history.push({ pathname: router, state: params })
+        sessionStorage.setItem("aid", params);
+        history.push({ pathname: router, state: { 'aid': params } })
     }
 }
 

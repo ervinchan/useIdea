@@ -3,7 +3,6 @@ import 'core-js/es6/set';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Spin } from 'antd';
 import { HashRouter as Router, Route, Switch, Redirect } from 'react-router-dom'
 import Loadable from 'react-loadable';
 import Loading from './common/Loading/Index'
@@ -146,18 +145,18 @@ const RegFinish = Loadable({
     loading: Loading,
 });
 
-const newMessage = Loadable({
-    loader: () => import('./routes/User/newMessage'),
-    loading: Loading,
-});
-const QyWork = Loadable({
-    loader: () => import('./routes/qy/Work'),
-    loading: Loading,
-});
-const QyJob = Loadable({
-    loader: () => import('./routes/qy/Job'),
-    loading: Loading,
-});
+// const newMessage = Loadable({
+//     loader: () => import('./routes/User/newMessage'),
+//     loading: Loading,
+// });
+// const QyWork = Loadable({
+//     loader: () => import('./routes/qy/Work'),
+//     loading: Loading,
+// });
+// const QyJob = Loadable({
+//     loader: () => import('./routes/qy/Job'),
+//     loading: Loading,
+// });
 const QyInfo = Loadable({
     loader: () => import('./routes/qy/Info'),
     loading: Loading,
@@ -178,14 +177,14 @@ const Qyspace = Loadable({
     loader: () => import('./routes/qy/Space'),
     loading: Loading,
 });
-const QyspaceArticle = Loadable({
-    loader: () => import('./routes/qy/SpaceArticle'),
-    loading: Loading,
-});
-const QyspaceJobList = Loadable({
-    loader: () => import('./routes/qy/SpaceJobList'),
-    loading: Loading,
-});
+// const QyspaceArticle = Loadable({
+//     loader: () => import('./routes/qy/SpaceArticle'),
+//     loading: Loading,
+// });
+// const QyspaceJobList = Loadable({
+//     loader: () => import('./routes/qy/SpaceJobList'),
+//     loading: Loading,
+// });
 const QyspaceJobInfo = Loadable({
     loader: () => import('./routes/qy/SpaceJobInfo'),
     loading: Loading,
@@ -198,7 +197,7 @@ const App = () => (
             <Redirect from='/refresh' to='/' />
             <Route exact path="/" breadcrumbName="首页" component={Home} />
             <Route exact path="/Question/:txt?" breadcrumbName="请教" component={Question} />
-            <Route exact path="/Question/Article/:qid?" breadcrumbName="请教" component={QuestionArticle} />
+            <Route exact path="/Question/Article/:aid?" breadcrumbName="请教" component={QuestionArticle} />
             <Route exact path="/Bookstore" breadcrumbName="蜗牛翻书" component={Bookstore} />
             <Route exact path="/Bookstore/NewBooks/:tid?" breadcrumbName="书单上新" component={Bookstore} />
             <Route exact path="/Bookstore/Bookbuy/:id" breadcrumbName="书单详情" component={Bookbuy} />

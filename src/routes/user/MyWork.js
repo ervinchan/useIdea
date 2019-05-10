@@ -9,8 +9,10 @@ import '../../Constants'
 import Loading from '../../common/Loading/Index'
 import 'swiper/dist/css/swiper.min.css'
 import Utils from '../../static/js/utils/utils.js'
+import Collect from '../../common/collect'
+import Like from '../../common/like'
+import Comment from '../../common/comment'
 import 'antd/lib/pagination/style/index.css';
-import '../../static/less/question.less'
 
 import defaultPhoto from "../../static/images/user/default.png"
 const PAGESIZE = 3;
@@ -113,7 +115,7 @@ export default class MyWork extends Component {
     handlePageChange = (page, pageSize) => {
         console.log(page, pageSize)
         this.setState({ curPage: page })
-        this.getBooksList(this.props.match.params.tid, this.state.sortType, page)
+        this.props.getData(this.props.params.tid, page)
     }
     handleLike = (item) => {
         Service.AddLike({
@@ -149,46 +151,70 @@ export default class MyWork extends Component {
     createList = () => {
         const { data } = this.props
         const categorys = global.constants.categorys
-        return data && data.list && data.list.map((item, index) => {
-            let Time = FormatDate.formatTime(item.updateDate)
-            let router = ``
-            switch (item.category.id) {
-                case categorys[0].id:
-                    router = `/Question/Article/`
-                    break;
-                case categorys[1].id:
+        if (data.list) {
+            return data && data.list && data.list.map((item, index) => {
+                let Time = FormatDate.formatTime(item.updateDate)
+                let router = ``
+                switch (item.category.id) {
+                    case categorys[0].id:
+                        router = `/Question/Article/`
+                        break;
+                    case categorys[1].id:
 
-                case categorys[1].id:
-                    router = `/Bookstore/Bookbuy/`
-                    break;
-                default:
-                    router = `/Inspiration/Article/`
-                    break;
+                    case categorys[1].id:
+                        router = `/Bookstore/Bookbuy/`
+                        break;
+                    default:
+                        router = `/Inspiration/Article/`
+                        break;
+                }
+                return (
+                    <li>
+                        <div className="ue_info">
+                            <a href="javascript:;" className="face" onClick={() => this.gotoRouter(`${router}${item.id}`)}>
+                                <img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
+                            </a>
+                            <div className="alt clearfix">
+                                <a href="javascript:;" className="j_name">{item.user.name}</a>
+                                <span className="dot"></span>
+                                <span>{Time}</span>
+                            </div>
+                            <div className="bat">{item.category.name}</div>
+                        </div>
+                        <div className="ue_box">
+                            <a className="thumb-img" href="javascript:;"><img src={item.image} /></a>
+                            <h1><a href="javascript:;" onClick={() => this.gotoRouter(`${router}${item.id}`)}>{item.title}</a></h1>
+                            <div className="txt nowrap">
+                                {item.description}
+                            </div>
+                            <div className="f-bartool clearfix">
+                                <Collect item={item} />
+                                <Like item={item} />
+                                <Comment item={item} />
+                            </div>
+                        </div>
+                    </li>
+                )
+            })
+        } else {
+            if (this.props.tab === "最新动态") {
+                return (
+                    <div className="nolist">
+                        <i className="icon-no-new"></i>
+                        <span>· 暂未留下动态 ·</span>
+                    </div>
+                )
+            } else {
+                return (
+                    <div className="nolist">
+                        <i className="icon-no-art"></i>
+                        <span>· 暂未发表文章 ·</span>
+                    </div>
+                )
             }
-            return (
-                <li>
-                    <div class="ue_info">
-                        <a href="javascript:;" class="face" onClick={() => this.gotoRouter(`${router}${item.id}`)}>
-                            <img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
-                        </a>
-                        <div class="alt clearfix">
-                            <a href="javascript:;" class="j_name">{item.user.name}</a>
-                            <span class="dot"></span>
-                            <span>{Time}</span>
-                        </div>
-                        <div class="bat">{item.category.name}</div>
-                    </div>
-                    <div class="ue_box">
-                        <a class="thumb-img" href="javascript:;"><img src={item.image} /></a>
-                        <h1><a href="javascript:;" onClick={() => this.gotoRouter(`${router}${item.id}`)}>{item.title}</a></h1>
-                        <div class="txt nowrap">
-                            {item.description}
-                        </div>
-                        <div class="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{item.commentNum}</span></a></div>
-                    </div>
-                </li>
-            )
-        })
+
+        }
+
     }
 
     render() {
@@ -197,7 +223,7 @@ export default class MyWork extends Component {
 
         return (
             <div className="">
-                <ul class="ue-article clearfix">
+                <ul className="ue-article clearfix">
                     {this.createList()}
                 </ul>
                 {
@@ -219,10 +245,10 @@ export default class MyWork extends Component {
                         }} />
                     )
                 }
-                {/* <div class="u-pages">
-                    <div class="box clearfix">
+                {/* <div className="u-pages">
+                    <div className="box clearfix">
                         <a href="javascript:;">Prev</a>
-                        <a href="javascript:;"><i class="fa-angle-double-left"></i></a>
+                        <a href="javascript:;"><i className="fa-angle-double-left"></i></a>
                         <a href="javascript:;">1</a>
                         <b>2</b>
                         <a href="javascript:;">3</a>
@@ -234,7 +260,7 @@ export default class MyWork extends Component {
                         <a href="javascript:;">9</a>
                         <a href="javascript:;">10</a>
                         <span>…</span>
-                        <a href="javascript:;"><i class="fa-angle-double-right"></i></a>
+                        <a href="javascript:;"><i className="fa-angle-double-right"></i></a>
                         <a href="javascript:;">Next</a>
                     </div>
                 </div> */}

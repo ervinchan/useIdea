@@ -8,6 +8,7 @@ import Utils from '../../static/js/utils/utils.js'
 import Service from '../../service/api.js'
 import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
+import Validate from '../../static/js/utils/validate.js'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
 import 'swiper/dist/css/swiper.min.css'
@@ -38,7 +39,9 @@ export default class InfoUpdate extends Component {
                 doubanInput: false,
                 zhihuInput: false
             },
-            pswConfirmError: false
+            pswConfirmError: false,
+            emailError: false,
+            phoneError: false
         };
     }
 
@@ -166,7 +169,9 @@ export default class InfoUpdate extends Component {
     }
 
     getRegionDatas = () => {
-        Service.getArea()
+        Service.getArea({
+            type: 2
+        })
             .then((response) => {
                 if (response.data.status === 1) {
                     let regionDatas = response.data.data
@@ -185,9 +190,22 @@ export default class InfoUpdate extends Component {
         })
     }
     setCity = (item) => {
-        let city = item.childList
         let province = item
-        this.setState({ city, province, district: [], cityItem: null, districtItem: null })
+        const { info } = this.state;
+        Service.getArea({
+            id: item.id
+        })
+            .then((response) => {
+                if (response.data.status === 1) {
+                    let city = response.data.data
+                    const cityItem = { city: '', district: '' }
+                    this.setState({ city, province, district: [], cityItem, districtItem: null, info: Object.assign(info, cityItem) })
+                }
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        // this.setState({ city, province, district: [], cityItem: null, districtItem: null })
     }
 
     createCity = () => {
@@ -198,9 +216,20 @@ export default class InfoUpdate extends Component {
     }
 
     setDistrict = (item) => {
-        let district = item.childList
         let cityItem = item
-        this.setState({ cityItem, district, districtItem: null })
+        Service.getArea({
+            id: item.id
+        })
+            .then((response) => {
+                if (response.data.status === 1) {
+                    let district = response.data.data
+                    this.setState({ cityItem, district, districtItem: null })
+                }
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+
     }
     createDistrict = () => {
         const { district } = this.state;
@@ -213,10 +242,19 @@ export default class InfoUpdate extends Component {
     }
 
     submitUserInfo = () => {
+        debugger
         const { info, province, cityItem, districtItem, userPhoto, weChatCode } = this.state;
         this.setState({ pswConfirmError: false })
         if (info.newPassword && (info.newPassword !== info.confirmPassword)) {
             return this.setState({ pswConfirmError: true })
+        }
+        if (!Validate.checkEmail(info.email)) {
+            layer.msg("请填写正确的邮箱")
+            return this.setState({ emailError: true })
+        }
+        if (!Validate.checkPhone(info.mobile)) {
+            layer.msg("请填写正确的手机号码")
+            return this.setState({ phoneError: true })
         }
         /*global layer */
         var oMyForm = new FormData();
@@ -256,7 +294,7 @@ export default class InfoUpdate extends Component {
     checkUserName = () => {
         const { info } = this.state;
         Service.validateLoginName({
-            loginName: info.name
+            name: info.name
         }).then((response) => {
             /*global layer */
             layer.msg(response.data.message)
@@ -314,7 +352,7 @@ export default class InfoUpdate extends Component {
 
     changeInfo = (e, field) => {
         const { info } = this.state;
-        info[field] = e.target.value
+        info[field] = e.target.value;
         this.setState({ info: info }, () => {
 
         })
@@ -330,7 +368,7 @@ export default class InfoUpdate extends Component {
     }
 
     render() {
-        const { province, cityItem, districtItem, info, userPhoto, userImg, weChatCode, media, pswConfirmError } = this.state;
+        const { province, cityItem, districtItem, info, userPhoto, userImg, weChatCode, media, pswConfirmError, emailError, phoneError } = this.state;
 
         return (
             <div className="">
@@ -455,25 +493,25 @@ export default class InfoUpdate extends Component {
                             </div>
                         </div>
                         <div className="ac-panel fr-rss">
-                            <div className="u-inline">
+                            <div className={"u-inline " + (emailError ? "isError" : "")}>
                                 <label className="u-form-label">登录邮箱</label>
-                                <div className="u-form-input width-250">
+                                <div className={"u-form-input width-250"}>
                                     <input type="text" className="u-input" placeholder="ideazhu@gmail.com" value={info.email} onChange={(e) => this.changeInfo(e, 'email')} />
                                 </div>
-                                <a href="javascript:;" className="ac-btn1">更换邮箱</a>
+                                <a href="javascript:;" className="ac-btn1" onClick={this.submitUserInfo}>更换邮箱</a>
                             </div>
-                            <div className="u-inline">
+                            <div className={"u-inline " + (phoneError ? "isError" : "")}>
                                 <label className="u-form-label">注册手机</label>
                                 <div className="u-form-input width-250">
                                     <input type="text" className="u-input" placeholder="暂未绑定手机号" value={info.mobile} onChange={(e) => this.changeInfo(e, 'mobile')} />
                                 </div>
-                                <a href="javascript:;" className="ac-btn1">绑定手机</a>
+                                <a href="javascript:;" className="ac-btn1" onClick={this.submitUserInfo}>绑定手机</a>
                             </div>
                             <div className="ac-choice">
                                 <h1>每周精选推荐</h1>
                                 <div className="radio">
                                     <input type="checkbox" id="inputChecked1" className="u-checkbox" />
-                                    <label for="inputChecked1">订阅</label>
+                                    <label>订阅</label>
                                 </div>
                                 <div className="u-helptxt">* 绑定邮箱才能订阅每周精选</div>
                             </div>

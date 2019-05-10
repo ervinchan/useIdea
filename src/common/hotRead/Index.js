@@ -60,11 +60,11 @@ export default class HotRead extends Component {
                     <a class="thumb-img" href={`/#/Inspiration/Article/${item.id}`}>
                         <LazyLoad><img src={item.image} /></LazyLoad>
                     </a>
-                    <h1><a href={item.link}>{item.title}</a></h1>
+                    <h1><a href={`/#/Inspiration/Article/${item.id}`}>{item.title}</a></h1>
                     <div className="f-bartool clearfix">
-                        <Collect fn={this.handleCollect} item={item} />
-                        <Like fn={this.handleLike} item={item} />
-                        <Comment fn={this.handleLike} item={item} />
+                        <Collect item={item} />
+                        <Like item={item} />
+                        <Comment item={item} />
                     </div>
 
                 </div>
@@ -94,40 +94,40 @@ export default class HotRead extends Component {
 
         })
     }
-    handleLike = (item) => {
-        Service.AddLike({
-            id: item.id
-        }).then((response) => {
-            global.constants.loading = false
-            if (response.data.status === 1) {
-                item.likeNum++
-                this.setState({})
-            }
-            /* global layer */
-            layer.msg(response.data.message)
-        })
-            .catch((error) => {
-                console.log(error)
-            })
-    }
-    handleCollect = (item) => {
-        Service.AddCollect({
-            userId: 1,
-            articleId: item.id
-        }).then((response) => {
-            global.constants.loading = false
-            if (response.data.status === 1) {
-                item.collectNum++
-                this.setState({})
-            }
+    // handleLike = (item) => {
+    //     Service.AddLike({
+    //         id: item.id
+    //     }).then((response) => {
+    //         global.constants.loading = false
+    //         if (response.data.status === 1) {
+    //             item.likeNum++
+    //             this.setState({})
+    //         }
+    //         /* global layer */
+    //         layer.msg(response.data.message)
+    //     })
+    //         .catch((error) => {
+    //             console.log(error)
+    //         })
+    // }
+    // handleCollect = (item) => {
+    //     Service.AddCollect({
+    //         userId: 1,
+    //         articleId: item.id
+    //     }).then((response) => {
+    //         global.constants.loading = false
+    //         if (response.data.status === 1) {
+    //             item.collectNum++
+    //             this.setState({})
+    //         }
 
-            /* global layer */
-            layer.msg(response.data.message)
-        })
-            .catch((error) => {
-                console.log(error)
-            })
-    }
+    //         /* global layer */
+    //         layer.msg(response.data.message)
+    //     })
+    //         .catch((error) => {
+    //             console.log(error)
+    //         })
+    // }
     render() {
         return (
             <div class="m-read-fade wrapper">

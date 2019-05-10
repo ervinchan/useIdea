@@ -70,26 +70,6 @@ export default class UserCenter extends Component {
         this.getMyFans();
         this.getMyFocus();
     }
-
-    createList = (name) => {
-        const listData = [];
-        const IconText = ({ type, text }) => (
-            <span>
-                <Icon type={type} style={{ marginRight: 8 }} />
-                {text}
-            </span>
-        );
-        return (
-            <div className="item">
-                <a href="javascript:;" className="thumb-img">
-                    <img src="css/images/1x1.png" />
-                </a>
-                <h1><a href="/#/Question/Article">请问大家有没有好用的微信排版工具？</a></h1>
-                <div className="alt"><span>昨天 21:32</span></div>
-                <a href="javascript:;" className="sponsor">赞助商提供</a>
-            </div>
-        )
-    }
     handleTabChange = (key) => {
         console.log(key);
     }
@@ -141,7 +121,7 @@ export default class UserCenter extends Component {
                             <a href="javascript:;" onClick={() => { this.gotoRouter(`/UserNews/${item.id}`) }}>作品<span>{item.attention2Num}</span></a>
                             <a href="javascript:;" onClick={() => { this.gotoRouter(`/MyFans/${item.id}`) }}>粉丝<span>{item.attention2Num}</span></a>
                         </div>
-                        <a href="javascript:;" class="a_follow" onClick={() => this.handleFoucs(item.id)}>关注</a>
+                        <a href="javascript:;" class="a_follow" onClick={() => this.handleFoucs(item.id)}>已关注</a>
                     </div>
                 </li>
             )

@@ -25,6 +25,9 @@ export default class Collect extends Component {
             if (response.data.status === 1) {
                 item.collectNum++
                 this.setState({})
+            } else if (response.data.status === 3) {
+                item.collectNum--
+                this.setState({})
             }
 
             /* global layer */

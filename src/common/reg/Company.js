@@ -22,7 +22,9 @@ export default class Reg extends Component {
             pswError: false,
             pswConfirmError: false,
             agree: false,
-            displayPsw: true
+            displayPsw: true,
+            userNameError: false,
+            regUserName: ""
         }
     }
 
@@ -43,6 +45,10 @@ export default class Reg extends Component {
         });
     }
 
+    handleUserName = (e) => {
+        this.setState({ 'regUserName': e.target.value })
+    }
+
     handleEmail = (e) => {
         this.setState({ 'regEmail': e.target.value })
     }
@@ -56,9 +62,12 @@ export default class Reg extends Component {
     }
 
     RegConfirm = () => {
-        const { regEmail, regPsw, regPswConfirm, agree } = this.state;
-        this.setState({ emailError: false, pswError: false, pswConfirmError: false })
+        const { regUserName, regEmail, regPsw, regPswConfirm, agree } = this.state;
+        this.setState({ emailError: false, pswError: false, pswConfirmError: false, userNameError: false })
         /*global layer */
+        if (!regUserName) {
+            return this.setState({ userNameError: true })
+        }
         if (!regEmail || !Validate.checkEmail(regEmail)) {
             return this.setState({ emailError: true })
         } else if (!regPsw) {
@@ -69,13 +78,14 @@ export default class Reg extends Component {
             return layer.msg("请先阅读网站用户协议并同意")
         }
         Service.validateLoginName({
-            loginName: regEmail
+            name: regEmail
         }).then((response) => {
             console.log(response)
             if (response.data.status === 1) {
                 let opts = {
                     password: regPsw,
-                    loginName: regEmail,
+                    loginName: regUserName,
+                    email: regEmail,
                     passwordConfirm: regPswConfirm,
                     isCompany: "true"
                 }
@@ -98,7 +108,7 @@ export default class Reg extends Component {
     }
 
     render() {
-        const { Nav, emailError, pswError, pswConfirmError, agree, displayPsw } = this.state
+        const { Nav, emailError, userNameError, pswError, pswConfirmError, agree, displayPsw } = this.state
         return (
             <div className="reg-body">
                 <div className="r-banner">
@@ -124,6 +134,14 @@ export default class Reg extends Component {
                             USEIDEA在传统创意门户基础上，引入社区设计的方法，为创意人之间的连接创造多一重可能。机构号基于创意社区生态结构设计开发，面向机构、品牌方和创意团体开放，通过发布项目、请教、活动、专访、招聘等8大功能，为传播创意赋能。
                         </div>
                         <div className="reg-section">
+                            <div className="r-lable">User Name</div>
+                            <div className={"r-input " + (userNameError ? "isError" : "")}>
+                                <i className="ico icon-mail-r"></i>
+                                <input type="text" placeholder="请输入用户名" onChange={this.handleUserName} />
+                                <div className="tipError">
+                                    用户名为必填项
+                                </div>
+                            </div>
                             <div className="r-lable">E-mall  address</div>
                             <div className={"r-input " + (emailError ? "isError" : "")}>
                                 <i className="ico icon-mail-r"></i>
