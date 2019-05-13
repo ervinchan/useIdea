@@ -12,6 +12,7 @@ import Footer from '../../common/footer/Index.js'
 import QyHead from './qyHead'
 import Service from '../../service/api.js'
 import FormatDate from '../../static/js/utils/formatDate.js'
+import Utils from '../../static/js/utils/utils.js'
 import 'swiper/dist/css/swiper.min.css'
 import '../../static/less/u.icenter.less'
 import 'antd/lib/tabs/style/index.less';
@@ -154,31 +155,40 @@ export default class UserCenter extends Component {
                     router = `/Bookstore/Bookbuy/`
                     break;
                 default:
-                    router = `/Inspiration/Article/`
+                    router = `/QyspaceJobInfo/`
                     break;
             }
             return (
                 <li>
-                    <div class="ue_info">
-                        <a href="javascript:;" class="face" onClick={() => this.gotoRouter(`${router}${item.id}`)}>
-                            <img src={item.user.photo || defaultPhoto} />
-                        </a>
-                        <div class="alt clearfix">
-                            <a href="javascript:;" class="j_name">{item.user.name}</a>
-                            <span class="dot"></span>
-                            <span>{Time}</span>
-                        </div>
-                        <div class="bat">{item.category.name}</div>
-                    </div>
-                    <div class="ue_box">
-                        <a class="thumb-img" href="javascript:;"><img src={item.image} /></a>
-                        <h1><a href="javascript:;" onClick={() => this.gotoRouter(`${router}${item.id}`)}>{item.title}</a></h1>
-                        <div class="txt nowrap">
-                            {item.description}
-                        </div>
-                        <div class="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{item.commentNum}</span></a></div>
-                    </div>
+                    <a class="thumb-img" href="javascript:;" onClick={() => this.gotoRouter(`${router}${item.id}`)}>
+                        <img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
+                    </a>
+                    <h1><a href="javascript:;">{item.title}</a></h1>
+                    <h3>{Time}</h3>
+                    <div class="bar"><a href="javascript:;"><i class="icon-qiye"></i>{item.company}</a><span><i class="icon-money"></i>{item.pay}</span></div>
+                    <span class="cost"><i class="icon-address"></i>{item.jcity}</span>
                 </li>
+                // <li>
+                //     <div class="ue_info">
+                //         <a href="javascript:;" class="face" onClick={() => this.gotoRouter(`${router}${item.id}`)}>
+                //             <img src={item.user.photo || defaultPhoto} />
+                //         </a>
+                //         <div class="alt clearfix">
+                //             <a href="javascript:;" class="j_name">{item.user.name}</a>
+                //             <span class="dot"></span>
+                //             <span>{Time}</span>
+                //         </div>
+                //         <div class="bat">{item.category.name}</div>
+                //     </div>
+                //     <div class="ue_box">
+                //         <a class="thumb-img" href="javascript:;"><img src={item.image} /></a>
+                //         <h1><a href="javascript:;" onClick={() => this.gotoRouter(`${router}${item.id}`)}>{item.title}</a></h1>
+                //         <div class="txt nowrap">
+                //             {item.description}
+                //         </div>
+                //         <div class="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{item.commentNum}</span></a></div>
+                //     </div>
+                // </li>
             )
         })
     }
@@ -218,6 +228,14 @@ export default class UserCenter extends Component {
 
         })
     }
+    createTags = () => {
+        const { jobInfo } = this.state;
+        if (jobInfo.keywords) {
+            const keywords = jobInfo.keywords.split(',')
+            return keywords.map((item) => <span>{item}</span>)
+        }
+
+    }
     render() {
         const { jobInfo, userPhoto, userImg } = this.state;
         return (
@@ -236,14 +254,15 @@ export default class UserCenter extends Component {
                         <div class="qy-jobinfo">
                             <div class="qy-title1"><b>{jobInfo.title}</b></div>
                             <div class="jtag clearfix">
-                                <span>带薪年假</span>
+                                {this.createTags()}
+                                {/* <span>带薪年假</span>
                                 <span>五险一金</span>
-                                <span>在职培训</span>
+                                <span>在职培训</span> */}
                             </div>
                             <div class="jalt">
                                 <ul class="clearfix">
                                     <li><span>发布日期：</span>{jobInfo.createDate}</li>
-                                    <li><span>工作地点：</span>{jobInfo.city}</li>
+                                    <li><span>工作地点：</span>{jobInfo.jcity}</li>
                                     <li><span>职位月薪：</span>{jobInfo.pay}/月</li>
                                     <li><span>工作经验：</span>{jobInfo.experience}</li>
                                     <li><span>学历要求：</span>{jobInfo.education}</li>

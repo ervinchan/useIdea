@@ -163,7 +163,7 @@ export default class UserCenter extends Component {
                         </div>
                         <div className="nick-data">
                             <p>
-                                <span>作品</span><a href="javascript:;">{userInfo && userInfo.attentionNum}</a>
+                                <span>作品</span><a href="javascript:;">{userInfo && userInfo.articleNum}</a>
                                 <span>关注</span><a href={`/#/MyFans/${userInfo && userInfo.id}`} >{userInfo && userInfo.attentionNum}</a>
                                 <span>粉丝</span><a href={`/#/MyFans/${userInfo && userInfo.id}`}>{userInfo && userInfo.attention2Num}</a>
                             </p>

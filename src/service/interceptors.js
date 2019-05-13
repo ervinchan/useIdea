@@ -35,6 +35,13 @@ Axios.interceptors.request.use(function (config) {
   if (userInfo) {
     config.headers.Authorization = `Bearer ${userInfo.token}`
   }
+  if (config.data && config.data.userId) {
+    if ((userInfo && userInfo.id) === config.data.userId) {
+      config.data.myUserId = userInfo.id
+    } else {
+      config.data.myUserId = 'tourists'
+    }
+  }
   return config
 }, function (error) {
   return Promise.reject(error);

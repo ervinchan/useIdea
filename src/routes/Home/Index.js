@@ -453,11 +453,11 @@ export default class App extends Component {
     createArticleForPerson = (item, router) => {
         let Time = FormatDate.formatTime(item.updateDate)
         return (
-            <div class="item user" onClick={() => this.gotoRouter(`${router}/${item.id}`)}>
-                <a class="thumb-img" href="javascript:;">
+            <div class="item user">
+                <a class="thumb-img" href="javascript:;" onClick={() => this.gotoRouter(`${router}/${item.id}`)}>
                     <LazyLoad><img src={item.image} /></LazyLoad>
                 </a>
-                <div class="tit"><a href="javascript:;">{item.title || item.bookName}</a></div>
+                <div class="tit"><a href="javascript:;" onClick={() => this.gotoRouter(`${router}/${item.id}`)}>{item.title || item.bookName}</a></div>
                 <div class="txt">{item.description}</div>
                 <div class="bar">
                     <span>{item.user.name}</span><span>·</span><span>{Time}</span>
@@ -475,10 +475,10 @@ export default class App extends Component {
     createArticleForCompany = (item, router) => {
         let Time = FormatDate.formatTime(item.updateDate)
         return (
-            <div className="item" onClick={() => this.gotoRouter(`${router}/${item.id}`)}>
-                <a className="thumb-img" href="javascript:;"><LazyLoad><img src={item.image} /></LazyLoad>
+            <div className="item">
+                <a className="thumb-img" href="javascript:;" onClick={() => this.gotoRouter(`${router}/${item.id}`)}><LazyLoad><img src={item.image} /></LazyLoad>
                 </a>
-                <div className="tit"><a href="javascript:;">{item.title}</a></div>
+                <div className="tit"><a href="javascript:;" onClick={() => this.gotoRouter(`${router}/${item.id}`)}>{item.title}</a></div>
                 <div className="txt">
                     <span>{Time}</span><br />
                     <span>Brand：{item.brand}</span>

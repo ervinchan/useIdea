@@ -148,31 +148,44 @@ export default class Article extends Component {
 
     handleLike = (item) => {
         Service.AddLike({
+            userId: userInfo && userInfo.id,
             id: item.id
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
                 item.likeNum++
                 this.setState({})
+            } else if (response.data.status === 3) {
+                item.likeNum--
+                this.setState({})
             }
             /* global layer */
             layer.msg(response.data.message)
         })
+            .catch((error) => {
+                console.log(error)
+            })
     }
     handleCollect = (item) => {
         Service.AddCollect({
-            userId: 1,
+            userId: userInfo && userInfo.id,
             articleId: item.id
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
                 item.collectNum++
                 this.setState({})
+            } else if (response.data.status === 3) {
+                item.collectNum--
+                this.setState({})
             }
 
             /* global layer */
             layer.msg(response.data.message)
         })
+            .catch((error) => {
+                console.log(error)
+            })
     }
 
     createCommentList = (data) => {
@@ -273,27 +286,33 @@ export default class Article extends Component {
 
     submitComment = (pid, content) => {
         const { articleInfo, commentTxt } = this.state;
-        Service.SubmitComment({
-            title: articleInfo.title,
-            categoryId: articleInfo.category.id,
-            contentId: this.props.match.params.aid,
-            replyId: pid || '',
-            name: userInfo && userInfo.name,
-            isValidate: "0",
-            content: content
-        }).then((response) => {
-            global.constants.loading = false
-            if (response.data.status === 1) {
-                this.cancleReply();
-                this.getArticleComment(this.props.match.params.aid, articleInfo.category.id)
-            }
+        if (userInfo && userInfo.id) {
+            Service.SubmitComment({
+                title: articleInfo.title,
+                categoryId: articleInfo.category.id,
+                contentId: this.props.match.params.aid,
+                replyId: pid || '',
+                name: userInfo && userInfo.name,
+                isValidate: "0",
+                content: content,
+                userId: userInfo && userInfo.id
+            }).then((response) => {
+                global.constants.loading = false
+                if (response.data.status === 1) {
+                    this.cancleReply();
+                    this.getArticleComment(this.props.match.params.aid, articleInfo.category.id)
+                }
 
-            /* global layer */
-            layer.msg(response.data.message)
-        })
-            .catch((error) => {
-                console.log(error)
+                /* global layer */
+                layer.msg(response.data.message)
             })
+                .catch((error) => {
+                    console.log(error)
+                })
+        } else {
+            layer.alert()
+        }
+
     }
 
     render() {

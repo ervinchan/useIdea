@@ -102,7 +102,7 @@ export default class Viewpoint extends Component {
 
     getRecommendList = () => {
         Service.GetAllArticle({
-            isRecommend: 1,
+            isTop: 1,
             pageNo: 1,
             pageSize: 4
         }).then((response) => {

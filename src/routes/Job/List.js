@@ -84,7 +84,7 @@ export default class JobList extends Component {
         })
     }
     getPayList = (categoryId) => {
-        Service.JobFilters()({
+        Service.JobFilters({
             type: 'pay'
         }).then((response) => {
             global.constants.loading = false
@@ -93,7 +93,7 @@ export default class JobList extends Component {
         })
     }
     getEducationList = (categoryId) => {
-        Service.JobFilters()({
+        Service.JobFilters({
             type: 'education'
         }).then((response) => {
             global.constants.loading = false
@@ -102,7 +102,7 @@ export default class JobList extends Component {
         })
     }
     getExperienceList = (categoryId) => {
-        Service.JobFilters()({
+        Service.JobFilters({
             type: 'experience'
         }).then((response) => {
             global.constants.loading = false
@@ -111,7 +111,7 @@ export default class JobList extends Component {
         })
     }
     getHotPost = () => {
-        Service.GetHotPost()({
+        Service.GetHotPost({
             categoryId: "981892a5c2394fe7b01ce706d917699e"
         }).then((response) => {
             global.constants.loading = false

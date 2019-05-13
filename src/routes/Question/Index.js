@@ -90,6 +90,8 @@ export default class Question extends Component {
         this.getReplyList();
         this.getBannerA();
         this.getBannerB();
+        this.getBannerC();
+        this.getBannerD();
         this.getRecommendBooks();
         this.getCategory()
     }
@@ -203,20 +205,88 @@ export default class Question extends Component {
             })
     }
 
+    getBannerC = () => {
+        Service.GetADList({
+            categoryId: this.categoryIds.id,
+            id: "3c43ad8ac9ad4a2b860e335aea1bc68c"
+        }).then((response) => {
+            if (response.data.status === 1) {
+                this.setState({ bannerCList: response.data.data })
+            }
+        })
+    }
+    getBannerD = () => {
+        Service.GetADList({
+            categoryId: this.categoryIds.id,
+            id: "3c43ad8ac9ad4a2b860e335abc1bc68c"
+        }).then((response) => {
+            if (response.data.status === 1) {
+                this.setState({ bannerDList: response.data.data })
+            }
+        })
+    }
+
+    createBannerC = () => {
+        const { bannerCList } = this.state
+        let bannerList = bannerCList.map((item, index) => {
+            return <a href={item.url} className="seat-h100"><img src={item.image} /></a>
+        })
+        return (
+            bannerList
+        )
+    }
+
+    createBannerD = () => {
+        const { bannerDList } = this.state
+        let bannerList = bannerDList.map((item, index) => {
+            return <a href={item.url} className="seat-h100"><img src={item.image} /></a>
+        })
+        return (
+            bannerList
+        )
+    }
+
     createQuestionList = (data) => {
+        const { bannerCList, bannerDList } = this.state;
         let items = data.list && data.list.map((item, index) => {
             let Time = FormatDate.formatTime(item.createDate)
+            if (bannerCList && (index % 7 === 0)) {
+                const banner = bannerCList[Math.trunc(index / 7)]
+                if (banner) {
+                    const Time2 = FormatDate.formatTime(banner.createDate)
+                    return (
+                        <div className="item">
+                            <a href={banner.link} target="_blank" className="thumb-img">
+                                <img src={banner.image || defaultPhoto} onError={Utils.setDefaultPhoto} />
+                            </a>
+                            <h1><a href={banner.link} target="_blank">{banner.name}</a></h1>
+                            <div className="alt"><span>{Time2}</span></div>
+                            <a href="javascript:;" className="sponsor">赞助商提供</a>
+                        </div>
+                    )
+                }
+
+
+            }
+            if (bannerDList && (index % 10 === 0) && index !== 0) {
+                const banner = bannerCList[Math.trunc(index / 10)]
+                if (banner) {
+                    return (
+                        <a href={banner.link} target="_blank" class="seat-x100 darken scale"><img src={banner.image || defaultPhoto} onError={Utils.setDefaultPhoto} /></a>
+                    )
+                }
+            }
             if (item.isNewRecord) {
-                return (
-                    <div className="item">
-                        <a href="javascript:;" onClick={() => this.gotoRouter(item.id)} className="thumb-img">
-                            <img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
-                        </a>
-                        <h1><a href="javascript:;" onClick={() => this.gotoRouter(item.id)}>{item.title}</a></h1>
-                        <div className="alt"><span>{Time}</span></div>
-                        {item.isNewRecord && <a href="javascript:;" className="sponsor">赞助商提供</a>}
-                    </div>
-                )
+                // return (
+                //     <div className="item">
+                //         <a href="javascript:;" onClick={() => this.gotoRouter(item.id)} className="thumb-img">
+                //             <img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
+                //         </a>
+                //         <h1><a href="javascript:;" onClick={() => this.gotoRouter(item.id)}>{item.title}</a></h1>
+                //         <div className="alt"><span>{Time}</span></div>
+                //         {item.isNewRecord && <a href="javascript:;" className="sponsor">赞助商提供</a>}
+                //     </div>
+                // )
             } else {
                 return (
                     <div class="item">

@@ -142,6 +142,7 @@ export default class InfoUpdate extends Component {
                 Object.assign(userInfo, userInfoDetail);
                 this.setState({ info: userInfo });
                 console.log(userInfo)
+                global.constants.loading = false
             })
             .catch((error) => {
                 console.log(error)

@@ -112,7 +112,7 @@ export default class GoodCopy extends Component {
         return goodcopyList.list && goodcopyList.list.map((item, index) => {
             return (
                 <li>
-                    <a className="thumb-img" href={`/#/Inspiration/Article/${item.id}`} /*onClick={() => Utils.gotoRouter('/Inspiration/Article/', { aid: item.id }, this.props.history)}*/><img src={item.image} /><span>{item.category.name}</span></a>
+                    <a className="thumb-img" href={`/#/Inspiration/Article/${item.id}`} /*onClick={() => Utils.gotoRouter('/Inspiration/Article/', { aid: item.id }, this.props.history)}*/><img src={item.image} /><span>{item.cmsArticleClassify && item.cmsArticleClassify.articleClassify}</span></a>
                     <h1><a href={`/#/Inspiration/Article/${item.id}`}>{item.title}</a></h1>
                     <div className="alt clearfix">
                         <a href={`/#/Inspiration/Article/${item.id}`} className="j_name"><img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />{item.user.name}</a>

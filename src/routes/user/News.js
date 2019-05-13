@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Menu, Icon, Badge, Tabs, List, Avatar, Divider, Button, Card, Popover } from 'antd';
 import Slider from "react-slick";
 import { StickyContainer, Sticky } from 'react-sticky';
-import { } from 'redux'
+
 import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
 import MyWork from './MyWork.js';
