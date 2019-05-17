@@ -32,7 +32,7 @@ export default class WheelBanner extends Component {
                     loop: true,
                     effect: 'fade',
                     autoplay: {
-                        delay: 2000
+                        delay: 5000
                     },
                     pagination: {
                         el: '.u-wheel .u-pagination',

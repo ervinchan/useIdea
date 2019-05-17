@@ -11,6 +11,9 @@ import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
 import BookMenu from '../../common/bookMenu/Menu'
 import WheelBanner from '../../common/wheelBanner/Index'
+import Collect from '../../common/collect'
+import Like from '../../common/like'
+import Comment from '../../common/comment'
 import 'swiper/dist/css/swiper.min.css'
 
 import 'antd/lib/pagination/style/index.css';
@@ -133,7 +136,7 @@ export default class Bookstore extends Component {
         return bigBanner.map((item, index) => {
             return (
                 <a key={index} className="swiper-slide" href={item.link}>
-                    <img src={item.image} alt={item.title}/>
+                    <img src={item.image} alt={item.title} />
                     <p>{item.title}</p>
                 </a>
             )
@@ -147,7 +150,7 @@ export default class Bookstore extends Component {
             return (
                 <li key={index}>
                     <a href={item.link}>
-                        <img src={item.image}  alt={item.title}/>
+                        <img src={item.image} alt={item.title} />
                         <p>{item.title}</p>
                     </a>
                 </li>
@@ -209,10 +212,14 @@ export default class Bookstore extends Component {
             return (
                 <li key={index}>
                     <div className="swiper-slide">
-                        <a className="thumb-img" href={item.link}><img src={item.image}  alt={item.title}/>
+                        <a className="thumb-img" href={item.link}><img src={item.image} alt={item.title} />
                         </a>
                         <h1><a href="#">{item.title}</a></h1>
-                        <div className="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleFavorite(index)}><i className="icon-heart"></i><span>{item.favorite}</span></a><a href="javascript:;" onClick={() => this.handleLikes(index)}><i className="icon-thumbs"></i><span>{item.like}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{item.comment}</span></a></div>
+                        <div className="f-bartool clearfix">
+                            <Collect item={item} />
+                            <Like item={item} />
+                            <Comment item={item} />
+                        </div>
 
                     </div>
                 </li>
@@ -220,17 +227,6 @@ export default class Bookstore extends Component {
         })
     }
 
-    handleFavorite = (index) => {
-        const { readList } = this.state;
-        readList[index].favorite++;
-        this.setState(readList);
-    }
-
-    handleLikes = (index) => {
-        const { readList } = this.state;
-        readList[index].like++;
-        this.setState(readList);
-    }
 
     handlePageChange = (page, pageSize) => {
         console.log(page, pageSize)

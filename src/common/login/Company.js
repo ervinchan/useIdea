@@ -74,7 +74,7 @@ export default class Login extends Component {
         const { loginEmail, loginPsw } = this.state;
         this.setState({ emailError: false, pswError: false })
         /*global layer */
-        if (!loginEmail || !Validate.checkEmail(loginEmail)) {
+        if (!loginEmail) {
             return this.setState({ emailError: true })
         } else if (!loginPsw) {
             return this.setState({ pswError: true })
@@ -140,9 +140,9 @@ export default class Login extends Component {
                             <div className="r-lable">E-mall  address</div>
                             <div className={"r-input " + (emailError ? "isError" : "")}>
                                 <i className="ico icon-mail-r"></i>
-                                <input type="text" placeholder="请输入电子邮箱" onChange={this.handleEmail} />
+                                <input type="text" placeholder="请输入用户名" onChange={this.handleEmail} />
                                 <div className="tipError">
-                                    请输入邮箱
+                                    请输入用户名
                                 </div>
                             </div>
                             <div className="r-lable">Password</div>

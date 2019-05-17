@@ -39,8 +39,9 @@ export default class Bookstore extends Component {
 
     componentDidMount() {
         this.getRecommendBooks();
+        this.getReadData();
         let locationState = this.props.location.state
-        this.getHotBooks("dc1b3e874dcd4f808be1d90b68a85c3d");
+        this.getHotBooks(global.constants.categoryIds['阅读场景'].id);
     }
 
     handleFavorite = (index) => {
@@ -58,7 +59,7 @@ export default class Bookstore extends Component {
     handlePageChange = (page, pageSize) => {
         console.log(page, pageSize)
         this.setState({ curPage: page })
-        this.getRecommendBooks(this.props.match.params.tid, this.state.sortType, page)
+        this.getReadData(page)
     }
 
     //主编荐书
@@ -69,6 +70,21 @@ export default class Bookstore extends Component {
             .then((response) => {
                 let recommendBooks = response.data.data
                 this.setState({ recommendBooks })
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+
+    getReadData = (pageNo) => {
+        Service.GetAllArticle({
+            categoryId: global.constants.categoryIds['阅读场景'].id,
+            pageSize: global.constants.PAGESIZE,
+            pageNo: pageNo
+        })
+            .then((response) => {
+                let readList = response.data.data
+                this.setState({ readList })
             })
             .catch((error) => {
                 console.log(error)
@@ -157,8 +173,8 @@ export default class Bookstore extends Component {
 
     render() {
         const { recommendBooks, banner, readList } = this.state;
-        let Books = recommendBooks && recommendBooks.list && recommendBooks.list.map((item, index) => {
-            let bookImagUrl = item.bookImagUrl.split('|')[1]
+        let Books = readList && readList.list && readList.list.map((item, index) => {
+            let bookImagUrl = item.image
             let Time = FormatDate.formatTime(item.updateDate)
             return (
                 // <li key={index}>
@@ -172,11 +188,11 @@ export default class Bookstore extends Component {
                 <li className="item" key={index}>
                     <a className="thumb-img" href={`/#/Bookstore/Bookbuy/${item.id}`}>
                         <img src={bookImagUrl} />
-                        <span>{item.firstClassId.name}</span>
+                        <span>{item.cmsArticleClassify && item.cmsArticleClassify.articleClassify}</span>
                     </a>
                     <h4><i className="icon-book"></i>主编荐书</h4>
                     <h1><a href="#">{item.bookName}</a></h1>
-                    <div className="txt">{item.authorIntroduce}</div>
+                    <div className="txt">{item.description}</div>
                     <div className="bar">
                         <span>{item.user.name}</span><span>·</span><span>{Time}</span>
                     </div>
@@ -205,8 +221,8 @@ export default class Bookstore extends Component {
                             </ul>
                         </div>
                         {
-                            recommendBooks && recommendBooks.list && (
-                                <Pagination key="Pagination" className="u-pages" current={this.state.curPage} onChange={this.handlePageChange} total={recommendBooks && recommendBooks.count} pageSize={PAGESIZE} itemRender={(page, type, originalElement) => {
+                            readList && readList.list && (
+                                <Pagination key="Pagination" className="u-pages" current={this.state.curPage} onChange={this.handlePageChange} total={readList && readList.count} pageSize={global.constants.PAGESIZE} itemRender={(page, type, originalElement) => {
                                     switch (type) {
                                         case 'prev':
                                             return [<a key={type} href="javascript:;">{type}</a>,

@@ -391,5 +391,13 @@ class API {
             opts: data
         })
     }
+
+    //文章评论
+    static GetArticleComment(data) {
+        return POST({
+            url: "/a/cms/comment/filter/findCommentByArticle?",
+            opts: data
+        })
+    }
 }
 export default API

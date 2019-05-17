@@ -5,7 +5,7 @@ global.constants = {
     categorys: [
         { id: '4812062598ec4b10bedfb38b59ea3e94', name: '请教' },
         { id: '26a6442976784f079b0ebc43da0d3487', name: '书单上新' },
-        { id: 'fc955d0f79494f0bb9b46c1edada631b', name: '阅读场景' },
+        { id: 'dc1b3e874dcd4f808be1d90b68a85c3d', name: '阅读场景' },
         { id: 'b1969f551e00485e855ea4f8d26aea4b', name: '见识灵感' },
         { id: '299c0a633b87429aa72c66656121427c', name: '专访幕后' },
         { id: '765cb41251224aff8c3416e17b82960b', name: '醒来再读' },
@@ -35,7 +35,7 @@ global.constants = {
             'url': '/Viewpoint',
         },
         "阅读场景": {
-            'id': 'fc955d0f79494f0bb9b46c1edada631b',
+            'id': 'dc1b3e874dcd4f808be1d90b68a85c3d',
             'url': '/Bookstore//ReadingTime',
         },
         "招聘": {

@@ -32,9 +32,13 @@ export default class Article extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
+        let aid = nextProps.match.params.aid
         var script = document.createElement('script');
         script.src = 'http://bdimg.share.baidu.com/static/api/js/share.js?cdnversion=' + ~(-new Date() / 36e5);
         document.body.appendChild(script);
+        this.getArticleInfo(aid)
+        this.getArticleContent(aid)
+        this.getCollectUsers(aid)
     }
 
     componentWillMount() {
@@ -86,12 +90,10 @@ export default class Article extends Component {
     }
 
     getArticleComment = (aid, cid) => {
-        Service.GetQuestion({
-            categoryId: cid,
-            contentId: aid
+        Service.GetArticleComment({
+            id: aid
         }).then((response) => {
             global.constants.loading = false
-            debugger
             if (response.data.status === 1) {
                 let articleComment = response.data.data
                 this.setState({ articleComment })
@@ -310,7 +312,7 @@ export default class Article extends Component {
                     console.log(error)
                 })
         } else {
-            layer.alert()
+            layer.alert('请先登录')
         }
 
     }
