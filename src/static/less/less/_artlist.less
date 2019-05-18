@@ -1,28 +1,205 @@
 ﻿//W文章列表
 .m-artlist {
-    > .item { position: relative; padding-left: 283px; height: 160px; border-bottom: 1px #eee solid; margin-bottom: 40px; overflow: hidden;
-        .thumb-img { .absolute(); left: 0; top: 0; height: 160px; background-color: #000;
-            img { height: 160px; max-width: 255px; background-color: @fuzhu; .transition(); }
-            &:hover img { .opacity(75); }
-        }
-        .tit { line-height: 28px; font-size: 18px; font-weight: bold; max-height: 56px; overflow: hidden; margin-bottom: 10px;
-            a { color: #333;
-                &:hover { color: @color; }
-                &:active { color: #999; }
+    >.item {
+        position: relative;
+        padding-left: 283px;
+        height: 160px;
+        border-bottom: 1px #eee solid;
+        margin-bottom: 40px;
+        overflow: hidden;
+
+        .thumb-img {
+            .absolute();
+            left: 0;
+            top: 0;
+            height: 160px;
+
+            /*删除background-color: #000;*/
+            img {
+                height: 160px;
+                /*删除max-width: 255px; background-color: @fuzhu;*/
+                .transition();
+            }
+
+            &:hover img {
+                /*删除.opacity(75);*/
+                /*新增*/
+                .img-darken(0.7);
+                /*end*/
             }
         }
-        .txt { max-height: 40px; line-height: 20px; overflow: hidden; font-size: 13px; color: #666; margin-bottom: 15px; }
-        .bar { .absolute(); bottom: 10px; left: 283px; right: 0; height: 30px; overflow: hidden; color: #666;
-            .user-img { float: left; display: inline-block; overflow: hidden; margin-right: 0.6rem;
-                img { height: 30px; background-color: @color; }
+
+        .tit {
+            line-height: 28px;
+            font-size: 18px;
+            font-weight: bold;
+            max-height: 56px;
+            overflow: hidden;
+            margin-bottom: 10px;
+
+            a {
+                color: #333;
+
+                &:hover {
+                    color: @color;
+                }
+
+                &:active {
+                    color: #999;
+                }
             }
-            > span { float: left; display: inline-block; height: 30px; line-height: 28px; .nowrap(); max-width: 150px; color: #666; margin-right: 0.3rem; }
-            .f-bartool { float: right; height: 30px; padding: 5px 0; }
         }
+
+        .txt {
+            max-height: 40px;
+            line-height: 20px;
+            overflow: hidden;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .bar {
+            .absolute();
+            bottom: 10px;
+            left: 283px;
+            right: 0;
+            height: 30px;
+            overflow: hidden;
+            color: #666;
+
+            .user-img {
+                float: left;
+                display: inline-block;
+                overflow: hidden;
+                margin-right: 0.6rem;
+
+                img {
+                    height: 30px;
+                    background-color: #f9f9f9;
+                }
+            }
+
+            >span {
+                float: left;
+                display: inline-block;
+                height: 30px;
+                line-height: 28px;
+                .nowrap();
+                max-width: 150px;
+                color: #666;
+                margin-right: 0.3rem;
+            }
+
+            .f-bartool {
+                float: right;
+                height: 30px;
+                padding: 5px 0;
+            }
+        }
+
         &.user {
-            .txt { max-height: 66px; line-height: 22px; }
-            .bar > span { font-size: 13px; }
+            .txt {
+                max-height: 66px;
+                line-height: 22px;
+            }
+
+            .bar>span {
+                font-size: 13px;
+            }
         }
     }
-    .seat-push { margin-bottom: 40px; }
+
+    .seat-push {
+        margin-bottom: 40px;
+    }
+}
+
+/*以下为新增1*/
+.m-artlist>.item .thumb-img {
+    width: 255px;
+}
+
+/*新增end*/
+
+@media screen and (max-width: 640px) {
+    .m-artlist {
+        >.item {
+            padding: 0 0 2.4vw;
+            background-color: #fff;
+            height: initial;
+            .border-radius(0.5rem);
+            border: none;
+            margin-bottom: 7vw;
+
+            .thumb-img {
+                display: block;
+                position: initial;
+                height: 45vw;
+                width: 100%;
+                margin-bottom: 2.4vw;
+                overflow: hidden;
+
+                img {
+                    width: 100%;
+                    height: initial;
+                    max-width: initial;
+                }
+            }
+
+            .tit {
+                margin: 0 5.5% 0.5rem;
+                line-height: 1.5;
+                font-size: @m-size-h1;
+                font-weight: @m-weight-h1;
+                max-height: initial;
+            }
+
+            .txt {
+                margin: 0 5.5%;
+                line-height: 2rem;
+                font-size: 1.1rem;
+                text-align: right;
+
+                >span:last-child {
+                    display: none;
+                }
+            }
+
+            .bar {
+                margin: 0 5.5%;
+                position: initial;
+                bottom: initial;
+                left: initial;
+                right: initial;
+                height: initial;
+                font-size: 1.1rem;
+
+                .user-img,
+                .f-bartool {
+                    display: none;
+                }
+
+                >span.name {
+                    float: initial;
+                    display: inline-block;
+                    height: initial;
+                    line-height: 2rem;
+                    .absolute();
+                    left: 5%;
+                    bottom: 2.4vw;
+                }
+            }
+
+            &.user {
+                .txt {
+                    display: none;
+                }
+            }
+        }
+
+        .seat-push {
+            display: none;
+        }
+    }
 }

@@ -24,6 +24,7 @@
     padding: 75px 0 25px;
     position: relative;
     overflow: hidden;
+    background: url(../images/loading_max.png) center #f2f2f2 no-repeat;
 
     .swiper-container {
         max-width: @max-width;
@@ -148,6 +149,7 @@
     textarea {
         height: 150px;
         font-size: 13px;
+        line-height: 2;
     }
 }
 
@@ -309,7 +311,7 @@
             width: 40px;
             height: 40px;
             .border-radius(100%);
-            background-color: #00ae8c;
+            background: #f9f9f9 !important;
             overflow: hidden;
 
             img {
@@ -454,7 +456,7 @@
                 top: 50%;
                 margin-top: -17px;
                 overflow: hidden;
-                background-color: #00ae8c;
+                background-size: contain !important;
             }
         }
     }
@@ -467,6 +469,7 @@
             width: 200px;
             max-height: 130px;
             background-color: @background;
+            margin-right: 25px;
         }
 
         .box {
@@ -582,7 +585,8 @@
                 width: 44px;
                 height: 44px;
                 .border-radius(100%);
-                background-color: #00ae8c;
+                background: url(../images/loading_min.png) center #f9f9f9 no-repeat;
+                background-size: contain;
                 overflow: hidden;
 
                 img {

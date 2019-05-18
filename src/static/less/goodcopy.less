@@ -20,34 +20,220 @@
 
 
 /*4-吃口文案.html*/
-.wa-search { background-color: @background; margin-bottom: 40px; padding: 50px 100px 50px 410px; position: relative;
-    .bar { .absolute(); left: 50px; top: 50px; width: 280px; }
-    .tag {
-        a { float: left; display: inline-block; width: 21%; margin: 0 2% 0.5rem; line-height: 1.8; .nowrap(); }
+.wa-search {
+    background-color: @background;
+    margin-bottom: 40px;
+    padding: 50px 100px 50px 410px;
+    position: relative;
+
+    .bar {
+        .absolute();
+        left: 50px;
+        top: 50px;
+        width: 280px;
     }
-    .alt { padding-top: 0.8rem; line-height: 1.6; color: #aaa; font-size: 13px; }
+
+    .tag {
+        a {
+            float: left;
+            display: inline-block;
+            width: 21%;
+            margin: 0 2% 0.5rem;
+            line-height: 1.8;
+            .nowrap();
+        }
+    }
+
+    .alt {
+        padding-top: 0.8rem;
+        line-height: 1.6;
+        color: #aaa;
+        font-size: 13px;
+    }
 }
 
 //吃口文案列表
 .wa-list {
-    ul { margin: 0 -1%; }
-    li { float: left; width: 23%; margin: 0 1% 30px; background-color: #fff; .transition(all .5s ease-in-out);
-        .thumb-img { display: block; position: relative; color: rgba(255,255,255,0.75); background: #000; height: 190px; overflow: hidden;
-            img { width: 100%; height: 190px; background-color: @fuzhu; .transition(all .5s ease-in-out); }
-            span { .absolute(); left: 1rem; top: 1rem; display: inline-block; line-height: 20px; padding: 0 0.8rem; .border-radius(20px); background-color: rgba(0,0,0,0.5); font-size: 12px; .transition(all .5s ease-in-out); }
+    ul {
+        margin: 0 -1%;
+    }
+
+    li {
+        float: left;
+        width: 23%;
+        margin: 0 1% 30px;
+        background-color: #fff;
+        .transition(all .5s ease-in-out);
+
+        .thumb-img {
+            display: block;
+            position: relative;
+            color: rgba(255, 255, 255, 0.75);
+            height: 190px;
+            overflow: hidden;
+
+            img {
+                width: 100%;
+                height: 190px;
+                .transition(all .5s ease-in-out);
+            }
+
+            span {
+                .absolute();
+                left: 1rem;
+                top: 1rem;
+                display: inline-block;
+                line-height: 20px;
+                padding: 0 0.8rem;
+                .border-radius(20px);
+                background-color: rgba(0, 0, 0, 0.5);
+                font-size: 12px;
+                .transition(all .5s ease-in-out);
+            }
+
             &:hover {
-                img { .opacity(70); }
+                img {
+                    .img-darken(0.7);
+                }
             }
         }
-        h1 { margin: 5px 8px 10px; height: 50px; line-height: 25px; overflow: hidden; font-size: 15px; font-weight: bold; }
-        .alt {.nowrap(); margin: 5px 8px 10px; line-height: 21px; color: #aaa;
-            .j_name { padding-left: 24px; position: relative; color: #666;
-                img {.absolute(); width: 18px; height: 18px; .border-radius(100%); left: 0; top: 50%; margin-top: -9px; overflow: hidden; background-color: #00ae8c; }
+
+        h1 {
+            margin: 5px 8px 10px;
+            height: 50px;
+            line-height: 25px;
+            overflow: hidden;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .alt {
+            .nowrap();
+            margin: 5px 8px 10px;
+            line-height: 21px;
+            color: #aaa;
+
+            .j_name {
+                padding-left: 24px;
+                position: relative;
+                color: #666;
+
+                img {
+                    .absolute();
+                    width: 18px;
+                    height: 18px;
+                    .border-radius(100%);
+                    left: 0;
+                    top: 50%;
+                    margin-top: -9px;
+                    overflow: hidden;
+                    background: #f6f6f6 !important;
+                }
             }
-            .dot { height: 20px; }
-            span { padding: 0 4px; font-size: 13px; }
+
+            .dot {
+                height: 20px;
+            }
+
+            span {
+                padding: 0 4px;
+                font-size: 13px;
+            }
         }
-        &:hover { /*.translate(0,-3px); .box-shadow(0 2px 6px rgba(0,0,0,.16));*/ h1 a { color: @color; }
+
+        &:hover {
+
+            /*.translate(0,-3px); .box-shadow(0 2px 6px rgba(0,0,0,.16));*/
+            h1 a {
+                color: @color;
+            }
         }
+    }
+}
+
+@media screen and (max-width: 640px) {
+
+    .m-wheel,
+    .wa-search,
+    .m-read-fade {
+        display: none !important;
+    }
+
+    .wa-list {
+        padding: 7vw 3.5% 3vw;
+
+        ul {
+            margin: 0;
+        }
+
+        li {
+            float: initial;
+            width: 100%;
+            margin: 0 0 7vw;
+            padding: 0 0 2.8vw;
+            background-color: #fff;
+            .border-radius(0.5rem);
+            overflow: hidden;
+
+            .thumb-img {
+                height: 45vw;
+                margin-bottom: 2.4vw;
+                overflow: hidden;
+
+                img {
+                    width: 100%;
+                    height: initial;
+                }
+
+                span {
+                    display: none;
+                }
+            }
+
+            h1 {
+                margin: 0 5.5% 0.5rem;
+                line-height: 1.5;
+                font-size: @m-size-h1;
+                font-weight: @m-weight-h1;
+                height: initial;
+            }
+
+            .alt {
+                margin: 0 5.5%;
+                line-height: 2rem;
+
+                .j_name {
+                    padding: 0;
+
+                    img {
+                        display: none;
+                    }
+                }
+
+                .dot {
+                    height: 2rem;
+                }
+
+                span {
+                    padding: 0 4px;
+                    line-height: 2rem;
+                    font-size: 1.1rem;
+                }
+
+                .m1-date {
+                    display: inline-block !important;
+                }
+
+                >span:last-child {
+                    display: none;
+                }
+            }
+        }
+    }
+
+    .u-pages,
+    .m-pages {
+        margin: 0 3.5%;
+        padding-bottom: 3vw;
     }
 }

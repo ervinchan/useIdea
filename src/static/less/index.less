@@ -23,47 +23,59 @@
 @import "./less/_read.less";
 
 //选项导航
-.p-nav-a { padding-bottom: 50px;
+.p-nav-a {
+    padding-bottom: 50px;
+
     .content-tab {
-        .ant-list-item{
-            padding:0;
-            border:none;
-            &:last-child{
-                border:none;
+        .ant-list-item {
+            padding: 0;
+            border: none;
+
+            &:last-child {
+                border: none;
             }
         }
+
         .ant-list-item-meta-avatar {
             width: 242px;
             overflow: hidden;
+
             img:hover {
                 transition: all .3s;
                 transform: scale(1.2);
             }
         }
+
         float: left;
         width:710px;
         margin-right:65px;
+
         .ant-list-item-meta {
             position: relative;
-            border-bottom:1px solid #e7e5e5;
-            margin-bottom:30px;
-            .ant-list-item-meta-title{
+            border-bottom: 1px solid #e7e5e5;
+            margin-bottom: 30px;
+
+            .ant-list-item-meta-title {
                 margin-bottom: 5px;
                 padding-top: 10px;
             }
-            .ant-list-item-meta-description{
-                p{
+
+            .ant-list-item-meta-description {
+                p {
                     line-height: 16px;
                 }
             }
+
             .action {
                 position: absolute;
                 bottom: 0;
             }
+
             .action-brand {
                 left: 258px;
-                margin-bottom:12px;
-                .brand-icon{
+                margin-bottom: 12px;
+
+                .brand-icon {
                     background: #333;
                     color: #fff;
                     padding: 3px;
@@ -72,11 +84,13 @@
                     vertical-align: middle;
                 }
             }
+
             .action-tool {
                 right: 0;
-                margin-bottom:12px;
+                margin-bottom: 12px;
             }
         }
+
         .loadmore-btn {
             width: 100%;
             padding: 30px;
@@ -88,45 +102,166 @@
             font-size: 15px;
         }
     }
-    li { float: left; margin-left: 35px; line-height: 20px; position: relative; font-size: 18px; padding-bottom: 0.9rem;
-        a { color: @font-light;
-            &:hover { color: @color; }
+
+    li {
+        float: left;
+        margin-left: 35px;
+        line-height: 20px;
+        position: relative;
+        font-size: 18px;
+        padding-bottom: 0.9rem;
+
+        a {
+            color: @font-light;
+
+            &:hover {
+                color: @color;
+            }
         }
-        &:first-child{margin-left:0;}
-        &.active { font-weight: bold;
-            a { color: @color; }
-            &:after { content: " "; background-color: @color; height: 2px; .absolute(); left: 0; bottom: 0; width: 100%; }
+
+        &:first-child {
+            margin-left: 0;
+            font-weight: bold;
+            margin-right: 1rem;
+        }
+
+        &.active {
+            font-weight: bold;
+
+            a {
+                color: @color;
+            }
+
+            &:after {
+                content: " ";
+                background-color: @color;
+                height: 2px;
+                .absolute();
+                left: 0;
+                bottom: 0;
+                width: 100%;
+            }
         }
     }
-    &.fixed { position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; max-width: initial; padding: 1.5rem 0; background-color: #fff; .transform(translateZ(0));.box-shadow(0 2px 4px rgba(0,0,0,0.08));
-        ul { max-width: @max-width; margin: 0 auto; }
+
+    &.fixed {
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        max-width: initial;
+        padding: 1.5rem 0;
+        background-color: #fff;
+        .transform(translateZ(0));
+        .box-shadow(0 2px 4px rgba(0, 0, 0, 0.08));
+
+        ul {
+            max-width: @max-width;
+            margin: 0 auto;
+        }
     }
 }
 
 
-.g-index { padding-bottom: 30px;
-    .g-left { width: @max-width - 405; }
-    .g-right { width: 315px;
-        [class^="seat-"], [class*=" seat-"] { margin-bottom: 10px; }
+.g-index {
+    padding-bottom: 30px;
+
+    .g-left {
+        width: @max-width - 405;
     }
-    .m-r-hot { padding-top: 40px }
-    .m-hot-tabs { padding-top: 30px }
-    .m-artlist { padding-bottom: 20px; }
+
+    .g-right {
+        width: 315px;
+
+        [class^="seat-"],
+        [class*=" seat-"] {
+            margin-bottom: 10px;
+        }
+    }
+
+    .m-r-hot {
+        padding-top: 40px
+    }
+
+    .m-hot-tabs {
+        padding-top: 30px
+    }
+
+    .m-artlist {
+        padding-bottom: 20px;
+    }
 }
 
 //热文排行
-.m-r-hot { margin-bottom: 30px;
-    .u-title { margin-bottom: 20px; }
+.m-r-hot {
+    margin-bottom: 30px;
+
+    .u-title {
+        margin-bottom: 20px;
+    }
 }
 
 .m-hot-tabs {
-    > .nav { line-height: 20px; border-left: 5px @color solid; margin-bottom: 25px; padding-left: 1rem;
-        li { float: left; display: inline-block; margin-right: 5px; line-height: 20px; cursor: pointer;
-            &.active { color: @color; font-weight: bold; font-size: 18px; }
+    >.nav {
+        line-height: 20px;
+        border-left: 5px @color solid;
+        margin-bottom: 25px;
+        padding-left: 1rem;
+
+        li {
+            float: left;
+            display: inline-block;
+            margin-right: 5px;
+            line-height: 20px;
+            cursor: pointer;
+
+            &.active {
+                color: @color;
+                font-weight: bold;
+                font-size: 18px;
+            }
         }
     }
 }
 
 //同行在读
-.p-txzd { margin-bottom: 40px; position: relative; }
- 
+.p-txzd {
+    margin-bottom: 40px;
+    position: relative;
+}
+
+
+@media screen and (max-width: 640px) {
+
+    .m-seat-x4,
+    .m-fs-book,
+    .m-interact,
+    .m-read-fade {
+        display: none;
+    }
+
+    .g-index {
+        padding: 7vw 0 3vw;
+
+        .g-left {
+            width: 100%;
+            margin: 0;
+            padding: 0 3.5%;
+        }
+
+        .p-nav-a,
+        >.g-right,
+        .seat-push {
+            display: none !important;
+        }
+
+        .m-artlist {
+            padding-bottom: 0;
+        }
+    }
+
+    .m1-head .back {
+        display: none;
+    }
+}
