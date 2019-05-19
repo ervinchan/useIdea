@@ -1,25 +1,199 @@
 ﻿//R热门读书
-.m-dushu { margin-bottom: 40px;
-    .swiper-container { margin-bottom: 20px; }
+.m-dushu {
+    margin-bottom: 40px;
+
+    .swiper-container {
+        margin-bottom: 20px;
+    }
 }
 
 //W同类好书
-.m-fs-book { position: relative; margin-bottom: 30px;
-    .u-title3 { margin-bottom: 30px; }
-    .swiper-slide { max-width: 33.33%; }
-    .u-pagination { padding-top: 30px; }
+.m-fs-book {
+    position: relative;
+    margin-bottom: 30px;
+
+    .u-title3 {
+        margin-bottom: 30px;
+    }
+
+    .swiper-slide {
+        max-width: 33.33%;
+        height: 295px;
+    }
+
+    .u-pagination {
+        padding-top: 30px;
+    }
 }
 
-.m-dushu, .m-fs-book, .fs-list {
-    .swiper-slide { display: block;
-        em { display: block; width: 100%; overflow: hidden; background: #000; margin-bottom: 20px; }
-        img { width: 100%; background-color: @fuzhu; .transition(all .6s ease-in-out); }
-        h1, h3 { line-height: 1; .nowrap(); margin-bottom: 10px; }
-        h3, .txt { color: #999; font-size: 12px; }
-        .txt { margin-top: 20px; height: 40px; line-height: 20px; overflow: hidden; }
+.m-dushu,
+.m-fs-book,
+.fs-list {
+    .swiper-slide {
+        display: block;
+
+        em {
+            display: block;
+            width: 100%;
+            overflow: hidden;
+            /*删除background: #000;*/
+            margin-bottom: 20px;
+        }
+
+        img {
+            width: 100%;
+            /*删除background-color: @fuzhu;*/
+            .transition(all .6s ease-in-out);
+        }
+
+        h1,
+        h3 {
+            line-height: 1;
+            .nowrap();
+            margin-bottom: 10px;
+        }
+
+        h3,
+        .txt {
+            color: #999;
+            font-size: 12px;
+        }
+
+        .txt {
+            margin-top: 20px;
+            height: 40px;
+            line-height: 20px;
+            overflow: hidden;
+        }
+
         &:hover {
-            img { .opacity(80); }
-            h3, .txt { color: #333; }
+            img {
+                /*删除.opacity(80);*/
+            }
+
+            h3,
+            .txt {
+                color: #333;
+            }
+        }
+    }
+}
+
+/*新增*/
+.m-dushu,
+.m-fs-book,
+.fs-list {
+    .swiper-slide {
+        em {
+            height: 180px;
+            display: flex !important;
+            justify-content: center;
+            background-color: transparent;
+            background: url(../../images/loading_min.png) center #f9f9f9 no-repeat !important;
+
+            img {
+                max-width: initial !important;
+                min-width: 100%;
+                height: 100%;
+                .pre(object-fit, cover);
+                .pre(object-position, 50% 50%);
+                background-color: transparent !important;
+
+                &:hover {
+                    .img-darken(0.7);
+                }
+            }
+        }
+    }
+}
+
+/*end*/
+
+@media screen and (max-width: 640px) {
+    .m2-fanshu {
+        background-color: #fff;
+    }
+
+    .m-dushu,
+    .m-fs-book,
+    .fs-list {
+        .swiper-slide {
+            /*删除background-color: #fff;*/
+            .border-radius(0.5rem);
+            padding: 0 0 2.6vw;
+            overflow: hidden;
+
+            em {
+                background-color: transparent;
+                margin-bottom: 2.4vw;
+                height: 45vw;
+            }
+
+            h1,
+            h3 {
+                margin: 0 5.5%;
+                line-height: 1.5;
+                font-size: @m-size-h1;
+            }
+
+            h1 {
+                margin-bottom: 0.5rem;
+                font-weight: @m-weight-h1;
+            }
+
+            h3 {
+                height: 2rem;
+                font-size: 1.1rem;
+                color: #aaa;
+
+                span {
+                    float: left;
+                    height: 2rem;
+                    line-height: 2rem;
+                    display: inline-block;
+                }
+
+                .dot {
+                    width: 10px;
+                }
+            }
+
+            .txt {
+                display: none;
+            }
+        }
+    }
+
+    .m-fs-book {
+        margin-bottom: 0;
+
+        .swiper-slide {
+            max-width: 50% !important;
+            padding: 0 0 1.2vw;
+
+            em {
+                height: initial !important;
+            }
+
+            h1 {
+                margin-bottom: 0.2rem;
+                font-size: 1.2rem;
+            }
+
+            h3 {
+                font-size: 0.9rem;
+            }
+        }
+
+        .u-title3 {
+            line-height: 1;
+            padding: 0;
+            border: none;
+            margin-bottom: 1.5rem;
+
+            b {
+                font-size: 1.8rem;
+            }
         }
     }
 }

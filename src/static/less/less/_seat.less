@@ -1,52 +1,234 @@
-﻿
-//广告
-[class^="seat-"], [class*=" seat-"] { display: block; max-width: 100%; overflow: hidden; .transition(); position: relative;
-    img { .transition(all .6s ease-in-out); width: 100%; background-color: @fuzhu; }
-    &:hover img { .opacity(80); }
-    &:active img { .opacity(94);.box-shadow(0 4px 16px rgba(0,0,0,0.2)); }
+﻿//广告
+[class^="seat-"],
+[class*=" seat-"] {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    .transition();
+    position: relative;
+
+    img {
+        .transition(all .6s ease-in-out);
+        width: 100%;
+        /*删除background-color: @fuzhu;*/
+    }
+
+    &:hover img {
+        /*删除.opacity(80);*/
+    }
+
+    &:active img {
+        /*删除.opacity(94);*/
+        .box-shadow(0 4px 16px rgba(0, 0, 0, 0.2));
+    }
 }
-.darken { background-color: #000; }
-.lighten { background-color: #fff; }
-.scale:hover img { .scale(1.04); }
+
+/*删除.darken { background-color: #000; }
+.lighten { background-color: #fff; }*/
+.scale:hover img {
+    .scale(1.04);
+}
 
 //四格广告
-.m-seat-x4 { padding: 45px 0; overflow: hidden; max-width: @max-width;
-    ul { margin: 0 -5px; }
-    li { float: left; width: 25%; padding: 0 5px; .transition();height:184px;overflow: hidden;
-        a, em { display: block; width: 100%; overflow: hidden; }
-        img { .transition(all .6s ease-in-out); width: 100%; }
-        h1 { background-color: #fff; height: 50px; line-height: 45px; .nowrap(); padding: 0 1rem; font-size: 16px; font-weight: 800; }
+.m-seat-x4 {
+    padding: 45px 0;
+    overflow: hidden;
+    max-width: @max-width;
+
+    ul {
+        margin: 0 -5px;
+    }
+
+    li {
+        float: left;
+        width: 25%;
+        padding: 0 5px;
+        .transition();
+
+        a,
+        em {
+            display: block;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        img {
+            .transition(all .6s ease-in-out);
+            width: 100%;
+        }
+
+        h1 {
+            background-color: #fff;
+            height: 50px;
+            line-height: 45px;
+            .nowrap();
+            padding: 0 1rem;
+            font-size: 16px;
+            font-weight: 800;
+        }
+
         &:hover {
-            img { .opacity(75); }
-            a { .box-shadow(0 4px 14px rgba(0,0,0,0.16)); }
+            img {
+                /*删除.opacity(75);*/
+            }
+
+            a {
+                .box-shadow(0 4px 14px rgba(0, 0, 0, 0.16));
+            }
         }
     }
 }
 
-.seat-push { display: block; background-color: #000;
-    img { height: 180px; }
-    .badge { left: 1.4rem; top: 1rem; bottom: initial; padding: 3px 10px; background-color: rgba(0,0,0,0.6) }
-    .txt {.absolute(2); bottom: 1rem; left: 1.4rem; right: 1.4rem; max-height: 4rem; line-height: 2rem; color: #fff; font-size: 16px; }
-    &:hover { background-color: #000;
-        img { .scale(1.02); .opacity(70); }
+.seat-push {
+    display: block;
+
+    /*删除background-color: #000;*/
+    img {
+        height: 180px;
+    }
+
+    .badge {
+        left: 1.4rem;
+        top: 1rem;
+        bottom: initial;
+        padding: 3px 10px;
+        background-color: rgba(0, 0, 0, 0.6)
+    }
+
+    .txt {
+        .absolute(2);
+        bottom: 1rem;
+        left: 1.4rem;
+        right: 1.4rem;
+        max-height: 4rem;
+        line-height: 2rem;
+        color: #fff;
+        font-size: 16px;
+    }
+
+    &:hover {
+
+        /*删除background-color: #000;*/
+        img {
+            .scale(1.02);
+            .opacity(70);
+        }
     }
 }
 
-.seat-x315, .seat-h190, .seat-h110 { width: 315px; margin-bottom: 10px; margin: 0 auto;
-    img { width: 100%; }
+.seat-x315,
+.seat-h190,
+.seat-h110 {
+    width: 315px;
+    margin-bottom: 10px;
+    margin: 0 auto;
+
+    img {
+        width: 100%;
+    }
 }
 
 //x315广告切换
-.slide-seat-315 { max-width: 315px; margin: 0 auto; }
+.slide-seat-315 {
+    width: 315px;
+    margin: 0 auto;
+    height: 190px;
 
-.seat-h110 { height: 110px;
-    img { height: 110px; }
 }
 
-.seat-h190 { height: 190px;
-    img { height: 190px; }
+.at-315.u-pagination {
+    padding-top: 18px;
 }
 
-.seat-x100 { width: 100%; margin-bottom: 10px;
-    img { width: 100%; }
+.seat-h110 {
+    height: 110px;
+
+    img {
+        height: 110px;
+    }
+}
+
+.seat-h190 {
+    height: 190px;
+
+    img {
+        height: 190px;
+    }
+}
+
+.seat-x100 {
+    width: 100%;
+    margin-bottom: 10px;
+
+    img {
+        width: 100%;
+    }
+}
+
+/*以下为新增1*/
+[class^="seat-"],
+[class*=" seat-"] {
+    img:hover {
+        .img-darken(0.7);
+    }
+}
+
+.lighten[class^="seat-"] {
+    position: relative;
+
+    &:before {
+        content: '';
+        position: absolute;
+        display: block;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        z-index: 5;
+        .transition();
+    }
+
+    &:hover:before {
+        background-color: rgba(255, 255, 255, 0.26);
+    }
+}
+
+.seat-x315,
+.seat-h190,
+.seat-h110,
+.seat-x100 {
+    background: url(../../images/loading_max.png) center #f9f9f9 no-repeat;
+}
+
+.m-seat-x4 li {
+
+    a,
+    em {
+        background: url(../../images/loading_max.png) center #f9f9f9 no-repeat;
+
+        img {
+            max-width: initial !important;
+            min-width: 100%;
+            height: 100%;
+            .pre(object-fit, cover);
+            .pre(object-position, 50% 50%);
+            background-color: transparent !important;
+
+            &:hover {
+                .img-darken(0.7);
+            }
+        }
+    }
+
+    a {
+        height: 175px;
+    }
+
+    em {
+        height: 140px;
+        display: flex !important;
+        justify-content: center;
+        background-color: transparent;
+        background: url(../../images/loading_min.png) center #f9f9f9 no-repeat !important;
+    }
 }

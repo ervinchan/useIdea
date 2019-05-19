@@ -4,6 +4,7 @@
     outline: none;
     word-wrap: break-word;
     .box-sizing();
+
     &:hover {
         outline: none;
     }
@@ -81,18 +82,22 @@ a {
     text-decoration: none;
     outline: none;
     color: #333;
+
     &:hover {
         text-decoration: none;
         _zoom: 1;
         outline: 0;
         color: @color;
     }
+
     &:active {
         color: fade(@color, 80%);
     }
+
     &:focus {
         outline: none;
     }
+
     &:focus,
     &:active,
     &:hover,
@@ -194,12 +199,15 @@ textarea {
     &::-webkit-input-placeholder {
         color: #bbb;
     }
+
     &:-moz-placeholder {
         color: #bbb;
     }
+
     &::-moz-placeholder {
         color: #bbb;
     }
+
     &:-ms-input-placeholder {
         color: #bbb;
     }
@@ -220,6 +228,7 @@ body {
     clear: both;
     margin: 0 auto;
     max-width: @max-width;
+
     &:after {
         content: '';
         display: block;
@@ -265,7 +274,7 @@ ul:after {
 .dot {
     position: relative;
     padding: 0 3px;
-    background: url(../images/dot.gif) center no-repeat;
+    background: url(../../images/dot.gif) center no-repeat;
 }
 
 .badge {
@@ -301,16 +310,26 @@ ul:after {
     font-weight: normal !important;
 }
 
+.nowrap {
+    .nowrap();
+}
+
 @media screen and (-webkit-min-device-pixel-ratio:0) {
     input {
         line-height: normal !important;
     }
 }
 
+[class^="m1-"],
+[class*=" m1-"] {
+    display: none;
+}
+
 .u-pages {
     padding: 40px 0;
     max-width: @max-width;
     margin: 0 auto;
+
     &:before,
     &:after {
         content: '';
@@ -319,10 +338,12 @@ ul:after {
         height: 0;
         clear: both;
     }
+
     .box {
         display: inline-block;
         margin: 0 auto;
     }
+
     a,
     span,
     b {
@@ -339,6 +360,7 @@ ul:after {
         text-decoration: none;
         cursor: pointer;
     }
+
     b {
         color: #fff;
         background-color: @color;
@@ -346,26 +368,32 @@ ul:after {
         padding: 0 1.4rem;
         text-align: center;
     }
+
     a {
         &:hover {
             background-color: #666;
             color: #fff;
         }
+
         &:active {
             background-color: @color;
         }
     }
+
     .ant-pagination-item {
         border: none;
         margin-right: 0;
     }
+
     .ant-pagination-item-active {
         border: none;
+
         a {
             background-color: @color;
             color: #fff;
         }
     }
+
     .ant-pagination-prev,
     .ant-pagination-next {
         margin-right: 0;
@@ -375,4 +403,81 @@ ul:after {
 .layui-layer-btn .layui-layer-btn0 {
     border-color: @color;
     background-color: @color;
+}
+
+@media screen and (max-width: 640px) {
+
+    html,
+    body {
+        background-color: #f7f7f7;
+        font-size: 9pt;
+        line-height: 1;
+        min-width: initial !important;
+    }
+
+    body {
+        max-width: 640px;
+        margin: 0 auto;
+        position: relative;
+        padding-top: 14vw;
+    }
+
+    .wrapper {
+        max-width: 640px !important;
+    }
+
+    [class^="m1-"],
+    [class*=" m1-"] {
+        display: block;
+    }
+}
+
+/*以下为新增1*/
+.thumb-img,
+.jb-head .jb-seat-x3 a,
+.jb-head .jb-seat-x2 a {
+    display: flex !important;
+    justify-content: center;
+    background-color: transparent;
+    background: url(../../images/loading_min.png) center #f9f9f9 no-repeat !important;
+    overflow: hidden;
+
+    img {
+        width: initial !important;
+        max-width: initial !important;
+        min-width: 100%;
+        height: 100%;
+        .pre(object-fit, cover);
+        .pre(object-position, 50% 50%);
+        background-color: transparent !important;
+
+        &:hover {
+            .img-darken(0.7);
+        }
+    }
+}
+
+.hot-team li {
+    img:hover {
+        .img-darken(0.8);
+    }
+}
+
+.fs-preview,
+.qy-envi {
+    .swiper-slide {
+        display: flex !important;
+        justify-content: center;
+        background-color: transparent;
+        background: url(../../images/loading_min.png) center #f9f9f9 no-repeat !important;
+
+        img {
+            max-width: initial !important;
+            min-width: 100%;
+            height: 100%;
+            .pre(object-fit, cover);
+            .pre(object-position, 50% 50%);
+            background-color: transparent !important;
+        }
+    }
 }

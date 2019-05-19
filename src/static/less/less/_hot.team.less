@@ -1,9 +1,30 @@
 ﻿//R热门团队
-.hot-team { padding-top: 10px;
-    li { float: left; width: 50%; text-align: center; margin-bottom: 25px;
-        a { display: inline-block; width: 70px; height: 70px; overflow: hidden; background: #000;
-            img { width: 70px; height: 70px; background-color: @fuzhu; .transition(all .5s ease-in-out); }
-            &:hover img { .opacity(75); }
+.hot-team {
+    padding-top: 10px;
+
+    li {
+        float: left;
+        width: 50%;
+        text-align: center;
+        margin-bottom: 25px;
+
+        a {
+            display: inline-block;
+            width: 70px;
+            height: 70px;
+            /*删除background: #000;*/
+            overflow: hidden;
+
+            img {
+                width: 70px;
+                height: 70px;
+                /*删除background-color: @fuzhu;*/
+                .transition(all .5s ease-in-out);
+            }
+
+            &:hover img {
+                /*删除.opacity(75);*/
+            }
         }
     }
 }

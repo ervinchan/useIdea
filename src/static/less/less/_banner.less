@@ -1,50 +1,209 @@
 ﻿//L首页轮播
-.f-banner { position: relative; width: 100%; min-height: 520px;
-    &:after, &:before { content: ''; position: absolute; left: 0; background: #f9f9f9; }
-    &:after { width: 100%; height: 380px; top: 90px; }
-    &:before { height: 30px; top: 470px; right: 50%; margin-right: @max-width / 2; }
-    .swiper-box { position: absolute; left: 50%; right: 0; margin-left: -(@max-width / 2); overflow: hidden; }
-    .swiper-container { position: relative; padding: 0 0 10px; width: 100%; max-width: 100%; overflow: hidden; }
-    .swiper-slide { float: left; display: block; width: 285px; height: 430px; margin-right: 12px; .transition(all .5s ease-in-out); cursor: pointer; overflow: hidden;
-        em { display: block; .center(); width: 100%; height: 350px; color: #ddd; font-size: 22px; .transition(all .5s ease-in-out); background-size: cover; position: relative; }
-        img { width: 100%; height: 430px; }
-        .txt {.absolute(); left: 0; bottom: 0; width: 100%; height: 75px; background-color: rgba(255,255,255,1); padding: 10px 15px;
-            span { display: block; line-height: 1.2; color: #aaa; margin-bottom: 0.8rem; .nowrap(); }
-            h1 { color: #333; font-size: 16px; font-weight: bold; .nowrap(); }
+.f-banner {
+    position: relative;
+    width: 100%;
+    min-height: 520px;
+
+    &:after,
+    &:before {
+        content: '';
+        position: absolute;
+        left: 0;
+        background: #f9f9f9;
+    }
+
+    &:after {
+        width: 100%;
+        height: 380px;
+        top: 90px;
+    }
+
+    &:before {
+        height: 30px;
+        top: 470px;
+        right: 50%;
+        margin-right: @max-width / 2;
+    }
+
+    .swiper-box {
+        position: absolute;
+        left: 50%;
+        right: 0;
+        margin-left: -(@max-width / 2);
+        overflow: hidden;
+    }
+
+    .swiper-container {
+        position: relative;
+        padding: 0 0 10px;
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    .swiper-slide {
+        float: left;
+        display: block;
+        width: 285px;
+        height: 430px;
+        margin-right: 12px;
+        .transition(all .5s ease-in-out);
+        cursor: pointer;
+        background: url(../../images/loading_max.png) center #f9f9f9 no-repeat;
+        overflow: hidden;
+
+        em,
+        img {
+            display: block;
+            .center();
+            width: 100%;
+            height: 350px;
+            color: #ddd;
+            font-size: 22px;
+            .transition(all .5s ease-in-out);
+            background-size: cover;
+            position: relative;
         }
-        &:hover { .box-shadow(0 5px 20px -7px rgba(25,25,25,.7));
-            em { .scale(1.15); }
+
+        .txt {
+            .absolute();
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 80px;
+            background-color: #fff;
+            padding: 10px 15px;
+
+            span {
+                display: block;
+                line-height: 1.2;
+                color: #aaa;
+                margin-bottom: 0.8rem;
+                .nowrap();
+            }
+
+            h1 {
+                color: #333;
+                font-size: 16px;
+                font-weight: bold;
+                .nowrap();
+            }
         }
+
+        &:hover {
+            .box-shadow(0 5px 20px -7px rgba(25, 25, 25, .7));
+
+            em,
+            img {
+                .scale(1.15);
+            }
+        }
+
         &:active {
-            .txt {.opacity(80); .transition(); }
-            em img { .opacity(60);.transition(); }
+            .txt {
+                .opacity(80);
+                .transition();
+            }
+
+            em img {
+                .img-darken(0.7);
+                .transition();
+            }
         }
     }
-    .swiper-slide-prev * {.opacity(0); }
-    .swiper-slide-active { width: 300px; height: 520px; .box-shadow(0 4px 14px rgba(0,0,0,0.16)); background-color: #fff;
-        em { width: 300px; height: 520px;
-            &:after { bottom: 0; height: 30%; }
-        }
-        img { height: 520px; }
-        .txt {.opacity(0); }
+
+    .swiper-slide-prev * {
+        .opacity(0);
     }
-    .u-pagination { .absolute(10); bottom: 10px; }
-    .u-prev { left: 100px; padding-right: 4px; }
-    .u-next { right: 100px; padding-left: 4px; }
+
+    .swiper-slide-active {
+        width: 300px;
+        height: 520px;
+        .box-shadow(0 4px 14px rgba(0, 0, 0, 0.16));
+        background-color: #fff;
+
+        em,
+        img {
+            width: 100%;
+            height: 520px;
+
+            &:after {
+                bottom: 0;
+                height: 30%;
+            }
+        }
+
+        .txt {
+            .opacity(0);
+        }
+    }
+
+    .u-pagination {
+        .absolute(10);
+        bottom: 10px;
+    }
+
+    .u-prev {
+        left: 100px;
+        padding-right: 4px;
+    }
+
+    .u-next {
+        right: 100px;
+        padding-left: 4px;
+    }
+
     &:hover {
-        .u-next, .u-prev { .opacity(100); }
+
+        .u-next,
+        .u-prev {
+            .opacity(100);
+        }
     }
-    .contact-list { .absolute(20); bottom: 0; right: 50%; margin-right: -(@max-width / 2);
-        a { float: left; }
+
+    .contact-list {
+        .absolute(20);
+        bottom: 0;
+        right: 50%;
+        margin-right: -(@max-width / 2);
+
+        a {
+            float: left;
+        }
     }
 }
 
 @media screen and (max-width:@max-width) {
     .f-banner {
-        .swiper-box { left: 0; margin: 0; }
-        .swiper-container { padding: 10px 0; }
-        .u-prev { left: 20px; }
-        .u-next { right: 20px; }
-        .contact-list { left: 0; width: 100%; margin: 0; }
+        .swiper-box {
+            left: 0;
+            margin: 0;
+        }
+
+        .swiper-container {
+            padding: 10px 0;
+        }
+
+        .u-prev {
+            left: 20px;
+        }
+
+        .u-next {
+            right: 20px;
+        }
+
+        .contact-list {
+            right: 0;
+            width: initial;
+            margin: 0;
+        }
     }
 }
+
+@media screen and (max-width: 640px) {
+    .f-banner {
+        display: none;
+    }
+}
+
+/*以上大部分都有调整*/

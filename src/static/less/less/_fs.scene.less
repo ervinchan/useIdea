@@ -1,19 +1,102 @@
 ﻿//Y阅读场景2
 .fs-scene {
-    .item { height: 200px; padding: 30px 35px 30px 350px; border: 1px #eee solid; background-color: #fff; position: relative; margin-bottom: 25px; .transition();
-        .thumb-img { display: block; .absolute(); width: 315px; height: 200px; left: -1px; top: -1px; overflow: hidden; background: #000;
-            img { height: 200px; width: 100%; background-color: @fuzhu; .transition(all .6s ease-in-out); }
-            span { .absolute(); display: inline-block; line-height: 20px; padding: 0 0.8rem; font-size: 13px; color: #fff; left: 1rem; top: 1rem; .border-radius(20px); background-color: rgba(0,0,0,0.36); }
-            &:hover img { .opacity(80);.scale(1.03); }
+    .item {
+        height: 200px;
+        padding: 30px 35px 30px 350px;
+        border: 1px #eee solid;
+        background-color: #fff;
+        position: relative;
+        margin-bottom: 25px;
+        .transition();
+
+        .thumb-img {
+            display: block;
+            .absolute();
+            width: 315px;
+            height: 200px;
+            left: -1px;
+            top: -1px;
+            overflow: hidden;
+
+            /*删除background: #000;*/
+            img {
+                height: 200px;
+                width: 100%;
+                /*删除background-color: @fuzhu;*/
+                .transition(all .6s ease-in-out);
+            }
+
+            span {
+                .absolute();
+                display: inline-block;
+                line-height: 20px;
+                padding: 0 0.8rem;
+                font-size: 13px;
+                color: #fff;
+                left: 1rem;
+                top: 1rem;
+                .border-radius(20px);
+                background-color: rgba(0, 0, 0, 0.36);
+            }
+
+            &:hover img {
+                /*删除.opacity(80);*/
+                /*新增*/
+                .img-darken(0.7);
+                /*end*/
+                .scale(1.03);
+            }
         }
-        h4 { line-height: 20px; padding-left: 24px; position: relative; color: #333; margin-bottom: 10px;
-            i { display: inline-block; width: 20px; height: 20px; .absolute(); left: 0; top: 50%; margin-top: -10px; }
+
+        h4 {
+            line-height: 20px;
+            padding-left: 24px;
+            position: relative;
+            color: #333;
+            margin-bottom: 10px;
+
+            i {
+                display: inline-block;
+                width: 20px;
+                height: 20px;
+                .absolute();
+                left: 0;
+                top: 50%;
+                margin-top: -10px;
+            }
         }
-        h1 { line-height: 24px; .nowrap(); font-size: 19px; font-weight: bold; margin-bottom: 10px; }
-        .txt { height: 44px; line-height: 22px; font-size: 13px; color: #666; overflow: hidden; margin-bottom: 15px; }
-        .bar { line-height: 20px; font-size: 12px; color: #666;
-            > * { display: inline-block; line-height: 20px; margin-right: 0.4rem; }
+
+        h1 {
+            line-height: 24px;
+            .nowrap();
+            font-size: 19px;
+            font-weight: bold;
+            margin-bottom: 10px;
         }
-        &:hover { .box-shadow(0 4px 20px rgba(0,0,0,0.06)); }
+
+        .txt {
+            height: 44px;
+            line-height: 22px;
+            font-size: 13px;
+            color: #666;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .bar {
+            line-height: 20px;
+            font-size: 12px;
+            color: #666;
+
+            >* {
+                display: inline-block;
+                line-height: 20px;
+                margin-right: 0.4rem;
+            }
+        }
+
+        &:hover {
+            .box-shadow(0 4px 20px rgba(0, 0, 0, 0.06));
+        }
     }
 }

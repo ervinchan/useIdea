@@ -1,6 +1,46 @@
-﻿.contact-list {
-    a { display: inline-block; width: 30px; height: 30px; padding: 5px; .border-radius(100%); background-color: #9a9a9a; margin-left: 0.4rem; cursor: pointer;
-        i { width: 20px; height: 20px; }
-        &:hover { background-color: @color; }
+﻿/*整体修改*/
+.contact-list {
+    a {
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        padding: 5px;
+        .border-radius(100%);
+        background-color: #9a9a9a;
+        margin-left: 0.4rem;
+        cursor: pointer;
+
+        i {
+            width: 20px;
+            height: 20px;
+        }
+
+        &:hover {
+            background-color: @color;
+        }
+    }
+}
+
+@media screen and (max-width: 640px) {
+    .m1-menu .contact-list a {
+        i {
+            background-size: contain !important;
+        }
+
+        .icon-wechat {
+            background: url(../../images/m/i-weixin-white.png)
+        }
+
+        .icon-weibo {
+            background: url(../../images/m/i-weibo-white.png)
+        }
+
+        .icon-buy {
+            background: url(../../images/m/i-shop-white.png)
+        }
+
+        .icon-zhihu {
+            background: url(../../images/m/i-zhihu-white.png)
+        }
     }
 }
