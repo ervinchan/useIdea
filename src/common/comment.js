@@ -24,7 +24,7 @@ export default class Comment extends Component {
     render() {
         const { fn, item } = this.props;
         return (
-            <a href="javascript:;"><i class="icon-comment"></i><span>{item.commentNum}</span></a>
+            <a href="javascript:;"><i className="icon-comment"></i><span>{item.commentNum}</span></a>
         )
     }
 }

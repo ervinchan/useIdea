@@ -41,7 +41,7 @@ export default class Collect extends Component {
     render() {
         const { fn, item } = this.props;
         return (
-            <a href="javascript:;" onClick={() => this.handleCollect(item)}><i class="icon-heart"></i><span>{item.collectNum}</span></a>
+            <a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a>
         )
     }
 }

@@ -8,7 +8,7 @@ export default class Like extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            
+
         }
     }
 
@@ -40,7 +40,7 @@ export default class Like extends Component {
     render() {
         const { fn, item } = this.props;
         return (
-            <a href="javascript:;" onClick={() => this.handleLike(item)}><i class="icon-thumbs"></i><span>{item.likeNum}</span></a>
+            <a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a>
         )
     }
 }
