@@ -16,7 +16,7 @@
 @import "./less/_read.less";
 @import "./less/_select.less";
 
-.background_art {
+#root>.background_art {
     background-color: #fcfbf7;
 }
 
@@ -913,11 +913,11 @@
         }
 
         #editorContainer {
-            height: calc(100% - 35px);
+            height: 600px;
         }
 
         .w-e-text-container {
-            height: 100% !important;
+            height: calc(100% - 35px) !important;
             border: none !important;
             /*!important是重点，因为原div是行内样式设置的高度300px*/
         }
