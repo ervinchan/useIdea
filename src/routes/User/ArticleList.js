@@ -10,6 +10,7 @@ import Footer from '../../common/footer/Index.js'
 import WheelBanner from '../../common/wheelBanner/Index'
 import HotRead from '../../common/hotRead/Index'
 import Service from '../../service/api.js'
+import Like from '../../common/like'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
 import 'swiper/dist/css/swiper.min.css'
@@ -18,7 +19,7 @@ import 'antd/lib/pagination/style/index.css';
 import '../../static/less/question.less'
 
 import defaultPhoto from "../../static/images/user/default.png"
-
+const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
 export default class ArticleList extends Component {
 
     constructor(props) {
@@ -27,7 +28,9 @@ export default class ArticleList extends Component {
             sortType: 0,
             curPage: 1,
             banner: [],
-            toolList: []
+            toolList: [],
+            replyId: '',
+            replyContent: ''
         };
     }
 
@@ -52,7 +55,7 @@ export default class ArticleList extends Component {
     }
 
     createList = () => {
-        const { data, dataType } = this.props;
+        const { data, dataType, replyContent } = this.props;
         if (dataType === "评论文章" || dataType === "请教回应") {
             return data && data.list && data.list.map(item => {
                 let Time = FormatDate.formatTime(item.createDate);
@@ -62,30 +65,33 @@ export default class ArticleList extends Component {
                             <img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
                         </a>
                         <div class="lx_alt clearfix">
-                            <a href="javascript:;" class="j_name">{item.user.name}</a>
+                            <a href="javascript:;" class="j_name" onClick={() => this.gotoRouter(`/Qyspace/${item.user.id}`)}>{item.user.name}</a>
                             <span>{dataType}</span>
                             <span class="dot"></span>
                             <span>{Time}</span>
                         </div>
                         <div class="lx_box">
-                            <a class="thumb-img" href="javascript:;"><img src="images/user/u1.png" /></a>
-                            <h1><a href="javascript:;">{item.title}</a></h1>
+                            <a class="thumb-img" href="javascript:;"><img src={item.image || "images/user/u1.png"}  onClick={() => this.gotoRouter(`/Qyspace/${item.user.id}`)}/></a>
+                            <h1><a href="javascript:;" onClick={() => this.gotoRouter(`/Qyspace/${item.user.id}`)}>{item.title}</a></h1>
                             <p>{Time}</p>
                         </div>
                         <div class="lx_txt">
                             {item.content}
                         </div>
                         <div class="lx-bar f-right">
-                            <a href="javascript:;" class="reply" onClick={() => this.handleLike(item)}><i class="icon-reply"></i>回复</a>
+                            {/* <a href="javascript:;" class="reply" onClick={() => this.handleReply(item)}><i class="icon-reply"></i>回复</a> */}
                             {/* <a href="javascript:;" class="thumbs"><i class="icon-thumbs"></i>赞</a> */}
-                            <a href="javascript:;" class="thumbs" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a>
+                            {/* <a href="javascript:;" class="thumbs" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a> */}
+                            <Like item={item} />
                         </div>
+                        <div class="lx-artfrom" style={{ display: (item.id === this.state.replyId ? "" : "none") }}><textarea placeholder="我来补充两句。" value={replyContent} onChange={this.handleChangeReply}></textarea><a href="javascript:;" class="escbtn" data-el="lxesc" onClick={this.cancleReply}>取消回复</a><a href="javascript:;" class="enbtn active" onClick={() => this.submitComment(item, replyContent)}>回 复</a></div>
+
                     </li>
 
                 )
             })
         } else if (dataType === "收藏文章") {
-            return data && data.map(item => {
+            return data.list && data.list.map(item => {
                 let Time = FormatDate.formatTime(item.createDate);
                 return (
                     <li>
@@ -119,6 +125,45 @@ export default class ArticleList extends Component {
 
     gotoRouter = (router) => {
         this.props.history.push(router)
+    }
+    cancleReply = () => {
+        this.setState({ replyId: '', replyContent: '' });
+    }
+
+    handleReply = (item) => {
+        this.setState({ replyId: item.id })
+    }
+    handleChangeReply = (e) => {
+        this.setState({ replyContent: e.target.value })
+    }
+    submitComment = (item, content) => {
+        if (userInfo && userInfo.id) {
+            Service.SubmitComment({
+                title: item.title,
+                categoryId: item.category.id,
+                contentId: item.id,
+                replyId: item.id || '',
+                name: userInfo && userInfo.name,
+                isValidate: "0",
+                content: content,
+                userId: userInfo && userInfo.id
+            }).then((response) => {
+                global.constants.loading = false
+                if (response.data.status === 1) {
+                    this.cancleReply();
+                    this.getArticleComment(item.id, item.category.id)
+                }
+
+                /* global layer */
+                layer.msg(response.data.message)
+            })
+                .catch((error) => {
+                    console.log(error)
+                })
+        } else {
+            layer.alert('请先登录')
+        }
+
     }
 
     render() {

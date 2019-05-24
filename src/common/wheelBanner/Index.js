@@ -21,6 +21,20 @@ export default class WheelBanner extends Component {
         this.getBannerB()
     }
 
+    componentDidUpdate(prevProps, prevState) {
+        var swiper_wheel = new Swiper('.u-wheel .swiper-container', {
+            loop: true,
+            effect: 'fade',
+            autoplay: true,
+            pagination: {
+                el: '.u-wheel .u-pagination',
+                bulletClass: 'bull',
+                bulletActiveClass: 'active',
+                clickable: true
+            }
+        });
+    }
+
     getBanner = () => {
         Service.GetADList({
             categoryId: this.props.categoryId,
@@ -28,19 +42,7 @@ export default class WheelBanner extends Component {
         }).then((response) => {
             let banner = response.data.data
             this.setState({ banner }, () => {
-                var swiper_wheel = new Swiper('.u-wheel .swiper-container', {
-                    loop: true,
-                    effect: 'fade',
-                    autoplay: {
-                        delay: 5000
-                    },
-                    pagination: {
-                        el: '.u-wheel .u-pagination',
-                        bulletClass: 'bull',
-                        bulletActiveClass: 'active',
-                        clickable: true
-                    }
-                });
+
             })
         })
     }
@@ -64,7 +66,7 @@ export default class WheelBanner extends Component {
         const { banner } = this.state
         return banner.map((item, index) => {
             return (
-                <a key={index} className="swiper-slide" href={item.link}>
+                <a key={'wheel' + index} className="swiper-slide" href={item.link} target="_blank">
                     <img src={item.image} />
                     <p>{item.name}</p>
                 </a>

@@ -23,12 +23,14 @@ export default class QyHead extends Component {
             fileList: [],
             collectList: [],
             visibleCover: false,
-            userImg: ""
+            userImg: "",
+            userToolNum:{}
         };
     }
 
     componentDidMount() {
         var that = this
+        this.getNumberByUser();
         //this.getMyWork();
     }
     gotoRouter = (router) => {
@@ -55,9 +57,24 @@ export default class QyHead extends Component {
             handleImg(file, newUrl)
         }, this);
     }
+    getNumberByUser = ()=>{
+        debugger
+        Service.FindNumberByUserId({
+            userId: userInfo && userInfo.id,
+            myUserId:'tourists'
+        }).then((response) => {
+            global.constants.loading = false
+            if (response.data.status === 1) {
+                this.setState({ userToolNum: response.data.data })
+            }
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
 
     render() {
-        const { fileList } = this.state;
+        const { fileList,userToolNum } = this.state;
         const { info, userPhoto, setUserPhoto, userImg } = this.props;
         const tabTit = `来信中心`;
         const props = {
@@ -100,9 +117,9 @@ export default class QyHead extends Component {
                     </div>
                     <div className="nick-data">
                         <p>
-                            <span>作品</span><a href={`/#/MyFans/${userInfo && userInfo.id}`} >{userInfo && userInfo.attentionNum}</a>
-                            <span>关注</span><a href={`/#/MyFans/${userInfo && userInfo.id}`} >{userInfo && userInfo.attentionNum}</a>
-                            <span>粉丝</span><a href={`/#/MyFans/${userInfo && userInfo.id}`}>{userInfo && userInfo.attention2Num}</a>
+                            <span>作品</span><a href={`/#/MyFans/${userInfo && userInfo.id}`} >{userToolNum && userToolNum.articleNum}</a>
+                            <span>关注</span><a href={`/#/MyFans/${userInfo && userInfo.id}`} >{userToolNum && userToolNum.attentionNum}</a>
+                            <span>粉丝</span><a href={`/#/MyFans/${userInfo && userInfo.id}`}>{userToolNum && userToolNum.fansNum}</a>
                         </p>
                     </div>
                     <div className="address"><i className="icon-address-w"></i>{info.provence}  {info.city}</div>

@@ -253,7 +253,8 @@ export default class Header extends Component {
                             </div> */}
                             <div className="inlet clearfix">
                                 <a href="/#/Login"><img src={fixpng} className="icon-gr" />个人登录</a>
-                                <a href="/#/LoginQy"><img src={fixpng} className="icon-qy" />企业登录</a>
+                                {/* <a href="/#/LoginQy"><img src={fixpng} className="icon-qy" />企业登录</a> */}
+                                <a href="javascript:;" title="功能开发中"><img src={fixpng} className="icon-qy" />企业登录</a>
                             </div>
                         </div>
                         {
@@ -345,14 +346,15 @@ export default class Header extends Component {
                         <li><a href="/#/Job">招 聘</a></li> */}
                     </ul>
                 </div>
-                <div className="search-wrap">
+                {/* 功能开发中
+                 <div className="search-wrap">
                     <div className="wrapper">
                         <div className="u-search">
                             <input type="text" placeholder="搜索与我有关的提问" onChange={this.handleChangeSearchTxt} />
                             <a href={`/#/Question/${searchTxt}`} className="fa-search" ></a>
                         </div>
                     </div>
-                </div>
+                </div> */}
             </div>
         )
     }

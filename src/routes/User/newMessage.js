@@ -198,7 +198,7 @@ export default class NewMessage extends Component {
     createList = () => {
         const { focus } = this.state
         const categorys = global.constants.categorys
-        return focus && focus.map((item, index) => {
+        return focus.list && focus.list.map((item, index) => {
             let Time = FormatDate.formatTime(item.updateDate)
             let router = ``
             switch (item.category.id) {
@@ -308,9 +308,9 @@ export default class NewMessage extends Component {
                     </ul>
                 </div>
                 <div className="tab-cont">
-                    <ArticleList data={newCommentList} dataType="评论文章" className="tab-item tab-discuss active" />
-                    <ArticleList data={collectList} dataType="收藏文章" className="tab-item tab-collection" />
-                    <ArticleList data={questionList} dataType="请教回应" className="tab-item tab-consult" />
+                    <ArticleList data={newCommentList} history={this.props.history} dataType="评论文章" className="tab-item tab-discuss active" />
+                    <ArticleList data={collectList} history={this.props.history} dataType="收藏文章" className="tab-item tab-collection" />
+                    <ArticleList data={questionList} history={this.props.history} dataType="请教回应" className="tab-item tab-consult" />
                     <div className="tab-item tab-fans">
                         <ul className="lx-fans clearfix">
                             {this.createFansList()}

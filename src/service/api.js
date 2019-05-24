@@ -399,5 +399,21 @@ class API {
             opts: data
         })
     }
+
+    //作品、关注、粉丝数
+    static FindNumberByUserId(data) {
+        return POST({
+            url: "/a/cms/article/filter/findNumberByUserId?",
+            opts: data
+        })
+    }
+
+    //点赞    
+    static HandleArticleLike(data) {
+        return POST({
+            url: "/a/cms/comment/filter/updateCommentLikeNum?",
+            opts: data
+        })
+    }
 }
 export default API

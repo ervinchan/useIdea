@@ -8,6 +8,9 @@ import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
 import WheelBanner from '../../common/wheelBanner/Index'
 import HotRead from '../../common/hotRead/Index'
+import Collect from '../../common/collect'
+import Like from '../../common/like'
+import Comment from '../../common/comment'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
 import 'swiper/dist/css/swiper.min.css'
@@ -136,41 +139,6 @@ export default class Bigidea extends Component {
             })
     }
 
-    handleLike = (item) => {
-        Service.AddLike({
-            id: item.id
-        }).then((response) => {
-            global.constants.loading = false
-            if (response.data.status === 1) {
-                item.likeNum++
-                this.setState({})
-            }
-            /* global layer */
-            layer.msg(response.data.message)
-        })
-            .catch((error) => {
-                console.log(error)
-            })
-    }
-    handleCollect = (item) => {
-        Service.AddCollect({
-            userId: 1,
-            articleId: item.id
-        }).then((response) => {
-            global.constants.loading = false
-            if (response.data.status === 1) {
-                item.collectNum++
-                this.setState({})
-            }
-
-            /* global layer */
-            layer.msg(response.data.message)
-        })
-            .catch((error) => {
-                console.log(error)
-            })
-    }
-
     //热门作者
     // getHostAuthor = (categoryId) => {
     //     let url = '/zsl/a/cms/article/getHostAuthor?'
@@ -211,8 +179,12 @@ export default class Bigidea extends Component {
                     <div className="txt">{item.description}</div>
                     <div className="bar">
                         <span>{item.user.name}</span><span className="dot"></span><span>{Time}</span>
-                        <div className="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{item.commentNum}</span></a></div>
-
+                        <div className="f-bartool clearfix">
+                        <Collect item={item} />
+                        <Like item={item} />
+                        <Comment item={item} />
+                        </div>
+                        
                     </div>
                 </div>
             )
@@ -229,7 +201,11 @@ export default class Bigidea extends Component {
                         <span>{item.category.name}</span>
                     </a>
                     <h1><a href="#">{item.description}</a></h1>
-                    <div className="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{item.commentNum}</span></a></div>
+                    <div className="f-bartool clearfix">
+                        <Collect item={item} />
+                        <Like item={item} />
+                        <Comment item={item} />
+                    </div>
 
                 </li>
             )
@@ -288,18 +264,6 @@ export default class Bigidea extends Component {
                 )
             }
         })
-    }
-
-    handleFavorite = (index) => {
-        const { readList } = this.state;
-        readList[index].favorite++;
-        this.setState(readList);
-    }
-
-    handleLikes = (index) => {
-        const { readList } = this.state;
-        readList[index].like++;
-        this.setState(readList);
     }
 
     handlePageChange = (page, pageSize) => {

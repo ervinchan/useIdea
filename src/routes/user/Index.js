@@ -33,6 +33,7 @@ export default class UserCenter extends Component {
             fileList: [],
             collectList: [],
             userPhoto: [],
+            userToolNum:{}
         };
     }
 
@@ -74,6 +75,7 @@ export default class UserCenter extends Component {
         });
         this.getCollectList();
         this.getMyWork();
+        this.getNumberByUser();
     }
     handleTabChange = (key) => {
         console.log(key);
@@ -136,8 +138,22 @@ export default class UserCenter extends Component {
 
         })
     };
+    getNumberByUser = ()=>{
+        Service.FindNumberByUserId({
+            userId: JSON.parse(sessionStorage.getItem("userInfo")).id,
+            myUserId:'tourists'
+        }).then((response) => {
+            global.constants.loading = false
+            if (response.data.status === 1) {
+                this.setState({ userToolNum: response.data.data })
+            }
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
     render() {
-        const { userPhoto } = this.state;
+        const { userPhoto,userToolNum } = this.state;
         const tabTit = `来信中心`;
         return (
             <div className="">
@@ -163,12 +179,12 @@ export default class UserCenter extends Component {
                         </div>
                         <div className="nick-data">
                             <p>
-                                <span>作品</span><a href="javascript:;">{userInfo && userInfo.articleNum}</a>
-                                <span>关注</span><a href={`/#/MyFans/${userInfo && userInfo.id}`} >{userInfo && userInfo.attentionNum}</a>
-                                <span>粉丝</span><a href={`/#/MyFans/${userInfo && userInfo.id}`}>{userInfo && userInfo.attention2Num}</a>
+                                <span>作品</span><a href="javascript:;">{userToolNum && userToolNum.articleNum}</a>
+                                <span>关注</span><a href={`/#/MyFans/${userInfo && userInfo.id}`} >{userToolNum && userToolNum.attentionNum}</a>
+                                <span>粉丝</span><a href={`/#/MyFans/${userInfo && userInfo.id}`}>{userToolNum && userToolNum.fansNum}</a>
                             </p>
                         </div>
-                        <div className="address"><i className="icon-address-w"></i>{userInfo.provence}  {userInfo.city}</div>
+                        <div className="address"><i className="icon-address-w"></i>{userInfo.provence.id}  {userInfo.city.id}</div>
                         <a href="javascript:;" className="add_upload" onClick={() => this.gotoRouter(`/ArticleEditor`)}>发表作品/经验</a>
                     </div>
                 </div>
@@ -181,7 +197,7 @@ export default class UserCenter extends Component {
                             
                         </ul> */}
                         <Tabs ref={e => this.tabDom = e} className="clearfix" onChange={this.handleTabChange}>
-                            <TabPane tab={["来信中心", <i className="badge" style={{ display: 'none' }}>99+</i>]} key="news" className="qj-news"><News data={this.state.listData} /></TabPane>
+                            <TabPane tab={["来信中心", <i className="badge" style={{ display: 'none' }}>99+</i>]} key="news" className="qj-news"><News data={this.state.listData} history={this.props.history} /></TabPane>
                             <TabPane tab="我的作品" key="reco"><MyWork data={this.state.listData} history={this.props.history} /></TabPane>
                             <TabPane tab="我的心选" key="reply"><MyHeart data={this.state.collectList} history={this.props.history} /></TabPane>
                         </Tabs>

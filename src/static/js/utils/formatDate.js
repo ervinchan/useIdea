@@ -39,11 +39,16 @@ class FormatDate {
         // } else if (minute < 60) {
         //     return minute
         // }
-        return minute > 60 ?
-            (
+        if (minute >= 60) {
+            return (
                 Math.floor(difTime / (3600 * 1000)) > 24 ?
                     this.customFormat(date, 'yyyy/MM/dd') : `${Math.floor(difTime / (3600 * 1000))}小时前`
-            ) : `${minute}分钟前`
+            )
+        } else if(minute >= 1) {
+            return `${minute}分钟前`
+        } else {
+            return '刚刚'
+        }
     }
     static apartHours(date) {
         let now = new Date();    //结束时间

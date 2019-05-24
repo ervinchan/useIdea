@@ -27,7 +27,8 @@ export default class Article extends Component {
             articleComment: {},
             collectUserList: [],
             isFans: 0,
-            replyContent: ""
+            replyContent: "",
+            isOpenReply: false
         };
     }
 
@@ -147,10 +148,30 @@ export default class Article extends Component {
         this.setState({ curPage: page })
         this.getBooksList(this.props.match.params.tid, this.state.sortType, page)
     }
-
     handleLike = (item) => {
         Service.AddLike({
             userId: userInfo && userInfo.id,
+            id: item.id
+        }).then((response) => {
+            global.constants.loading = false
+            if (response.data.status === 1) {
+                item.likeNum++
+                this.setState({})
+            } else if (response.data.status === 3) {
+                item.likeNum--
+                this.setState({})
+            }
+            /* global layer */
+            layer.msg(response.data.message)
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+    handleArticleLike = (item) => {
+        Service.HandleArticleLike({
+            userId: userInfo && userInfo.id,
+            myUseId: userInfo && userInfo.id,
             id: item.id
         }).then((response) => {
             global.constants.loading = false
@@ -176,12 +197,10 @@ export default class Article extends Component {
             global.constants.loading = false
             if (response.data.status === 1) {
                 item.collectNum++
-                this.setState({})
             } else if (response.data.status === 3) {
                 item.collectNum--
-                this.setState({})
             }
-
+            this.getCollectUsers(this.props.match.params.aid)
             /* global layer */
             layer.msg(response.data.message)
         })
@@ -191,12 +210,12 @@ export default class Article extends Component {
     }
 
     createCommentList = (data) => {
-        const { replyContent } = this.state;
+        const { replyContent, isOpenReply } = this.state;
         return data.list && data.list.map((item, index) => {
             let Time = FormatDate.formatTime(item.createDate);
             return (
                 <div className="disc-item">
-                    <a href="javascript:;" className="thumb"><img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} /></a>
+                    <a href="javascript:;" className="thumb"><img src={item.userPhoto || defaultPhoto} onError={Utils.setDefaultPhoto} /></a>
                     <div className="alt">
                         <a href="javascript:;" className="j_name" onClick={() => this.gotoRouter(`/UserNews${item.user.id}`)}>{item.user.name}</a><span className="dot"></span><span>{Time}</span>
                     </div>
@@ -204,9 +223,9 @@ export default class Article extends Component {
                         {item.content}
                     </div>
                     <div className="bar">
-                        <a href="javascript:;">投诉</a><a href="javascript:;" onClick={() => this.handleReply(item)}>回复</a><a href="javascript:;" className="thumbs" onClick={() => this.handleLike(item)}><i className="icon-thumbs-up"></i>{item.commentNum}</a>
+                        <a href="javascript:;">投诉</a><a href="javascript:;" onClick={() => this.handleReply(item)}>回复</a><a href="javascript:;" className="thumbs" onClick={() => this.handleArticleLike(item)}><i className="icon-thumbs-up"></i>{item.likeNum}</a>
                     </div>
-                    <div class="replyfrom" style={{ display: (item.id === this.state.replyId ? "" : "none") }}><textarea value={replyContent} placeholder="我来补充两句。" onChange={this.handleChangeReply} /><a href="javascript:;" class="thumb"><img src={(userInfo && userInfo.photo) || defaultPhoto} onError={Utils.setDefaultPhoto} /></a><a href="javascript:;" class="artbtn" onClick={() => this.submitComment(item.id, replyContent)}>留 言</a><a href="javascript:;" class="escbtn" onClick={this.cancleReply}>稍后再说</a></div>
+                    <div class="replyfrom" style={{ display: (item.id === this.state.replyId && isOpenReply ? "" : "none") }}><textarea value={replyContent} placeholder="我来补充两句。" onChange={this.handleChangeReply} /><a href="javascript:;" class="thumb"><img src={(userInfo && userInfo.photo) || defaultPhoto} onError={Utils.setDefaultPhoto} /></a><a href="javascript:;" class="artbtn" onClick={() => this.submitComment(item.id, replyContent)}>留 言</a><a href="javascript:;" class="escbtn" onClick={this.cancleReply}>稍后再说</a></div>
                     {
                         item.childComments &&
                         <div className="disc-sub">
@@ -225,7 +244,7 @@ export default class Article extends Component {
             let Time = FormatDate.formatTime(item.createDate)
             return (
                 <div className="disc-item">
-                    <a href="javascript:;" className="thumb"><img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} /></a>
+                    <a href="javascript:;" className="thumb"><img src={item.userPhoto || defaultPhoto} onError={Utils.setDefaultPhoto} /></a>
                     <div className="alt">
                         <a href="javascript:;" className="j_name" onClick={() => this.gotoRouter(`/UserNews${item.user.id}`)}>{item.user.name}</a><span className="dot"></span><span>{Time}</span>
                     </div>
@@ -233,7 +252,7 @@ export default class Article extends Component {
                         {item.content}
                     </div>
                     <div className="bar">
-                        <a href="javascript:;">投诉</a><a href="javascript:;" onClick={() => this.handleReply(item)}>回复</a><a href="javascript:;" className="thumbs" onClick={() => this.handleLike(item)}><i className="icon-thumbs-up"></i>{item.commentNum}</a>
+                        <a href="javascript:;">投诉</a><a href="javascript:;" onClick={() => this.handleReply(item)}>回复</a><a href="javascript:;" className="thumbs" onClick={() => this.handleArticleLike(item)}><i className="icon-thumbs-up"></i>{item.likeNum}</a>
                     </div>
                     <div class="replyfrom" style={{ display: (item.id === this.state.replyId ? "" : "none") }}><textarea value={replyContent} placeholder="我来补充两句。" onChange={this.handleChangeReply} /><a href="javascript:;" class="thumb"><img src={(userInfo && userInfo.photo) || defaultPhoto} onError={Utils.setDefaultPhoto} /></a><a href="javascript:;" class="artbtn" onClick={() => this.submitComment(item.id, replyContent)}>留 言</a><a href="javascript:;" class="escbtn" onClick={this.cancleReply}>稍后再说</a></div>
                     {
@@ -252,7 +271,7 @@ export default class Article extends Component {
     }
 
     handleReply = (item) => {
-        this.setState({ replyId: item.id })
+        this.setState({ replyId: item.id, isOpenReply: item.id === this.state.replyId ? !this.state.isOpenReply : true });
     }
     handleChangeReply = (e) => {
         this.setState({ replyContent: e.target.value })
@@ -297,7 +316,8 @@ export default class Article extends Component {
                 name: userInfo && userInfo.name,
                 isValidate: "0",
                 content: content,
-                userId: userInfo && userInfo.id
+                userId: userInfo && userInfo.id,
+                userPhoto: userInfo && userInfo.photo
             }).then((response) => {
                 global.constants.loading = false
                 if (response.data.status === 1) {
@@ -322,7 +342,7 @@ export default class Article extends Component {
 
         let Time = FormatDate.formatTime(articleInfo.updateDate)
         return (
-            <div className="">
+            <div className="background_art hd-line">
                 {/* 头部 */}
                 < Header />
                 {/* 轮播banner */}

@@ -81,6 +81,7 @@ export default class App extends Component {
             });
 
             var swiper_bzhd = new Swiper('.m-interact .swiper-container', {
+                autoHeight: true,//新增
                 slidesPerView: 'auto',
                 spaceBetween: 20,
                 loop: true,

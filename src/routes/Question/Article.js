@@ -7,6 +7,9 @@ import FormatDate from '../../static/js/utils/formatDate.js'
 import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
 import HotRead from '../../common/hotRead/Index'
+import Collect from '../../common/collect'
+import Like from '../../common/like'
+import Comment from '../../common/comment'
 import Service from '../../service/api.js'
 import Utils from '../../static/js/utils/utils.js'
 //import Editor from 'rc-wang-editor'
@@ -126,9 +129,9 @@ export default class QuestionArticle extends Component {
         this.props.history.push(router)
     }
     getArticleInfo = () => {
-
+        debugger
         Service.GetAllArticle({
-            id: this.props.match.params.qid,
+            id: this.props.match.params.aid,
             categoryId: this.categoryIds.id
         }).then((response) => {
             if (response.data.status === 1) {
@@ -141,7 +144,7 @@ export default class QuestionArticle extends Component {
     getCommentList = () => {
 
         Service.GetCommentList({
-            contentId: this.props.match.params.qid,
+            contentId: this.props.match.params.aid,
             categoryId: this.categoryIds.id
         }).then((response) => {
             if (response.data.status === 1) {
@@ -421,11 +424,12 @@ export default class QuestionArticle extends Component {
         Service.SubmitComment({
             title: articleInfo.title,
             categoryId: this.categoryIds.id,
-            contentId: this.props.match.params.qid,
+            contentId: this.props.match.params.aid,
             replyId: '',
-            name: userInfo && userInfo.id,
+            name: userInfo && userInfo.name,
             isValidate: "0",
-            content: this.state.EditorVal
+            content: this.state.EditorVal,
+            userId: userInfo && userInfo.id
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -473,7 +477,14 @@ export default class QuestionArticle extends Component {
                                     <a href="javascript:;">显示全部 <i className="fa-angle-down"></i></a>
                                 </div>
                             </div>
-                            <div className="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(articleInfo)}><i className="icon-heart"></i><span>{articleInfo.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(articleInfo)}><i className="icon-thumbs"></i><span>{articleInfo.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{articleInfo.commentNum}</span></a></div>
+                            <div className="f-bartool clearfix">
+                                <Collect item={articleInfo} />
+                                <Like item={articleInfo} />
+                                <Comment item={articleInfo} />
+                                {/* <a href="javascript:;" onClick={() => this.handleCollect(articleInfo)}><i className="icon-heart"></i><span>{articleInfo.collectNum}</span></a>
+                                <a href="javascript:;" onClick={() => this.handleLike(articleInfo)}><i className="icon-thumbs"></i><span>{articleInfo.likeNum}</span></a>
+                                <a href="javascript:;"><i className="icon-comment"></i><span>{articleInfo.commentNum}</span></a> */}
+                            </div>
 
                         </div>
 

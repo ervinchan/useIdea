@@ -14,6 +14,7 @@ import WheelBanner from '../../common/wheelBanner/Index'
 import Collect from '../../common/collect'
 import Like from '../../common/like'
 import Comment from '../../common/comment'
+import marquee from 'marquee'
 import 'swiper/dist/css/swiper.min.css'
 
 import 'antd/lib/pagination/style/index.css';
@@ -71,8 +72,8 @@ export default class Bookstore extends Component {
         // console.log(this.props.match.params);
         // this.getBooksList(this.props.match.params.tid, this.state.sortType)
         this.getNews()
-        this.getBanner()
         this.getReadData()
+
         $(function () {
             $(".u-select [role=note]").on("click", function (e) {
                 e = window.event || e;
@@ -88,8 +89,6 @@ export default class Bookstore extends Component {
                 that.setState({ sortType })
                 that.getBooksList(that.props.match.params.tid, sortType)
             });
-
-
         })
     }
 
@@ -102,60 +101,6 @@ export default class Bookstore extends Component {
             .catch((error) => {
                 console.log(error)
             })
-    }
-
-    getBanner = () => {
-        Service.GetBanners()
-            .then((response) => {
-                let banner = response.data.data
-                this.setState({ banner }, () => {
-                    new Swiper('.u-wheel .swiper-container', {
-                        loop: true,
-                        effect: 'fade',
-                        autoplay: {
-                            delay: 2000
-                        },
-                        pagination: {
-                            el: '.u-wheel .u-pagination',
-                            bulletClass: 'bull',
-                            bulletActiveClass: 'active',
-                            clickable: true
-                        }
-                    });
-                })
-
-            })
-            .catch((error) => {
-                console.log(error)
-            })
-    }
-
-    createBanner = () => {
-        const { banner } = this.state
-        let bigBanner = banner.slice(0, 3)
-        return bigBanner.map((item, index) => {
-            return (
-                <a key={index} className="swiper-slide" href={item.link}>
-                    <img src={item.image} alt={item.title} />
-                    <p>{item.title}</p>
-                </a>
-            )
-        })
-    }
-
-    createBannerList = () => {
-        const { banner } = this.state
-        let smallBanner = banner.slice(3, 7)
-        return smallBanner.map((item, index) => {
-            return (
-                <li key={index}>
-                    <a href={item.link}>
-                        <img src={item.image} alt={item.title} />
-                        <p>{item.title}</p>
-                    </a>
-                </li>
-            )
-        })
     }
 
     createNews = () => {
@@ -199,6 +144,13 @@ export default class Bookstore extends Component {
             .then((response) => {
                 let news = response.data.data
                 this.setState({ news })
+                if (news.length > 4) {
+                    marquee('fs-new ul', {
+                        speed: 180, // default speed = 1000, set speed to 4x
+                        freezeDelay: 1000 // freeze for a second once one marquee iteration is complete
+                    });
+                }
+
             })
             .catch((error) => {
                 console.log(error)
