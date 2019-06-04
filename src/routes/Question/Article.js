@@ -129,7 +129,6 @@ export default class QuestionArticle extends Component {
         this.props.history.push(router)
     }
     getArticleInfo = () => {
-        debugger
         Service.GetAllArticle({
             id: this.props.match.params.aid,
             categoryId: this.categoryIds.id
@@ -143,9 +142,12 @@ export default class QuestionArticle extends Component {
 
     getCommentList = () => {
 
-        Service.GetCommentList({
-            contentId: this.props.match.params.aid,
-            categoryId: this.categoryIds.id
+        // Service.GetCommentList({
+        //     contentId: this.props.match.params.aid,
+        //     categoryId: this.categoryIds.id
+        // })
+        Service.GetArticleComment({
+            id: this.props.match.params.aid
         }).then((response) => {
             if (response.data.status === 1) {
                 let commentList = response.data.data
@@ -175,13 +177,33 @@ export default class QuestionArticle extends Component {
         const { questionList } = this.state;
         return questionList.list && questionList.list.slice(0, 10).map((item, index) => {
             return (
-                <li onClick={() => Utils.gotoRouter(this.props.history, '/Question/Article/', item.id)}>
+                <li onClick={() => this.gotoRouter(`/Question/Article/${item.id}`)}>
                     <a href="javascript:;">{item.title}</a><span>{item.commentNum}个回答</span>
                 </li>
             )
         })
     }
-
+    handleArticleLike = (item) => {
+        Service.HandleArticleLike({
+            userId: userInfo && userInfo.id,
+            myUseId: userInfo && userInfo.id,
+            id: item.id
+        }).then((response) => {
+            global.constants.loading = false
+            if (response.data.status === 1) {
+                item.likeNum++
+                this.setState({})
+            } else if (response.data.status === 3) {
+                item.likeNum--
+                this.setState({})
+            }
+            /* global layer */
+            layer.msg(response.data.message)
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
     // createCommentList = (data) => {
     //     const { commentList } = this.state;
     //     return commentList.list && commentList.list.map((item, index) => {
@@ -225,7 +247,7 @@ export default class QuestionArticle extends Component {
                 <div className="fu_detail hidden" id="item11">
                     <div className="fu_info">
                         <a href="javascript:;" className="face">
-                            <img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
+                            <img src={item.userPhoto || defaultPhoto} onError={Utils.setDefaultPhoto} />
                         </a>
                         <div className="alt clearfix">
                             <a href="javascript:;" className="j_name">{item.name}</a>
@@ -237,15 +259,14 @@ export default class QuestionArticle extends Component {
                     <div className="fu_txt clearfix" dangerouslySetInnerHTML={{ __html: item.content }}>
 
                     </div>
-                    <a href="javascript:;" className="jq-hidden" data-for="#item11"> <i className="fa-angle-up"></i></a>
+                    {/* <a href="javascript:;" className="jq-hidden" data-for="#item11"> <i className="fa-angle-up"></i></a> */}
                     <div className="f-bartool clearfix">
-                        {/* <a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a> */}
-                        <a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a>
+                        <a href="javascript:;" onClick={() => this.handleArticleLike(item)}><i className="icon-heart"></i><span>{item.likeNum}</span></a>
+
                         <a href="javascript:;" /*onClick={() => this.handleReply(item)}*/><i className="icon-comment"></i><span>{item.commentNum}</span></a>
-                        {/* <a href="javascript:;"><i className="icon-thumbs"></i><span>36</span></a>
-                        <a href="javascript:;"><i className="icon-comment"></i><span>51</span></a> */}
+
                         <a href="javascript:;"><i className="icon-link"></i><span>链接</span></a>
-                        <a href="javascript:;" className="tousu" onClick={() => this.handleComplaints(item)}>投诉内容</a>
+                        {/* <a href="javascript:;" className="tousu" onClick={() => this.handleComplaints(item)}>投诉内容</a> */}
                     </div>
                     {
                         item.childComments &&
@@ -419,17 +440,28 @@ export default class QuestionArticle extends Component {
         this.getBooksList(this.props.match.params.tid, this.state.sortType, page)
     }
 
-    submitComment = () => {
+    submitComment = (pid) => {
         const { articleInfo } = this.state;
+        // Service.SubmitComment({
+        //     title: articleInfo.title,
+        //     categoryId: this.categoryIds.id,
+        //     contentId: this.props.match.params.aid,
+        //     replyId: '',
+        //     name: userInfo && userInfo.name,
+        //     isValidate: "0",
+        //     content: this.state.EditorVal,
+        //     userId: userInfo && userInfo.id
+        // })
         Service.SubmitComment({
             title: articleInfo.title,
-            categoryId: this.categoryIds.id,
+            categoryId: articleInfo.category.id,
             contentId: this.props.match.params.aid,
-            replyId: '',
+            replyId: pid || '',
             name: userInfo && userInfo.name,
             isValidate: "0",
             content: this.state.EditorVal,
-            userId: userInfo && userInfo.id
+            userId: userInfo && userInfo.id,
+            userPhoto: userInfo && userInfo.photo
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -468,13 +500,13 @@ export default class QuestionArticle extends Component {
                                 <a href="javascript:;" className="j_name"><img src={articleInfo.user && (articleInfo.user.photo || defaultPhoto)} className="thumb-img" />{articleInfo.user && articleInfo.user.name}</a>
                                 <span>▪</span>
                                 <span>{Time}</span>
-                                <a href="javascript:;" className="tag">文案技巧</a>
+                                {articleInfo.classifying && articleInfo.classifying.classifying && <a href="javascript:;" className="tag">{articleInfo.classifying.classifying}</a>}
                             </div>
                             <div className="txt clearfix">
-                                <img src={articleInfo.image} className="thumb-img" />
+                                {articleInfo.image && <img src={articleInfo.image} className="thumb-img" />}
                                 <div className="box">
                                     <div dangerouslySetInnerHTML={{ __html: articleInfo.articleData && articleInfo.articleData.content }} />
-                                    <a href="javascript:;">显示全部 <i className="fa-angle-down"></i></a>
+                                    {articleInfo.articleData && articleInfo.articleData.content && articleInfo.articleData.content.lenght > 100 && <a href="javascript:;">显示全部 <i className="fa-angle-down"></i></a>}
                                 </div>
                             </div>
                             <div className="f-bartool clearfix">
@@ -518,7 +550,7 @@ export default class QuestionArticle extends Component {
                         </div>
                         <div className="u-forum">
                             <div className="u-title3">
-                                <b>{commentList.count || 0}条热心回答</b>
+                                <b>{commentList.list && commentList.list.length || 0}条热心回答</b>
                                 {/* <div className="u-select">
                                     <div className="in_sort" role="note">热度排行</div>
                                     <div data-for=".in_sort" role="menu">

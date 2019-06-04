@@ -17,7 +17,7 @@ import 'antd/lib/pagination/style/index.css';
 import '../../static/less/goodcopy.less';
 import defaultPhoto from "../../static/images/user/default.png"
 import Utils from "../../static/js/utils/utils"
-const PAGESIZE = 20;
+const PAGESIZE = 16;
 
 export default class GoodCopy extends Component {
 
@@ -128,7 +128,7 @@ export default class GoodCopy extends Component {
         const { HotKeywords } = this.state
         return HotKeywords && HotKeywords.slice(0, 12).map((item, index) => {
             return (
-                <a href="javascript:;" onClick={() => this.handleSearch(item.brand)}>{item.brand}</a>
+                <a href="javascript:;" onClick={() => this.handleSearch(item.keywords)}>{item.keywords}</a>
             )
         })
     }
@@ -201,7 +201,7 @@ export default class GoodCopy extends Component {
                     </ul>
                 </div>
                 {
-                    goodcopyList && goodcopyList.list && (
+                    goodcopyList && goodcopyList.list && (goodcopyList.count > PAGESIZE) && (
                         <Pagination key="Pagination" className="u-pages" current={this.state.curPage} onChange={this.handlePageChange} total={goodcopyList && goodcopyList.count} pageSize={PAGESIZE} itemRender={(page, type, originalElement) => {
                             switch (type) {
                                 case 'prev':

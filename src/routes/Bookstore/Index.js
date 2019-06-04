@@ -60,7 +60,7 @@ export default class Bookstore extends Component {
     }
 
     componentDidMount() {
-        let that = this
+        
         let tid = this.props.match.params.tid
         let hasSearch = tid && tid.includes('search')
         if (hasSearch) {
@@ -74,6 +74,10 @@ export default class Bookstore extends Component {
         this.getNews()
         this.getReadData()
 
+
+    }
+    componentDidUpdate() {
+        let that = this
         $(function () {
             $(".u-select [role=note]").on("click", function (e) {
                 e = window.event || e;

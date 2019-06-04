@@ -24,7 +24,7 @@ export default class QyHead extends Component {
             collectList: [],
             visibleCover: false,
             userImg: "",
-            userToolNum:{}
+            userToolNum: {}
         };
     }
 
@@ -57,11 +57,10 @@ export default class QyHead extends Component {
             handleImg(file, newUrl)
         }, this);
     }
-    getNumberByUser = ()=>{
-        debugger
+    getNumberByUser = () => {
         Service.FindNumberByUserId({
             userId: userInfo && userInfo.id,
-            myUserId:'tourists'
+            myUserId: 'tourists'
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -74,7 +73,7 @@ export default class QyHead extends Component {
     }
 
     render() {
-        const { fileList,userToolNum } = this.state;
+        const { fileList, userToolNum } = this.state;
         const { info, userPhoto, setUserPhoto, userImg } = this.props;
         const tabTit = `来信中心`;
         const props = {

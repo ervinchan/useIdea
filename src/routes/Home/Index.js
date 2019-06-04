@@ -52,6 +52,24 @@ export default class App extends Component {
     }
 
     componentDidMount() {
+
+        // this.getQuestionList();
+        this.getViewPointList();
+        this.getGoodCopyList();
+        this.getBootStoreList();
+        this.getJobsList();
+        this.getBannerA();
+        this.getBannerB();
+        this.getBannerC();
+        this.getBannerE();
+        this.getBannerF();
+        this.getBannerG();
+        this.getRecommendBooks(this.state.pageNo);
+        this.getTopAuthor();
+        this.getHitsArticle();
+        this.getHotCompany();
+    }
+    componentDidUpdate(prevProps, prevState) {
         $(function () {
             $("#utabs").find("li").on("mouseenter", function () {
                 let tab = $($(this).attr("tabfor"));
@@ -80,18 +98,6 @@ export default class App extends Component {
                 }
             });
 
-            var swiper_bzhd = new Swiper('.m-interact .swiper-container', {
-                autoHeight: true,//新增
-                slidesPerView: 'auto',
-                spaceBetween: 20,
-                loop: true,
-                loopFillGroupWithBlank: true,
-                navigation: {
-                    nextEl: '.m-interact .f-next',
-                    prevEl: '.m-interact .f-prev'
-                }
-            });
-
             var swiper_txzd = new Swiper('.p-txzd .swiper-container', {
                 autoHeight: true,
                 slidesPerView: 4,
@@ -113,6 +119,18 @@ export default class App extends Component {
                     clickable: true
                 }
             });
+            var swiper_bzhd = new Swiper('.m-interact .swiper-container', {
+                autoHeight: true,//新增
+                slidesPerView: 'auto',
+                spaceBetween: 20,
+                loop: true,
+                loopFillGroupWithBlank: true,
+                navigation: {
+                    nextEl: '.m-interact .f-next',
+                    prevEl: '.m-interact .f-prev'
+                }
+            });
+
             //下拉选择
             $(".u-select [role=note]").on("click", function (e) {
                 e = window.event || e;
@@ -162,21 +180,6 @@ export default class App extends Component {
                 }
             });
         })
-        // this.getQuestionList();
-        this.getViewPointList();
-        this.getGoodCopyList();
-        this.getBootStoreList();
-        this.getJobsList();
-        this.getBannerA();
-        this.getBannerB();
-        this.getBannerC();
-        this.getBannerE();
-        this.getBannerF();
-        this.getBannerG();
-        this.getRecommendBooks(this.state.pageNo);
-        this.getTopAuthor();
-        this.getHitsArticle();
-        this.getHotCompany();
     }
 
     getBannerA = () => {
@@ -511,7 +514,7 @@ export default class App extends Component {
             return (
                 <a href="javascript:;" style={{ width: "280px", marginRight: "10px" }} key={index} className="swiper-slide" onClick={() => this.gotoRouter(`${router}/${item.id}`)}>
                     <em><img src={bookImagUrl} /> </em>
-                    <h1>{item.name}</h1>
+                    <h1>{item.bookName}</h1>
                     <h3> {item.author}</h3>
                     <div className="txt">{item.editorRecommend}</div>
                 </a>
@@ -535,6 +538,7 @@ export default class App extends Component {
             pageNo: pageNo || 1,
             pageSize: PAGESIZE
         }).then((response) => {
+            global.constants.loading = false
             if (response.data.status === 1) {
                 if (pageNo === 1) {
                     const recommendBooks = response.data.data
@@ -571,7 +575,7 @@ export default class App extends Component {
                 let bannerItem = bannerFList[i - 1]
                 if (bannerItem) {
                     banner = (
-                        <a href={bannerItem.url} class="seat-push">
+                        <a href={bannerItem.link} target="_blank" class="seat-push">
                             <LazyLoad><img src={bannerItem.image} /></LazyLoad>
                             <span class="badge">推荐</span>
                             <p class="txt">{bannerItem.name}</p>
@@ -641,7 +645,7 @@ export default class App extends Component {
                 <li key={index}>
                     <a href="javascript:;" onClick={() => this.gotoRouter(`/UserNews/${item.user.id}`)}>
                         <em><LazyLoad><img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} /></LazyLoad></em>
-                        <span>{item.author}</span>
+                        <span>{item.user.name}</span>
                         <i className="fa-angle-right"></i>
                     </a>
                 </li>
@@ -781,7 +785,7 @@ export default class App extends Component {
                             <li><a href="javascript:;" onClick={() => this.gotoRouter('/Viewpoint')}>醒来再读</a></li>
                             <li><a href="javascript:;" onClick={() => this.gotoRouter('/GoodCopy')}>吃口文案</a></li>
                             <li><a href="javascript:;" onClick={() => this.gotoRouter('/Bookstore')}>书单上新</a></li>
-                            <li><a href="javascript:;" onClick={() => this.gotoRouter('/Job')}>招聘</a></li>
+                            {/* <li><a href="javascript:;" onClick={() => this.gotoRouter('/Job')}>招聘</a></li> */}
                         </ul>
                     </div>
 

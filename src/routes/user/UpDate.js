@@ -243,7 +243,6 @@ export default class InfoUpdate extends Component {
     }
 
     submitUserInfo = () => {
-        debugger
         const { info, province, cityItem, districtItem, userPhoto, weChatCode } = this.state;
         this.setState({ pswConfirmError: false })
         if (info.newPassword && (info.newPassword !== info.confirmPassword)) {
@@ -398,7 +397,7 @@ export default class InfoUpdate extends Component {
                                 <span>粉丝</span><a href={`/#/MyFans/${userInfo && userInfo.id}`}>{userInfo && userInfo.attention2Num}</a>
                             </p>
                         </div>
-                        <div className="address"><i className="icon-address-w"></i>{info.provence}  {info.city}</div>
+                        <div className="address"><i className="icon-address-w"></i>{info.provence.id}  {info.city.id}</div>
                         <a href="javascript:;" className="add_upload" onClick={() => this.gotoRouter(`/ArticleEditor`)}>发表作品/经验</a>
                     </div>
                 </div>
@@ -452,7 +451,7 @@ export default class InfoUpdate extends Component {
                                     <ul className="select-group clearfix">
                                         <li>
                                             <div className="u-select">
-                                                <div className="in_province" role="note">{(province && province.name) || info.provence || "省份"}</div>
+                                                <div className="in_province" role="note">{(province && province.name) || info.provence.id || "省份"}</div>
                                                 <div data-for=".in_province" role="menu">
                                                     <ul>
                                                         {this.createRegion()}
@@ -462,7 +461,7 @@ export default class InfoUpdate extends Component {
                                         </li>
                                         <li>
                                             <div className="u-select">
-                                                <div className="in_city" role="note">{(cityItem && cityItem.name) || info.city || "城市"}</div>
+                                                <div className="in_city" role="note">{(cityItem && cityItem.name) || info.city.id || "城市"}</div>
                                                 <div data-for=".in_city" role="menu">
                                                     <ul>
                                                         {this.createCity()}
@@ -472,7 +471,7 @@ export default class InfoUpdate extends Component {
                                         </li>
                                         <li>
                                             <div className="u-select">
-                                                <div className="in_area" role="note">{(districtItem && districtItem.name) || info.district || "县区"}</div>
+                                                <div className="in_area" role="note">{(districtItem && districtItem.name) || info.district.id || "县区"}</div>
                                                 <div data-for=".in_area" role="menu">
                                                     <ul>
                                                         {this.createDistrict()}
@@ -583,7 +582,7 @@ export default class InfoUpdate extends Component {
                     </div>
                 </div>
                 <Footer />
-                <Loading />
+                {/* <Loading /> */}
             </div>
         );
     }

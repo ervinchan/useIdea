@@ -71,7 +71,7 @@ export default class ArticleList extends Component {
                             <span>{Time}</span>
                         </div>
                         <div class="lx_box">
-                            <a class="thumb-img" href="javascript:;"><img src={item.image || "images/user/u1.png"}  onClick={() => this.gotoRouter(`/Qyspace/${item.user.id}`)}/></a>
+                            <a class="thumb-img" href="javascript:;"><img src={item.image || "images/user/u1.png"} onClick={() => this.gotoRouter(`/Qyspace/${item.user.id}`)} /></a>
                             <h1><a href="javascript:;" onClick={() => this.gotoRouter(`/Qyspace/${item.user.id}`)}>{item.title}</a></h1>
                             <p>{Time}</p>
                         </div>
@@ -169,12 +169,14 @@ export default class ArticleList extends Component {
     render() {
         const { toolList } = this.state;
         const { className, data } = this.props;
+
+        debugger
         return (
             <div class={className}>
                 <ul class="lx-article clearfix">
                     {this.createList()}
                 </ul>
-                <div class="more-b" style={{ display: data.list && data.list.length < 20 ? 'none' : 'block' }}>
+                <div class="more-b" style={{ display: (data.list && data.list.length > 20 ) ? 'block' : 'none' }}>
                     <a href="javascript:;">更多动态</a>
                 </div>
             </div>

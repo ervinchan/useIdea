@@ -47,7 +47,7 @@ export default class Viewpoint extends Component {
     componentDidMount() {
 
         this.getViewPointMenu(this.categoryIds.id);
-        this.getViewPoints(this.categoryIds.id);
+        this.getViewPoints();
         this.getHostAuthor();
         this.getRecommendList(this.categoryIds.id);
         this.getBannerA();
@@ -74,10 +74,15 @@ export default class Viewpoint extends Component {
         })
     }
     getViewPoints = (categoryId) => {
-        Service.GetAllArticle({
-            categoryId: categoryId || '',
+        let params = categoryId ? {
+            categoryId: this.categoryIds.id || '',
+            id: categoryId,
             pageSize: PAGESIZE
-        }).then((response) => {
+        } : {
+                categoryId: this.categoryIds.id || '',
+                pageSize: PAGESIZE
+            }
+        Service.GetAllArticle(params).then((response) => {
             global.constants.loading = false
             let viewPointList = response.data.data
             this.setState({ viewPointList })
@@ -103,6 +108,7 @@ export default class Viewpoint extends Component {
     getRecommendList = () => {
         Service.GetAllArticle({
             isTop: 1,
+            categoryId: this.categoryIds.id,
             pageNo: 1,
             pageSize: 4
         }).then((response) => {
@@ -209,7 +215,7 @@ export default class Viewpoint extends Component {
                 <li key={index}>
                     <a className="thumb-img" href={`/#/Inspiration/Article/${item.id}`}>
                         <img src={item.image} />
-                        <span>{item.category.name}</span>
+                        <span>{item.brand}</span>
                     </a>
                     <h1><a href={`/#/Inspiration/Article/${item.id}`}>{item.description}</a></h1>
                     <div className="f-bartool clearfix">

@@ -1,6 +1,7 @@
 global.constants = {
     loading: false,
     userInfo: JSON.parse(sessionStorage.getItem("userInfo")) || {},
+    weixin: "../../static/images/weixin.jpg",
     PAGESIZE: 15,
     categorys: [
         { id: '4812062598ec4b10bedfb38b59ea3e94', name: '请教' },
@@ -36,7 +37,18 @@ global.constants = {
         },
         "阅读场景": {
             'id': 'dc1b3e874dcd4f808be1d90b68a85c3d',
-            'url': '/Bookstore//ReadingTime',
+            'url': '/Bookstore/ReadingTime',
+        },
+        '见识灵感': {
+            'id': 'b49c9133960c4700b253b7a3283dcbef',
+            'url': 'Inspiration',
+        },
+        '专访幕后': {
+            'id': '299c0a633b87429aa72c66656121427c',
+            'url': '/Inspiration/Interview'
+        },
+        '灵感库': {
+            'id': 'b1969f551e00485e855ea4f8d26aea4b'
         },
         "招聘": {
             'id': '981892a5c2394fe7b01ce706d917699e',

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Menu, Icon, Badge, Tabs, List, Avatar, Divider, Button, Card, Popover } from 'antd';
+import { Tabs, Popover } from 'antd';
 import Slider from "react-slick";
 import { StickyContainer, Sticky } from 'react-sticky';
 
@@ -9,6 +9,7 @@ import MyWork from './MyWork.js';
 import 'swiper/dist/css/swiper.min.css'
 import '../../static/less/u.icenter.less'
 import 'antd/lib/tabs/style/index.less';
+import 'antd/lib/popover/style/index.less';
 import '../../static/less/u.space.less'
 import Service from '../../service/api.js'
 import '../../Constants'
@@ -20,11 +21,14 @@ const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
 export default class UserNews extends Component {
     /* global $ */
     tabDom = null
+    PAGESIZE = 6;
     constructor(props) {
         super(props);
         this.state = {
             news: [],
-            authorInfo: {}
+            authorInfo: {},
+            visibleWexin: false,
+            userToolNum: {}
         };
     }
 
@@ -34,13 +38,14 @@ export default class UserNews extends Component {
         this.getNews(userId)
         this.getNewsArticles(userId)
         this.getUserInfo(userId)
+        this.getNumberByUser()
     }
 
     getNews = (userId, pageNo) => {
         Service.GetLatestAction({
             userId: userId,
             myUserId: userInfo && userInfo.id,
-            pageSize: global.constants.PAGESIZE,
+            pageSize: this.PAGESIZE,
             pageNo: pageNo
         }).then((response) => {
             global.constants.loading = false
@@ -72,7 +77,7 @@ export default class UserNews extends Component {
         Service.GetAllArticle({
             userId: userId,
             myUserId: userInfo && userInfo.id,
-            pageSize: global.constants.PAGESIZE,
+            pageSize: this.PAGESIZE,
             pageNo: pageNo
         }).then((response) => {
             global.constants.loading = false
@@ -91,8 +96,33 @@ export default class UserNews extends Component {
         this.props.history.push(router)
     }
 
+    hide = () => {
+        this.setState({
+            visibleWexin: false,
+        });
+    };
+
+    handleVisibleChange = visible => {
+        this.setState({ visibleWexin: visible });
+    };
+
+    getNumberByUser = () => {
+        Service.FindNumberByUserId({
+            userId: userInfo && userInfo.id,
+            myUserId: 'tourists'
+        }).then((response) => {
+            global.constants.loading = false
+            if (response.data.status === 1) {
+                this.setState({ userToolNum: response.data.data })
+            }
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+
     render() {
-        const { authorInfo, news, newsArticles } = this.state
+        const { authorInfo, news, newsArticles, userToolNum } = this.state
         return (
             <div className="">
                 {/* 头部 */}
@@ -110,23 +140,36 @@ export default class UserNews extends Component {
                         </div>
                         <div className="nick-data">
                             <p>
-                                <span>作品</span><a href="javascript:;">{authorInfo.attentionNum}</a>
-                                <span>关注</span><a href="javascript:;">{authorInfo.attentionNum}</a>
-                                <span>粉丝</span><a href="javascript:;" onClick={() => this.gotoRouter(`/MyFans/${authorInfo.id}`)}>{authorInfo.attention2Num}</a>
+                                <span>作品</span><a href="javascript:;" onClick={() => this.gotoRouter(`/UserCenter/${userInfo && userInfo.id}`)}>{userToolNum && userToolNum.articleNum}</a>
+                                {/* <span>关注</span><a href={`/#/MyFans/${userInfo && userInfo.id}`} >{userToolNum && userToolNum.attentionNum}</a>
+                                <span>粉丝</span><a href={`/#/MyFans/${userInfo && userInfo.id}`}>{userToolNum && userToolNum.fansNum}</a> */}
+                                <span>关注</span><a href="javascript:;" onClick={() => this.gotoRouter(`/MyFans/${userInfo && userInfo.id}`)} >{userToolNum && userToolNum.attentionNum}</a>
+                                <span>粉丝</span><a href="javascript:;" onClick={() => this.gotoRouter(`/MyFans/${userInfo && userInfo.id}`)}>{userToolNum && userToolNum.fansNum}</a>
                             </p>
                         </div>
-                        <div className="address"><i className="icon-address-w"></i>{authorInfo.provence}{authorInfo.city}</div>
-                        <div class="userFx">
-                            <a href="javascript:;" class="uweixin"><i class="icon-weixin-in"></i></a>
-                            <a href="javascript:;" class="uweibo"><i class="icon-weibo-in"></i></a>
-                            <a href="javascript:;" class="uzhihu"><i class="icon-zhihu-in"></i></a>
-                            <a href="javascript:;" class="udou"><i class="icon-dou-in"></i></a>
+                        <div className="address"><i className="icon-address-w"></i>{authorInfo.provence && authorInfo.provence.name} {authorInfo.city && authorInfo.city.name}</div>
+                        <div className="userFx">
+                            {
+                                authorInfo.weiXin &&
+                                <Popover
+                                    content={<img src={authorInfo.weiXin} alt="关注微信" />}
+                                    title=""
+                                    trigger="click"
+                                    visible={this.state.visibleWexin}
+                                    onVisibleChange={this.handleVisibleChange}
+                                >
+                                    <a href="javascript:;" className="uweixin" ><i className="icon-weixin-in"></i></a>
+                                </Popover>
+                            }
+                            {authorInfo.weiBo && <a href={authorInfo.weiBo} target="_blank" className="uweibo"><i className="icon-weibo-in"></i></a>}
+                            {authorInfo.zhiHu && <a href={authorInfo.zhiHu} target="_blank" className="uzhihu"><i className="icon-zhihu-in"></i></a>}
+                            {authorInfo.douBan && <a href={authorInfo.douBan} target="_blank" className="udou"><i className="icon-dou-in"></i></a>}
                         </div>
                         {/* <a href="javascript:;" className="add_upload" onClick={() => this.gotoRouter(`/ArticleEditor`)}>发表作品/经验</a> */}
                     </div>
                 </div>
-                <div class="wrapper g-icenter minpage">
-                    <div class="ue-tabnav">
+                <div className="wrapper g-icenter minpage">
+                    <div className="ue-tabnav">
                         <Tabs ref={e => this.tabDom = e} className="clearfix" onChange={this.handleTabChange}>
                             <TabPane tab="最新动态" key="news" className="qj-news">
                                 <MyWork data={news} tab="最新动态" history={this.props.history} getData={this.getNews} params={this.props.match.params} />
@@ -135,7 +178,7 @@ export default class UserNews extends Component {
                                 <MyWork data={newsArticles} tab="最新文章" history={this.props.history} getData={this.getNewsArticles} params={this.props.match.params} />
                             </TabPane>
                         </Tabs>
-                        {/* <a href="javascript:;" class="edit">更新个人资料</a> */}
+                        {/* <a href="javascript:;" className="edit">更新个人资料</a> */}
                     </div>
 
                 </div>

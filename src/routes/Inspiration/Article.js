@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Input, Tabs, Pagination } from 'antd';
+import { Popover } from 'antd';
 import FormatDate from '../../static/js/utils/formatDate.js'
 import Utils from '../../static/js/utils/utils.js'
 import Service from '../../service/api.js'
@@ -28,7 +28,9 @@ export default class Article extends Component {
             collectUserList: [],
             isFans: 0,
             replyContent: "",
-            isOpenReply: false
+            isOpenReply: false,
+            bannerAList: [],
+            visibleWexin: false
         };
     }
 
@@ -41,19 +43,14 @@ export default class Article extends Component {
         this.getArticleContent(aid)
         this.getCollectUsers(aid)
     }
-
-    componentWillMount() {
-
-    }
     componentDidMount() {
         let that = this
         let aid = this.props.match.params.aid
-        var script = document.createElement('script');
-        script.src = 'http://bdimg.share.baidu.com/static/api/js/share.js?cdnversion=' + ~(-new Date() / 36e5);
-        document.body.appendChild(script);
+
         this.getArticleInfo(aid)
         this.getArticleContent(aid)
         this.getCollectUsers(aid)
+        this.getBannerA()
         // $(".copy").on("click", function () {
         //     var inputText = document.getElementById('inputText');
         //     var currentFocus = document.activeElement;
@@ -64,14 +61,36 @@ export default class Article extends Component {
         // })
 
     }
+    componentDidUpdate(prevProps, prevState) {
 
+    }
+
+    getBannerA = () => {
+        Service.GetADList({
+            categoryId: "e12f2236bc134e18ac3db4028c626650",
+            id: "3c43ad8ac9ad4a2b860e335aea161805"
+        }).then((response) => {
+            if (response.data.status === 1) {
+                this.setState({ bannerAList: response.data.data })
+            }
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+
+    }
     getArticleInfo = (aid) => {
         Service.GetAllArticle({
             id: aid
         }).then((response) => {
+            global.constants.loading = false
             let articleInfo = response.data.data
             this.getArticleComment(aid, articleInfo.category.id)
-            this.setState({ articleInfo })
+            this.setState({ articleInfo }, function () {
+                var script = document.createElement('script');
+                script.src = 'http://bdimg.share.baidu.com/static/api/js/share.js?cdnversion=' + ~(-new Date() / 36e5);
+                document.body.appendChild(script);
+            })
         })
             .catch((error) => {
                 console.log(error)
@@ -82,6 +101,7 @@ export default class Article extends Component {
         Service.GetArticleContent({
             id: aid
         }).then((response) => {
+            global.constants.loading = false
             let articleContent = response.data.data
             this.setState({ articleContent })
         })
@@ -217,7 +237,7 @@ export default class Article extends Component {
                 <div className="disc-item">
                     <a href="javascript:;" className="thumb"><img src={item.userPhoto || defaultPhoto} onError={Utils.setDefaultPhoto} /></a>
                     <div className="alt">
-                        <a href="javascript:;" className="j_name" onClick={() => this.gotoRouter(`/UserNews${item.user.id}`)}>{item.user.name}</a><span className="dot"></span><span>{Time}</span>
+                        <a href="javascript:;" className="j_name" onClick={() => this.gotoRouter(`/UserNews${item.user && item.user.id}`)}>{item.user && item.user.name}</a><span className="dot"></span><span>{Time}</span>
                     </div>
                     <div className="txt">
                         {item.content}
@@ -246,7 +266,7 @@ export default class Article extends Component {
                 <div className="disc-item">
                     <a href="javascript:;" className="thumb"><img src={item.userPhoto || defaultPhoto} onError={Utils.setDefaultPhoto} /></a>
                     <div className="alt">
-                        <a href="javascript:;" className="j_name" onClick={() => this.gotoRouter(`/UserNews${item.user.id}`)}>{item.user.name}</a><span className="dot"></span><span>{Time}</span>
+                        <a href="javascript:;" className="j_name" onClick={() => this.gotoRouter(`/UserNews${item.user.id}`)}>{item.user && item.user.name}</a><span className="dot"></span><span>{Time}</span>
                     </div>
                     <div className="txt">
                         {item.content}
@@ -337,10 +357,22 @@ export default class Article extends Component {
 
     }
 
+    hide = () => {
+        this.setState({
+            visibleWexin: false,
+        });
+    };
+
+    handleVisibleChange = visible => {
+        this.setState({ visibleWexin: visible });
+    };
+
     render() {
-        const { articleInfo, articleContent, articleComment, isFans, commentTxt } = this.state;
+        const { articleInfo, articleContent, articleComment, isFans, commentTxt, bannerAList } = this.state;
 
         let Time = FormatDate.formatTime(articleInfo.updateDate)
+        let authorInfo = articleInfo && articleInfo.user
+        let gotoUserCetner = articleInfo.user && articleInfo.user.id === userInfo.id ? `/UserCenter/${articleInfo.user && articleInfo.user.id}` : `/UserNews/${articleInfo.user && articleInfo.user.id}`
         return (
             <div className="background_art hd-line">
                 {/* 头部 */}
@@ -406,9 +438,15 @@ export default class Article extends Component {
                             <a href="javascript:;"><i className="icon-more-3"></i></a>
                         </div> */}
                     </div>
-                    <a href="javascript:;" className="seat-x100 darken seat-art">
-                        <img src="images/article/d1.jpg" />
-                    </a>
+                    {
+                        bannerAList[0] &&
+                        (
+                            <a href={bannerAList[0].link} target="_blank" className="seat-x100 darken seat-art">
+                                <img alt={bannerAList[0].name} src={bannerAList[0].image} />
+                            </a>
+                        )
+                    }
+
                     <div className="art-discuss">
                         <h1>刚收到 {articleComment.count ? articleComment.count : 0} 条评论留言</h1>
                         <div className="artfrom">
@@ -421,15 +459,30 @@ export default class Article extends Component {
                         <div className="author">
                             <h1>本文作者</h1>
                             <div className="box">
-                                <a href="javascript:;" className="thumb" onClick={() => this.gotoRouter(`/UserNews/${articleInfo.user && articleInfo.user.id}`)}>
+                                <a href="javascript:;" className="thumb" onClick={() => this.gotoRouter(gotoUserCetner)}>
                                     <img src={articleInfo.user && articleInfo.user.photo || defaultPhoto} />
                                 </a>
                                 <h2>{articleInfo.user && articleInfo.user.name}</h2>
                                 <div className="bar">
-                                    <a href="javascript:;" className="icon-weixin-in"></a>
+                                    {/* <a href="javascript:;" className="icon-weixin-in"></a>
                                     <a href="javascript:;" className="icon-weibo-in"></a>
                                     <a href="javascript:;" className="icon-zhihu-in"></a>
-                                    <a href="javascript:;" className="icon-dou-in"></a>
+                                    <a href="javascript:;" className="icon-dou-in"></a> */}
+                                    {
+                                        authorInfo && authorInfo.weiXin &&
+                                        <Popover
+                                            content={<img src={authorInfo && authorInfo.weiXin} alt="关注微信" />}
+                                            title=""
+                                            trigger="click"
+                                            visible={this.state.visibleWexin}
+                                            onVisibleChange={this.handleVisibleChange}
+                                        >
+                                            <a href="javascript:;" className="uweixin" ><i className="icon-weixin-in"></i></a>
+                                        </Popover>
+                                    }
+                                    {authorInfo && authorInfo.weiBo && <a href={authorInfo.weiBo} target="_blank" className="uweibo"><i className="icon-weibo-in"></i></a>}
+                                    {authorInfo && authorInfo.zhiHu && <a href={authorInfo.zhiHu} target="_blank" className="uzhihu"><i className="icon-zhihu-in"></i></a>}
+                                    {authorInfo && authorInfo.douBan && <a href={authorInfo.douBan} target="_blank" className="udou"><i className="icon-dou-in"></i></a>}
                                 </div>
                                 <div className="lk">
                                     {
@@ -439,7 +492,7 @@ export default class Article extends Component {
                                     {/* {
                                         isFans && <a href="javascript:;" onClick={() => this.handleSubFans(JSON.parse(sessionStorage.getItem("userInfo")) && JSON.parse(sessionStorage.getItem("userInfo")).id)}>取消关注</a>
                                     } */}
-                                    <a href="javascript:;" onClick={() => this.gotoRouter(`/UserNews/${articleInfo.user.id}`)}>主 页</a>
+                                    <a href="javascript:;" onClick={() => this.gotoRouter(gotoUserCetner)}>主 页</a>
                                 </div>
                             </div>
                         </div>

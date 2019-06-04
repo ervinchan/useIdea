@@ -18,7 +18,7 @@ import Loading from '../../common/Loading/Index'
 import Item from 'antd/lib/list/Item';
 import defaultPhoto from "../../static/images/user/default.png"
 const TabPane = Tabs.TabPane;
-
+const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
 export default class UserCenter extends Component {
     /* global $ */
     tabDom = null
@@ -27,7 +27,9 @@ export default class UserCenter extends Component {
         this.state = {
             myFocusList: [],
             myFansList: [],
-            activeKey: 'news'
+            activeKey: 'news',
+            visibleWexin: false,
+            userToolNum: {}
         };
     }
 
@@ -69,6 +71,7 @@ export default class UserCenter extends Component {
         });
         this.getMyFans();
         this.getMyFocus();
+        this.getNumberByUser()
     }
     handleTabChange = (key) => {
         console.log(key);
@@ -132,7 +135,7 @@ export default class UserCenter extends Component {
         const { articleInfo } = this.state;
         Service.AddAttention({
             attention2UserId: uid,
-            userId: JSON.parse(sessionStorage.getItem("userInfo")).id
+            userId: userInfo.id
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -149,7 +152,7 @@ export default class UserCenter extends Component {
     }
     createMyFans = () => {
         const { myFansList } = this.state;
-        return myFansList.map((item, index) => {
+        return myFansList.list && myFansList.list.map((item, index) => {
             return (
                 <li>
                     <div class="lx-item">
@@ -170,8 +173,33 @@ export default class UserCenter extends Component {
             )
         })
     }
+    hide = () => {
+        this.setState({
+            visibleWexin: false,
+        });
+    };
+
+    handleVisibleChange = visible => {
+        this.setState({ visibleWexin: visible });
+    };
+
+    getNumberByUser = () => {
+        Service.FindNumberByUserId({
+            userId: userInfo && userInfo.id,
+            myUserId: 'tourists'
+        }).then((response) => {
+            global.constants.loading = false
+            if (response.data.status === 1) {
+                this.setState({ userToolNum: response.data.data })
+            }
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
 
     render() {
+        const { userToolNum } = this.state;
         const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
         return (
             <div className="">
@@ -190,17 +218,30 @@ export default class UserCenter extends Component {
                         </div>
                         <div className="nick-data">
                             <p>
-                                <span>作品</span><a href="javascript:;">{userInfo.attentionNum}</a>
-                                <span>关注</span><a href="javascript:;">{userInfo.attentionNum}</a>
-                                <span>粉丝</span><a href="javascript:;" onClick={() => this.gotoRouter(`/MyFans/${userInfo.id}`)}>{userInfo.attention2Num}</a>
+                                <span>作品</span><a href="javascript:;" onClick={() => this.gotoRouter(`/UserCenter/${userInfo && userInfo.id}`)}>{userToolNum && userToolNum.articleNum}</a>
+                                {/* <span>关注</span><a href={`/#/MyFans/${userInfo && userInfo.id}`} >{userToolNum && userToolNum.attentionNum}</a>
+                                <span>粉丝</span><a href={`/#/MyFans/${userInfo && userInfo.id}`}>{userToolNum && userToolNum.fansNum}</a> */}
+                                <span>关注</span><a href="javascript:;" onClick={() => this.gotoRouter(`/MyFans/${userInfo && userInfo.id}`)} >{userToolNum && userToolNum.attentionNum}</a>
+                                <span>粉丝</span><a href="javascript:;" onClick={() => this.gotoRouter(`/MyFans/${userInfo && userInfo.id}`)}>{userToolNum && userToolNum.fansNum}</a>
                             </p>
                         </div>
                         <div className="address"><i className="icon-address-w"></i>上海  卢湾</div>
                         <div class="userFx">
-                            <a href="javascript:;" class="uweixin"><i class="icon-weixin-in"></i></a>
-                            <a href="javascript:;" class="uweibo"><i class="icon-weibo-in"></i></a>
-                            <a href="javascript:;" class="uzhihu"><i class="icon-zhihu-in"></i></a>
-                            <a href="javascript:;" class="udou"><i class="icon-dou-in"></i></a>
+                            {
+                                userInfo.weiXin &&
+                                <Popover
+                                    content={<img src={userInfo.weiXin} alt="关注微信" />}
+                                    title=""
+                                    trigger="click"
+                                    visible={this.state.visibleWexin}
+                                    onVisibleChange={this.handleVisibleChange}
+                                >
+                                    <a href="javascript:;" className="uweixin" ><i className="icon-weixin-in"></i></a>
+                                </Popover>
+                            }
+                            {userInfo.weiBo && <a href={userInfo.weiBo} target="_blank" className="uweibo"><i className="icon-weibo-in"></i></a>}
+                            {userInfo.zhiHu && <a href={userInfo.zhiHu} target="_blank" className="uzhihu"><i className="icon-zhihu-in"></i></a>}
+                            {userInfo.douBan && <a href={userInfo.douBan} target="_blank" className="udou"><i className="icon-dou-in"></i></a>}
                         </div>
 
                     </div>
@@ -214,8 +255,8 @@ export default class UserCenter extends Component {
                             
                         </ul> */}
                         <Tabs ref={e => this.tabDom = e} className="clearfix" onChange={this.handleTabChange}>
-                            <TabPane tab={["我关注的人", <span>{userInfo.attentionNum}</span>]} key="news" className="qj-news lx-fans clearfix">{this.createMyFocus()}</TabPane>
-                            <TabPane tab={["我的粉丝", <span>{userInfo.attention2Num}</span>]} key="reco" className="qj-news lx-fans clearfix">{this.createMyFans()}</TabPane>
+                            <TabPane tab={["我关注的人", <span>{userToolNum && userToolNum.attentionNum}</span>]} key="news" className="qj-news lx-fans clearfix">{this.createMyFocus()}</TabPane>
+                            <TabPane tab={["我的粉丝", <span>{userToolNum && userToolNum.fansNum}</span>]} key="reco" className="qj-news lx-fans clearfix">{this.createMyFans()}</TabPane>
                         </Tabs>
                         {/* <a href="u_myaccount.html" class="edit">更新个人资料</a> */}
                     </div>

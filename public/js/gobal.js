@@ -1,3 +1,4 @@
+
 /*gobal $ */
 /*gobal layer */
 /*gobal tab */
@@ -56,7 +57,7 @@ $(function () {
                     closeBtn: 0,
                     anim: 0,
                     shadeClose: true,
-                    content: '<div class="weixin-box"><h1>文案圈周刊</h1><img src="/@2018/css/images/weixin.jpg" alt="微信公众号" /><h3>微信扫码关注，记录创作者的洞见</h3><p>联系编辑：zhuquex</p></div>'
+                    content: '<div class="weixin-box"><h1>响创意 官方微信</h1><img src="/images/weixin.jpg" alt="微信公众号" /><h3>扫码关注，记录创造者的洞见</h3><p>合作联系：zhuquex</p></div>'
                 });
                 break;
             case ("reply"):

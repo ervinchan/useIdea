@@ -15,10 +15,9 @@ import Comment from '../../common/comment'
 import 'antd/lib/pagination/style/index.css';
 
 import defaultPhoto from "../../static/images/user/default.png"
-const PAGESIZE = 3;
 
 export default class MyWork extends Component {
-
+    PAGESIZE = 6
     constructor(props) {
         super(props);
         this.state = {
@@ -48,56 +47,7 @@ export default class MyWork extends Component {
             $($(this).data("for")).toggleClass("hidden");
         });
 
-        this.getArticleInfo("7a8bbb7d262142cbb7ae5bf884935e81")
-    }
 
-    getArticleInfo = (categoryId) => {
-        Service.GetAllArticle({
-            hits: 1,
-            categoryId: categoryId || ''
-        }).then((response) => {
-            if (categoryId) {
-                let toolList = response.data.data
-                this.setState({ toolList })
-            } else {
-                let hotBooks = response.data.data
-                this.setState({ hotBooks }, () => {
-                    var swiper_read = new Swiper('.m-read-fade .swiper-container', {
-                        effect: 'fade',
-                        pagination: {
-                            el: '.m-read-fade .u-pagination',
-                            bulletclassName: 'bull',
-                            bulletActiveclassName: 'active',
-                            clickable: true
-                        }
-                    });
-                })
-            }
-
-        })
-            .catch((error) => {
-                console.log(error)
-            })
-    }
-
-    createToolList = () => {
-        const { toolList } = this.state
-        return toolList && toolList.map((item, index) => {
-            return (
-                <li>
-                    <div className="item">
-                        <a className="thumb-img" href={`/#/Bookstore/Bookbuy/${item.id}`}><img src={item.image} /></a>
-                        <div className="tag">{item.category.name}</div>
-                        <h1><a href={`/#/Bookstore/Bookbuy/${item.id}`}>{item.title}</a></h1>
-                        <div className="alt clearfix">
-                            <a href="#" className="j_name"><img src={item.user.img} className="thumb-img" />{item.user.name}</a>
-                            <span className="dot"></span>
-                            <span>{item.description}</span>
-                        </div>
-                    </div>
-                </li>
-            )
-        })
     }
 
     handleFavorite = (index) => {
@@ -227,8 +177,8 @@ export default class MyWork extends Component {
                     {this.createList()}
                 </ul>
                 {
-                    data && data.list && (
-                        <Pagination key="Pagination" className="u-pages" current={this.state.curPage} onChange={this.handlePageChange} total={data && data.count} pageSize={PAGESIZE} itemRender={(page, type, originalElement) => {
+                    data && data.list && data.count > this.PAGESIZE && (
+                        <Pagination key="Pagination" className="u-pages" current={this.state.curPage} onChange={this.handlePageChange} total={data && data.count} pageSize={this.PAGESIZE} itemRender={(page, type, originalElement) => {
                             switch (type) {
                                 case 'prev':
                                     return [<a key={type} href="javascript:;">{type}</a>,

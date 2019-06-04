@@ -150,19 +150,28 @@ export default class Header extends Component {
             if (item.childList) {
                 Lis = this.loopChildren(item, item.childList)
             }
-            let Li = item.childList && item.name !== "招聘" ?
-                <li key={index} ><NavLink to={{
-                    pathname: `/${url}`,
-                    state: { navId: item.id },
-                    // hash: item.id
-                }} activeClassName="active" isActive={(match, location) => this.setActive(match, location, url)}>{item.name}</NavLink><ul>{Lis}</ul></li>
-                :
-                <li key={index} ><NavLink to={{
-                    pathname: `/${url}`,
-                    state: { navId: item.id },
-                    // hash: item.id
-                }} activeClassName="active" isActive={(match, location) => this.setActive(match, location, url)}>{item.name}</NavLink></li>
-            return Li
+            // let Li = item.childList && item.name !== "招聘" ?
+            //     <li key={index} ><NavLink to={{
+            //         pathname: `/${url}`,
+            //         state: { navId: item.id },
+            //         // hash: item.id
+            //     }} activeClassName="active" isActive={(match, location) => this.setActive(match, location, url)}>{item.name}</NavLink><ul>{Lis}</ul></li>
+            //     :
+            //     <li key={index} ><NavLink to={{
+            //         pathname: `/${url}`,
+            //         state: { navId: item.id },
+            //         // hash: item.id
+            //     }} activeClassName="active" isActive={(match, location) => this.setActive(match, location, url)}>{item.name}</NavLink></li>
+            // return Li
+            if (item.name !== "招聘") {
+                return (
+                    <li key={index} ><NavLink to={{
+                        pathname: `/${url}`,
+                        state: { navId: item.id },
+                        // hash: item.id
+                    }} activeClassName="active" isActive={(match, location) => this.setActive(match, location, url)}>{item.name}</NavLink>{item.childList && <ul>{Lis}</ul>}</li>
+                )
+            }
         })
     }
 

@@ -144,7 +144,7 @@ export default class Question extends Component {
                         {item.description}
                     </div>
                     <div className="tag">
-                        <a href={item.url} >#文案经验</a>
+                        <a href={item.link} target="_blank">#文案经验</a>
                     </div>
                 </div>
             )
@@ -153,7 +153,7 @@ export default class Question extends Component {
     createBannerB = () => {
         const { bannerBList } = this.state
         let bannerList = bannerBList.map((item, index) => {
-            return <a href={item.url} className="seat-h100"><img src={item.image} /></a>
+            return <a href={item.link} className="seat-h100" target="_blank"><img src={item.image} /></a>
         })
         return (
             bannerList
@@ -250,11 +250,12 @@ export default class Question extends Component {
         const { bannerCList, bannerDList } = this.state;
         let items = data.list && data.list.map((item, index) => {
             let Time = FormatDate.formatTime(item.createDate)
+            let bannerCDom = null, bannerDDom = null;
             if (bannerCList && (index % 7 === 0)) {
                 const banner = bannerCList[Math.trunc(index / 7)]
                 if (banner) {
                     const Time2 = FormatDate.formatTime(banner.createDate)
-                    return (
+                    bannerCDom = (
                         <div className="item">
                             <a href={banner.link} target="_blank" className="thumb-img">
                                 <img src={banner.image || defaultPhoto} onError={Utils.setDefaultPhoto} />
@@ -269,9 +270,10 @@ export default class Question extends Component {
 
             }
             if (bannerDList && (index % 10 === 0) && index !== 0) {
-                const banner = bannerCList[Math.trunc(index / 10)]
+                debugger
+                const banner = bannerCList[Math.trunc(index / 10) - 1]
                 if (banner) {
-                    return (
+                    bannerDDom = (
                         <a href={banner.link} target="_blank" class="seat-x100 darken scale"><img src={banner.image || defaultPhoto} onError={Utils.setDefaultPhoto} /></a>
                     )
                 }
@@ -289,19 +291,24 @@ export default class Question extends Component {
                 // )
             } else {
                 return (
-                    <div class="item">
-                        <a href="javascript:;" class="thumb-img" onClick={() => this.gotoRouter(item.id)}>
-                            <img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
-                        </a>
-                        <h1><a href="javascript:;" onClick={() => this.gotoRouter(item.id)}>{item.title}</a></h1>
-                        <div class="alt">
-                            <span>{Time}</span>
-                            {item.isTop !== "0" && <span class="icon-top"></span>}
-                            {item.isRecommend !== "0" && <span class="icon-jian"></span>}
+                    [
+                        bannerCDom,
+                        bannerDDom,
+                        <div class="item">
+                            <a href="javascript:;" class="thumb-img" onClick={() => this.gotoRouter(item.id)}>
+                                <img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
+                            </a>
+                            <h1><a href="javascript:;" onClick={() => this.gotoRouter(item.id)}>{item.title}</a></h1>
+                            <div class="alt">
+                                <span>{Time}</span>
+                                {item.isTop !== "0" && <span class="icon-top"></span>}
+                                {item.isRecommend !== "0" && <span class="icon-jian"></span>}
+                            </div>
+                            <div class="txt" dangerouslySetInnerHTML={{ __html: item.content }}></div>
+                            <div class="f-bartool clearfix"><a href="javascript:;" onClick={() => this.gotoRouter(item.id)}><i class="icon-comment"></i><span>{item.commentNum}</span></a></div>
                         </div>
-                        <div class="txt" dangerouslySetInnerHTML={{ __html: item.content }}></div>
-                        <div class="f-bartool clearfix"><a href="javascript:;" onClick={() => this.gotoRouter(item.id)}><i class="icon-comment"></i><span>{item.commentNum}</span></a></div>
-                    </div>
+                    ]
+
                 )
             }
         })

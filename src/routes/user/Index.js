@@ -25,6 +25,7 @@ const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
 export default class UserCenter extends Component {
     /* global $ */
     tabDom = null
+    PAGESIZE = 6
     constructor(props) {
         super(props);
         this.state = {
@@ -33,7 +34,7 @@ export default class UserCenter extends Component {
             fileList: [],
             collectList: [],
             userPhoto: [],
-            userToolNum:{}
+            userToolNum: {}
         };
     }
 
@@ -87,13 +88,15 @@ export default class UserCenter extends Component {
         this.props.history.push(router)
     }
 
-    getCollectList = () => {
+    getCollectList = (pageNo) => {
         Service.GetCollectList({
-            userId: JSON.parse(sessionStorage.getItem("userInfo")).id
+            userId: userInfo && userInfo.id,
+            pageSize: this.PAGESIZE,
+            pageNo: pageNo || 1
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
-                this.setState({ collectList: response.data.data.articles })
+                this.setState({ collectList: response.data.data })
             }
         })
             .catch((error) => {
@@ -101,8 +104,8 @@ export default class UserCenter extends Component {
             })
     }
     getMyWork = () => {
-        Service.GetLatestAction({
-            userId: JSON.parse(sessionStorage.getItem("userInfo")).id
+        Service.GetAllArticle({
+            userId: userInfo && userInfo.id
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -138,10 +141,10 @@ export default class UserCenter extends Component {
 
         })
     };
-    getNumberByUser = ()=>{
+    getNumberByUser = () => {
         Service.FindNumberByUserId({
-            userId: JSON.parse(sessionStorage.getItem("userInfo")).id,
-            myUserId:'tourists'
+            userId: userInfo && userInfo.id,
+            myUserId: 'tourists'
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -153,7 +156,7 @@ export default class UserCenter extends Component {
             })
     }
     render() {
-        const { userPhoto,userToolNum } = this.state;
+        const { userPhoto, userToolNum } = this.state;
         const tabTit = `来信中心`;
         return (
             <div className="">
@@ -172,19 +175,21 @@ export default class UserCenter extends Component {
                                     <p><i className="icon-user-img"></i><span>更新个人头像</span></p>
                                 </a>
                             </Upload> */}
-                            <img src={userInfo.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
+                            <img src={userInfo && userInfo.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
                         </div>
                         <div className="nick-name">
                             <h1><b>{userInfo && userInfo.name}</b></h1>
                         </div>
                         <div className="nick-data">
                             <p>
-                                <span>作品</span><a href="javascript:;">{userToolNum && userToolNum.articleNum}</a>
-                                <span>关注</span><a href={`/#/MyFans/${userInfo && userInfo.id}`} >{userToolNum && userToolNum.attentionNum}</a>
-                                <span>粉丝</span><a href={`/#/MyFans/${userInfo && userInfo.id}`}>{userToolNum && userToolNum.fansNum}</a>
+                                <span>作品</span><a href="javascript:;" onClick={() => this.gotoRouter(`/UserCenter/${userInfo && userInfo.id}`)}>{userToolNum && userToolNum.articleNum}</a>
+                                {/* <span>关注</span><a href={`/#/MyFans/${userInfo && userInfo.id}`} >{userToolNum && userToolNum.attentionNum}</a>
+                                <span>粉丝</span><a href={`/#/MyFans/${userInfo && userInfo.id}`}>{userToolNum && userToolNum.fansNum}</a> */}
+                                <span>关注</span><a href="javascript:;" onClick={() => this.gotoRouter(`/MyFans/${userInfo && userInfo.id}`)} >{userToolNum && userToolNum.attentionNum}</a>
+                                <span>粉丝</span><a href="javascript:;" onClick={() => this.gotoRouter(`/MyFans/${userInfo && userInfo.id}`)}>{userToolNum && userToolNum.fansNum}</a>
                             </p>
                         </div>
-                        <div className="address"><i className="icon-address-w"></i>{userInfo.provence.id}  {userInfo.city.id}</div>
+                        <div className="address"><i className="icon-address-w"></i>{userInfo && userInfo.provence.name}  {userInfo && userInfo.city.name}</div>
                         <a href="javascript:;" className="add_upload" onClick={() => this.gotoRouter(`/ArticleEditor`)}>发表作品/经验</a>
                     </div>
                 </div>
@@ -198,8 +203,8 @@ export default class UserCenter extends Component {
                         </ul> */}
                         <Tabs ref={e => this.tabDom = e} className="clearfix" onChange={this.handleTabChange}>
                             <TabPane tab={["来信中心", <i className="badge" style={{ display: 'none' }}>99+</i>]} key="news" className="qj-news"><News data={this.state.listData} history={this.props.history} /></TabPane>
-                            <TabPane tab="我的作品" key="reco"><MyWork data={this.state.listData} history={this.props.history} /></TabPane>
-                            <TabPane tab="我的心选" key="reply"><MyHeart data={this.state.collectList} history={this.props.history} /></TabPane>
+                            <TabPane tab="我的作品" key="reco"><MyWork data={this.state.listData} history={this.props.history} getData={this.getMyWork} /></TabPane>
+                            <TabPane tab="我的心选" key="reply"><MyHeart data={this.state.collectList} history={this.props.history} getData={this.getCollectList} /></TabPane>
                         </Tabs>
                         <a href="javascript:;" className="edit" onClick={() => this.gotoRouter(`/InfoUpDate/${userInfo.id}`)}>更新个人资料</a>
                     </div>

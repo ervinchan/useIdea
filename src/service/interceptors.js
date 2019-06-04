@@ -53,6 +53,7 @@ Axios.interceptors.response.use((config) => {
   //     ...
   //     // 在这里设置请求头与携带token信息
   // ])
+  global.constants.loading = false
   if (config.data.status === 2) {
 
   }

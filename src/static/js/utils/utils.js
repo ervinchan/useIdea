@@ -67,7 +67,6 @@ class Utils {
     }
     static gotoRouter(history, router, params) {
         // history.push({ pathname: router, state: params })
-        debugger
         sessionStorage.setItem("aid", params);
         history.push({ pathname: router, state: { 'aid': params } })
     }

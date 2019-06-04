@@ -111,12 +111,15 @@ export default class MyHeart extends Component {
     handlePageChange = (page, pageSize) => {
         console.log(page, pageSize)
         this.setState({ curPage: page })
-        this.getBooksList(this.props.match.params.tid, this.state.sortType, page)
+        this.props.getData(this.props.params.tid, page)
+    }
+    gotoRouter = (router) => {
+        this.props.history.push(router)
     }
     createList = () => {
         const { data } = this.props
         const categorys = global.constants.categorys
-        return data && data.map((item, index) => {
+        return data && data.list && data.list.map((item, index) => {
             let Time = FormatDate.formatTime(item.updateDate)
             let router = ``
             switch (item.category.id) {
@@ -147,7 +150,7 @@ export default class MyHeart extends Component {
                     </div>
                     <div className="ue_box">
                         <a className="thumb-img" href="javascript:;"><img src={item.image} /></a>
-                        <h1><a href="javascript:;" onClick={() => this.gotoRouter()}>{item.title}</a></h1>
+                        <h1><a href="javascript:;" onClick={() => this.gotoRouter(`${router}${item.id}`)}>{item.title}</a></h1>
                         <div className="txt nowrap">
                             {item.description}
                         </div>
@@ -160,7 +163,7 @@ export default class MyHeart extends Component {
 
     render() {
         const { toolList } = this.state;
-
+        const { data } = this.props
         return (
             <div className="">
                 <ul className="ue-article clearfix">
@@ -208,6 +211,25 @@ export default class MyHeart extends Component {
                         </div>
                     </li> */}
                 </ul>
+                {
+                    data && data.list && data.count > this.PAGESIZE && (
+                        <Pagination key="Pagination" className="u-pages" current={this.state.curPage} onChange={this.handlePageChange} total={data && data.count} pageSize={this.PAGESIZE} itemRender={(page, type, originalElement) => {
+                            switch (type) {
+                                case 'prev':
+                                    return [<a key={type} href="javascript:;">{type}</a>,
+                                    <a href="javascript:;" ><i className="fa-angle-double-left"></i></a>]
+                                case 'next':
+                                    return [
+                                        <a key={type} href="javascript:;" ><i className="fa-angle-double-right"></i></a>,
+                                        <a href="javascript:;">{type}</a>
+                                    ]
+                                default:
+                                    return <a key={page} href="javascript:;">{page}</a>;
+
+                            }
+                        }} />
+                    )
+                }
                 {/* <div className="u-pages">
                     <div className="box clearfix">
                         <a href="javascript:;">Prev</a>

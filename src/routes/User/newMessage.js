@@ -11,6 +11,9 @@ import Footer from '../../common/footer/Index.js'
 import WheelBanner from '../../common/wheelBanner/Index'
 import HotRead from '../../common/hotRead/Index'
 import ArticleList from './ArticleList'
+import Collect from '../../common/collect'
+import Like from '../../common/like'
+import Comment from '../../common/comment'
 import Service from '../../service/api.js'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
@@ -21,7 +24,7 @@ import '../../static/less/question.less'
 import '../../static/less/u.laixin.less'
 
 import defaultPhoto from "../../static/images/user/default.png"
-const PAGESIZE = 3;
+const PAGESIZE = 6;
 const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
 export default class NewMessage extends Component {
 
@@ -157,40 +160,6 @@ export default class NewMessage extends Component {
         this.setState({ curPage: page })
         this.getBooksList(this.props.match.params.tid, this.state.sortType, page)
     }
-    handleLike = (item) => {
-        Service.AddLike({
-            id: item.id
-        }).then((response) => {
-            global.constants.loading = false
-            if (response.data.status === 1) {
-                item.likeNum++
-                this.setState({})
-            }
-            /* global layer */
-            layer.msg(response.data.message)
-        })
-            .catch((error) => {
-                console.log(error)
-            })
-    }
-    handleCollect = (item) => {
-        Service.AddCollect({
-            userId: 1,
-            articleId: item.id
-        }).then((response) => {
-            global.constants.loading = false
-            if (response.data.status === 1) {
-                item.collectNum++
-                this.setState({})
-            }
-
-            /* global layer */
-            layer.msg(response.data.message)
-        })
-            .catch((error) => {
-                console.log(error)
-            })
-    }
     gotoRouter = (router) => {
         this.props.history.push(router)
     }
@@ -233,32 +202,53 @@ export default class NewMessage extends Component {
                         <div className="txt nowrap">
                             {item.description}
                         </div>
-                        <div className="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleCollect(item)}><i className="icon-heart"></i><span>{item.collectNum}</span></a><a href="javascript:;" onClick={() => this.handleLike(item)}><i className="icon-thumbs"></i><span>{item.likeNum}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{item.commentNum}</span></a></div>
+                        <div className="f-bartool clearfix">
+                            <Collect item={item} />
+                            <Like item={item} />
+                            <Comment item={item} />
+                        </div>
                     </div>
                 </li>
             )
         })
     }
+    handleFoucs = (uid) => {
+        Service.AddAttention({
+            attention2UserId: uid,
+            userId: JSON.parse(sessionStorage.getItem("userInfo")).id
+        }).then((response) => {
+            global.constants.loading = false
+            if (response.data.status === 1) {
+
+                this.setState({ isFans: response.data.status })
+            }
+
+            /* global layer */
+            layer.msg(response.data.message)
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
 
     createFansList = () => {
         const { fans } = this.state;
-        fans.map(item => {
+        return fans.list && fans.list.map(item => {
             return (
                 <li>
-                    <div className="lx-item">
-                        <a href="javascript:;" className="face">
-                            <img src="images/user/userTx.jpg" />
+                    <div class="lx-item">
+                        <a href="javascript:;" class="face">
+                            <img src={item.photo || defaultPhoto} />
                         </a>
-                        <h1><a href="javascript:;" className="j_name">Vinvinvy</a></h1>
-                        <div className="lx_txt">
-                            食一碗人間煙火，品幾杯人生起落~
-                    </div>
-                        <div className="lx_alt clearfix">
-                            <a href="javascript:;">作品<span>7</span></a>
-                            <a href="javascript:;">粉丝<span>136</span></a>
+                        <h1><a href="javascript:;" class="j_name">{item.name}</a></h1>
+                        <div class="lx_txt">
+                            {item.description}
                         </div>
-                        <a href="javascript:;" className="a_follow">关注</a>
-                        <a href="javascript:;" className="a_follow">已关注<span>取消关注</span></a>
+                        <div class="lx_alt clearfix">
+                            {/* <a href="javascript:;" onClick={() => { this.gotoRouter(`/UserNews/${item.id}`) }}>作品<span>{item.attention2Num}</span></a> */}
+                            <a href="javascript:;" onClick={() => { this.gotoRouter(`/MyFans/${item.id}`) }}>粉丝<span>{item.attention2Num}</span></a>
+                        </div>
+                        <a href="javascript:;" class="a_follow" onClick={() => this.handleFoucs(item.id)}>已关注</a>
                     </div>
                 </li>
             )
@@ -293,15 +283,17 @@ export default class NewMessage extends Component {
                 <div className="ue-minav">
                     <ul className="u-tabs1 clearfix">
                         <li tabfor=".tab-discuss" className="active">
-                            <a href="javascript:;">新评论</a>
+                            <a href="javascript:;">新评论{/*<span>{newCommentList.length}</span>*/}</a>
                         </li>
-                        <li tabfor=".tab-collection"><a href="javascript:;">收藏<span>{collectList.length}</span></a>
+                        <li tabfor=".tab-collection"><a href="javascript:;">收藏
+                        {/* <span>{collectList.count}</span> */}
+                        </a>
                         </li>
-                        <li tabfor=".tab-consult"><a href="javascript:;">请教</a>
+                        <li tabfor=".tab-consult"><a href="javascript:;">请教{/*<span>{questionList.count}</span>*/}</a>
                         </li>
-                        <li tabfor=".tab-fans"><a href="javascript:;">粉丝<span>{fans.length}</span></a>
+                        <li tabfor=".tab-fans"><a href="javascript:;">粉丝{/*<span>{fans.count}</span>*/}</a>
                         </li>
-                        <li tabfor=".ue-article"><a href="javascript:;">关注更新<span>{focus.length}</span></a>
+                        <li tabfor=".ue-article"><a href="javascript:;">关注更新{/*<span>{focus.count}</span>*/}</a>
                         </li>
                         <li tabfor=".tab-msg"><a href="javascript:;">站内消息<i className="badge" style={{ display: sysNews.allNews.length ? 'block' : 'none' }}>{sysNews.allNews.length}</i></a>
                         </li>

@@ -12,10 +12,10 @@ import 'swiper/dist/css/swiper.min.css'
 import 'antd/lib/pagination/style/index.css';
 import '../../static/less/bigidea.less';
 
-const PAGESIZE = 20;
+const PAGESIZE = 16;
 
 export default class Interview extends Component {
-
+    categoryIds = global.constants.categoryIds['专访幕后']
     constructor(props) {
         super(props);
         this.state = {
@@ -101,7 +101,7 @@ export default class Interview extends Component {
 
                 </div>
                 {
-                    inrerviewList && inrerviewList.list && (
+                    inrerviewList && inrerviewList.list && inrerviewList.count > PAGESIZE && (
                         <Pagination key="Pagination" className="u-pages" current={this.state.curPage} onChange={this.handlePageChange} total={inrerviewList && inrerviewList.count} pageSize={PAGESIZE} itemRender={(page, type, originalElement) => {
                             switch (type) {
                                 case 'prev':

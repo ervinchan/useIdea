@@ -94,12 +94,12 @@ export default class Bookstore extends Component {
     //获取阅读场景数据
     getHotBooks = (categoryId) => {
         Service.GetAllArticle({
-            hits: 1,
+            isRecommend: 1,
             categoryId: categoryId || '',
         })
             .then((response) => {
                 if (categoryId) {
-                    let readTimeHotBooks = response.data.data
+                    let readTimeHotBooks = response.data.data.list
                     this.setState({ readTimeHotBooks })
                 } else {
                     let hotBooks = response.data.data
@@ -133,7 +133,10 @@ export default class Bookstore extends Component {
                 <h1><a href="javascript:;">{firstReadTimeHotBooks[0].title}</a></h1>
                 <div className="txt">
                     {firstReadTimeHotBooks[0].description}
-                    <a href="javascript:;">查看原文</a>
+                    {
+                        firstReadTimeHotBooks[0].description.length > 150 &&
+                        <a  href={`/#/Bookstore/Bookbuy/${firstReadTimeHotBooks[0].id}`}>查看原文</a>
+                    }
                 </div>
                 <ul>
                     <li>
@@ -191,7 +194,7 @@ export default class Bookstore extends Component {
                         <span>{item.cmsArticleClassify && item.cmsArticleClassify.articleClassify}</span>
                     </a>
                     <h4><i className="icon-book"></i>主编荐书</h4>
-                    <h1><a href="#">{item.bookName}</a></h1>
+                    <h1><a href="#">{item.title}</a></h1>
                     <div className="txt">{item.description}</div>
                     <div className="bar">
                         <span>{item.user.name}</span><span>·</span><span>{Time}</span>
@@ -221,7 +224,7 @@ export default class Bookstore extends Component {
                             </ul>
                         </div>
                         {
-                            readList && readList.list && (
+                            readList && readList.list && readList.count > global.constants.PAGESIZE && (
                                 <Pagination key="Pagination" className="u-pages" current={this.state.curPage} onChange={this.handlePageChange} total={readList && readList.count} pageSize={global.constants.PAGESIZE} itemRender={(page, type, originalElement) => {
                                     switch (type) {
                                         case 'prev':

@@ -18,10 +18,10 @@ import 'swiper/dist/css/swiper.min.css'
 import 'antd/lib/pagination/style/index.css';
 import '../../static/less/bigidea.less';
 
-const PAGESIZE = 20;
+const PAGESIZE = 10;
 
 export default class Bigidea extends Component {
-
+    categoryIds = global.constants.categoryIds['见识灵感']
     constructor(props) {
         super(props);
         this.state = {
@@ -54,7 +54,7 @@ export default class Bigidea extends Component {
 
     getBannerC = () => {
         Service.GetADList({
-            categoryId: "b49c9133960c4700b253b7a3283dcbef",
+            categoryId: this.categoryIds.id,
             id: "37e7de978cc14723b8d51ec902ed0f73"
         }).then((response) => {
             if (response.data.status === 1) {
@@ -68,7 +68,7 @@ export default class Bigidea extends Component {
     }
     getBannerD = () => {
         Service.GetADList({
-            categoryId: "b49c9133960c4700b253b7a3283dcbef",
+            categoryId: this.categoryIds.id,
             id: "df2c63345f9b42beb860f9150d4002f7"
         }).then((response) => {
             if (response.data.status === 1) {
@@ -85,6 +85,7 @@ export default class Bigidea extends Component {
     getRecommendArticle = () => {
         Service.GetAllArticle({
             isRecommend: 1,
+            categoryId: this.categoryIds.id,
             pageNo: 1,
             pageSize: 4
         }).then((response) => {
@@ -114,7 +115,7 @@ export default class Bigidea extends Component {
         Service.GetAllArticle({
             categoryId: categoryId || '',
             pageNo: pageNo || 1,
-            pageSize: global.constants.PAGESIZE,
+            pageSize: PAGESIZE,
         })
             .then((response) => {
                 let BigIdeaDatas = response.data.data
@@ -180,11 +181,11 @@ export default class Bigidea extends Component {
                     <div className="bar">
                         <span>{item.user.name}</span><span className="dot"></span><span>{Time}</span>
                         <div className="f-bartool clearfix">
-                        <Collect item={item} />
-                        <Like item={item} />
-                        <Comment item={item} />
+                            <Collect item={item} />
+                            <Like item={item} />
+                            <Comment item={item} />
                         </div>
-                        
+
                     </div>
                 </div>
             )
@@ -198,7 +199,7 @@ export default class Bigidea extends Component {
                 <li key={index}>
                     <a className="thumb-img" href="javascript:;">
                         <img src={item.image} />
-                        <span>{item.category.name}</span>
+                        <span>{item.brand}</span>
                     </a>
                     <h1><a href="#">{item.description}</a></h1>
                     <div className="f-bartool clearfix">
@@ -296,8 +297,8 @@ export default class Bigidea extends Component {
                             {this.createBigIdeaList()}
                         </div>
                         {
-                            BigIdeaDatas && BigIdeaDatas.list && (
-                                <Pagination key="Pagination" className="u-pages" current={this.state.curPage} onChange={this.handlePageChange} total={BigIdeaDatas && BigIdeaDatas.count} pageSize={global.constants.PAGESIZE} itemRender={(page, type, originalElement) => {
+                            BigIdeaDatas && BigIdeaDatas.list && BigIdeaDatas.count > PAGESIZE && (
+                                <Pagination key="Pagination" className="u-pages" current={this.state.curPage} onChange={this.handlePageChange} total={BigIdeaDatas && BigIdeaDatas.count} pageSize={PAGESIZE} itemRender={(page, type, originalElement) => {
                                     switch (type) {
                                         case 'prev':
                                             return [<a key={type} href="javascript:;">{type}</a>,

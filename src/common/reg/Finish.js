@@ -37,9 +37,12 @@ export default class Reg extends Component {
     render() {
         let state = this.props.location.state
         return (
-            <div className="reg-body">
+            <div className="reg-body reg-user">
+                <a href="index.html" className="r-logo">
+                    <img src={logo} />
+                </a>
                 <div className="r-banner">
-                    <img src={regBanner} />
+                    {/* <img src={regBanner} /> */}
                     <div className="swiper-container">
                         <div className="swiper-wrapper">
                             <div className="swiper-slide">
@@ -50,11 +53,9 @@ export default class Reg extends Component {
                         </div>
                     </div>
                     <div className="u-pagination wide"></div>
-                    <a href="index.html" className="r-logo">
-                        <img src={logo} />
-                    </a>
+
                 </div>
-                <div className="reg-wrapper">
+                {/* <div className="reg-wrapper">
                     <div className="reg-640">
                         <div className="r-title">
                             恭喜你！一身才华，从此迸发。
@@ -66,6 +67,21 @@ export default class Reg extends Component {
                             <a href="javascript:;" className="r-btn" onClick={this.gobackHome}>返回首页登录</a>
                         </div>
 
+                    </div>
+                </div> */}
+                <div class="reg-wrapper">
+                    <div class="reg-cell">
+                        <div class="reg-640">
+                            <div class="reg-section">
+                                <div class="r-title mb-30">
+                                    <b>恭喜你！</b>一身才华，从此迸发
+                                </div>
+                                <div class="r-finish-txt mb-20">
+                                    我们已向您的邮箱（<span>{state.user && state.user.email}</span>）发出一封验证邮件。请查收邮件、点击验证，正式踏上灵感旅程。
+                                </div>
+                                <a href="javascript:;" class="r-btn" onClick={this.gobackHome}>登录邮箱验证激活</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
