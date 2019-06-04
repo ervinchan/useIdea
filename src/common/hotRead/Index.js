@@ -56,8 +56,8 @@ export default class HotRead extends Component {
         return hotBooks.map((item, index) => {
             let slide = null
             itemDom.push(
-                <div class="item">
-                    <a class="thumb-img" href={`/#/Inspiration/Article/${item.id}`}>
+                <div className="item" key={item.id}>
+                    <a className="thumb-img" href={`/#/Inspiration/Article/${item.id}`}>
                         <LazyLoad><img src={item.image} /></LazyLoad>
                     </a>
                     <h1><a href={`/#/Inspiration/Article/${item.id}`}>{item.title}</a></h1>
@@ -72,7 +72,7 @@ export default class HotRead extends Component {
             if (index !== 0 && (index + 1) % 8 === 0) {
 
                 slide = (
-                    <div key={index} class="swiper-slide">
+                    <div key={index} className="swiper-slide">
                         {itemDom}
                     </div>
                 )
@@ -82,7 +82,7 @@ export default class HotRead extends Component {
                 )
             } else if (index === hotBooks.length - 1) {
                 slide = (
-                    <div key={index} class="swiper-slide">
+                    <div key={index} className="swiper-slide">
                         {itemDom}
                     </div>
                 )
@@ -130,17 +130,17 @@ export default class HotRead extends Component {
     // }
     render() {
         return (
-            <div class="m-read-fade wrapper">
-                <div class="u-title2">
+            <div className="m-read-fade wrapper">
+                <div className="u-title2">
                     <h1>热门阅读</h1>
                 </div>
-                <div class="fixed_bottom"></div>
-                <div class="swiper-container">
-                    <div class="swiper-wrapper">
+                <div className="fixed_bottom"></div>
+                <div className="swiper-container">
+                    <div className="swiper-wrapper">
                         {this.createHotBooksList()}
                     </div>
                 </div>
-                <div class="u-pagination wide"></div>
+                <div className="u-pagination wide"></div>
             </div>
         )
     }

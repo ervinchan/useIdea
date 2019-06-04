@@ -60,7 +60,7 @@ export default class Bookstore extends Component {
     }
 
     componentDidMount() {
-        
+
         let tid = this.props.match.params.tid
         let hasSearch = tid && tid.includes('search')
         if (hasSearch) {

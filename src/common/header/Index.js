@@ -178,7 +178,7 @@ export default class Header extends Component {
     loopChildren = (parent, items) => {
         let Lis = items.map((item, index) => {
             let url = item.url.split("#")[1];
-            return <li ><i className="fa-angle-right"></i><NavLink to={{
+            return <li key={item.id}><i className="fa-angle-right"></i><NavLink to={{
                 pathname: `/${url}`,
                 state: { navId: item.id }
             }} activeClassName="active" id={item.id}>{item.name}</NavLink></li>

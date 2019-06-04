@@ -14,7 +14,7 @@ import 'antd/lib/pagination/style/index.css';
 import '../../static/less/article.less';
 import defaultPhoto from "../../static/images/user/default.png"
 const PAGESIZE = 3;
-const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
+let userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
 export default class Article extends Component {
 
     constructor(props) {
@@ -42,6 +42,7 @@ export default class Article extends Component {
         this.getArticleInfo(aid)
         this.getArticleContent(aid)
         this.getCollectUsers(aid)
+
     }
     componentDidMount() {
         let that = this
@@ -62,7 +63,7 @@ export default class Article extends Component {
 
     }
     componentDidUpdate(prevProps, prevState) {
-
+        userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
     }
 
     getBannerA = () => {
@@ -234,7 +235,7 @@ export default class Article extends Component {
         return data.list && data.list.map((item, index) => {
             let Time = FormatDate.formatTime(item.createDate);
             return (
-                <div className="disc-item">
+                <div className="disc-item" key={item.id}>
                     <a href="javascript:;" className="thumb"><img src={item.userPhoto || defaultPhoto} onError={Utils.setDefaultPhoto} /></a>
                     <div className="alt">
                         <a href="javascript:;" className="j_name" onClick={() => this.gotoRouter(`/UserNews${item.user && item.user.id}`)}>{item.user && item.user.name}</a><span className="dot"></span><span>{Time}</span>
@@ -245,7 +246,7 @@ export default class Article extends Component {
                     <div className="bar">
                         <a href="javascript:;">投诉</a><a href="javascript:;" onClick={() => this.handleReply(item)}>回复</a><a href="javascript:;" className="thumbs" onClick={() => this.handleArticleLike(item)}><i className="icon-thumbs-up"></i>{item.likeNum}</a>
                     </div>
-                    <div class="replyfrom" style={{ display: (item.id === this.state.replyId && isOpenReply ? "" : "none") }}><textarea value={replyContent} placeholder="我来补充两句。" onChange={this.handleChangeReply} /><a href="javascript:;" class="thumb"><img src={(userInfo && userInfo.photo) || defaultPhoto} onError={Utils.setDefaultPhoto} /></a><a href="javascript:;" class="artbtn" onClick={() => this.submitComment(item.id, replyContent)}>留 言</a><a href="javascript:;" class="escbtn" onClick={this.cancleReply}>稍后再说</a></div>
+                    <div className="replyfrom" style={{ display: (item.id === this.state.replyId && isOpenReply ? "" : "none") }}><textarea value={replyContent} placeholder="我来补充两句。" onChange={this.handleChangeReply} /><a href="javascript:;" className="thumb"><img src={(userInfo && userInfo.photo) || defaultPhoto} onError={Utils.setDefaultPhoto} /></a><a href="javascript:;" className="artbtn" onClick={() => this.submitComment(item.id, replyContent)}>留 言</a><a href="javascript:;" className="escbtn" onClick={this.cancleReply}>稍后再说</a></div>
                     {
                         item.childComments &&
                         <div className="disc-sub">
@@ -274,7 +275,7 @@ export default class Article extends Component {
                     <div className="bar">
                         <a href="javascript:;">投诉</a><a href="javascript:;" onClick={() => this.handleReply(item)}>回复</a><a href="javascript:;" className="thumbs" onClick={() => this.handleArticleLike(item)}><i className="icon-thumbs-up"></i>{item.likeNum}</a>
                     </div>
-                    <div class="replyfrom" style={{ display: (item.id === this.state.replyId ? "" : "none") }}><textarea value={replyContent} placeholder="我来补充两句。" onChange={this.handleChangeReply} /><a href="javascript:;" class="thumb"><img src={(userInfo && userInfo.photo) || defaultPhoto} onError={Utils.setDefaultPhoto} /></a><a href="javascript:;" class="artbtn" onClick={() => this.submitComment(item.id, replyContent)}>留 言</a><a href="javascript:;" class="escbtn" onClick={this.cancleReply}>稍后再说</a></div>
+                    <div className="replyfrom" style={{ display: (item.id === this.state.replyId ? "" : "none") }}><textarea value={replyContent} placeholder="我来补充两句。" onChange={this.handleChangeReply} /><a href="javascript:;" className="thumb"><img src={(userInfo && userInfo.photo) || defaultPhoto} onError={Utils.setDefaultPhoto} /></a><a href="javascript:;" className="artbtn" onClick={() => this.submitComment(item.id, replyContent)}>留 言</a><a href="javascript:;" className="escbtn" onClick={this.cancleReply}>稍后再说</a></div>
                     {
                         item.childComments &&
                         <div className="disc-sub">
@@ -372,7 +373,7 @@ export default class Article extends Component {
 
         let Time = FormatDate.formatTime(articleInfo.updateDate)
         let authorInfo = articleInfo && articleInfo.user
-        let gotoUserCetner = articleInfo.user && articleInfo.user.id === userInfo.id ? `/UserCenter/${articleInfo.user && articleInfo.user.id}` : `/UserNews/${articleInfo.user && articleInfo.user.id}`
+        let gotoUserCetner = articleInfo.user && articleInfo.user.id === (userInfo && userInfo.id) ? `/UserCenter/${articleInfo.user && articleInfo.user.id}` : `/UserNews/${articleInfo.user && articleInfo.user.id}`
         return (
             <div className="background_art hd-line">
                 {/* 头部 */}
