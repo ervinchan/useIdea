@@ -76,7 +76,7 @@ export default class Viewpoint extends Component {
     getViewPoints = (categoryId) => {
         let params = categoryId ? {
             categoryId: this.categoryIds.id || '',
-            id: categoryId,
+            cmsArticleClassifyId: categoryId,
             pageSize: PAGESIZE
         } : {
                 categoryId: this.categoryIds.id || '',

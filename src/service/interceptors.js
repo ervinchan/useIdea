@@ -61,6 +61,7 @@ Axios.interceptors.response.use((config) => {
 }, (error) => {
   // 如何在这里加入react中的路由转跳？
   const router = new HashRouter()
+  console.log(error)
   //router.history.push('/')
   return Promise.reject(error);
 });

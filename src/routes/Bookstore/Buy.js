@@ -9,7 +9,9 @@ import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
 import BookMenu from '../../common/bookMenu/Menu'
 import FormatDate from '../../static/js/utils/formatDate.js'
-
+import Collect from '../../common/collect'
+import Like from '../../common/like'
+import Comment from '../../common/comment'
 import 'swiper/dist/css/swiper.min.css'
 import '../../static/less/bookstore.less';
 
@@ -162,7 +164,11 @@ export default class Bookstore extends Component {
                         <a className="thumb-img" href={item.link}><img src={item.image} />
                         </a>
                         <h1><a href="#">{item.title}</a></h1>
-                        <div className="f-bartool clearfix"><a href="javascript:;" onClick={() => this.handleFavorite(index)}><i className="icon-heart"></i><span>{item.favorite}</span></a><a href="javascript:;" onClick={() => this.handleLikes(index)}><i className="icon-thumbs"></i><span>{item.like}</span></a><a href="javascript:;"><i className="icon-comment"></i><span>{item.comment}</span></a></div>
+                        <div className="f-bartool clearfix">
+                            <Collect item={item} />
+                            <Like item={item} />
+                            <Comment item={item} />
+                        </div>
 
                     </div>
                 </li>

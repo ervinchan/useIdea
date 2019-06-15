@@ -30,7 +30,7 @@ export default class Bookstore extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            sortType: 0,
+            sortType: "0",
             curPage: 1,
             banner: [],
             news: [],
@@ -74,9 +74,6 @@ export default class Bookstore extends Component {
         this.getNews()
         this.getReadData()
 
-
-    }
-    componentDidUpdate() {
         let that = this
         $(function () {
             $(".u-select [role=note]").on("click", function (e) {
@@ -87,13 +84,18 @@ export default class Bookstore extends Component {
             $(".u-select li").on("click", function (e) {
                 e = window.event || e;
                 e.stopPropagation();
-                let sortType = Number($(this).attr("type"))
-                $($(this).parents("[role=menu]").data("for")).html($(this).text());
-                $(this).parents("[role=menu]").hide();
-                that.setState({ sortType })
+                let sortType = $(this).attr("type")
+
+                that.setState({ sortType }, () => {
+                    // $($(this).parents("[role=menu]").data("for")).html($(this).text());
+                    $(this).parents("[role=menu]").hide();
+                })
                 that.getBooksList(that.props.match.params.tid, sortType)
             });
         })
+    }
+    componentDidUpdate() {
+
     }
 
     getReadData = () => {
@@ -241,7 +243,7 @@ export default class Bookstore extends Component {
                         <div className="u-title3">
                             <b>蜗牛翻书</b>
                             <div className="u-select">
-                                <div className="in_sort" role="note">热度排行</div>
+                                <div className="in_sort" role="note">{this.state.sortType === '0' ? '热度排行' : '上新排行'}</div>
                                 <div data-for=".in_sort" role="menu">
                                     <ul>
                                         <li type="0">热度排行</li>

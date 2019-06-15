@@ -33,9 +33,6 @@ export default class Collect extends Component {
             /* global layer */
             layer.msg(response.data.message)
         })
-            .catch((error) => {
-                console.log(error)
-            })
     }
 
     render() {

@@ -478,12 +478,12 @@ export default class Article extends Component {
                                             visible={this.state.visibleWexin}
                                             onVisibleChange={this.handleVisibleChange}
                                         >
-                                            <a href="javascript:;" className="uweixin" ><i className="icon-weixin-in"></i></a>
+                                            <a href="javascript:;" className="icon-weixin-in" ><i className="icon-weixin-in"></i></a>
                                         </Popover>
                                     }
-                                    {authorInfo && authorInfo.weiBo && <a href={authorInfo.weiBo} target="_blank" className="uweibo"><i className="icon-weibo-in"></i></a>}
-                                    {authorInfo && authorInfo.zhiHu && <a href={authorInfo.zhiHu} target="_blank" className="uzhihu"><i className="icon-zhihu-in"></i></a>}
-                                    {authorInfo && authorInfo.douBan && <a href={authorInfo.douBan} target="_blank" className="udou"><i className="icon-dou-in"></i></a>}
+                                    {authorInfo && authorInfo.weiBo && <a href={authorInfo.weiBo} target="_blank" className="icon-weibo-in"><i className="icon-weibo-in"></i></a>}
+                                    {authorInfo && authorInfo.zhiHu && <a href={authorInfo.zhiHu} target="_blank" className="icon-zhihu-in"><i className="icon-zhihu-in"></i></a>}
+                                    {authorInfo && authorInfo.douBan && <a href={authorInfo.douBan} target="_blank" className="icon-dou-in"><i className="icon-dou-in"></i></a>}
                                 </div>
                                 <div className="lk">
                                     {
