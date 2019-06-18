@@ -124,7 +124,7 @@ export default class Reg extends Component {
                     </div>
                     <div className="u-pagination wide"></div>
                     <a href="index.html" className="r-logo">
-                        <img src={logo} />
+                        <img src="images/reg_logo.png" />
                     </a>
                 </div>
                 <div className="reg-wrapper">

@@ -146,7 +146,7 @@ export default class Reg extends Component {
         return (
             <div className="reg-body">
                 <a href="javascript:;" className="r-logo">
-                    <img src={logo} />
+                    <img src="images/reg_logo.png" />
                 </a>
                 <div class="r-banner">
                     <div class="swiper-container">

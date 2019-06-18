@@ -241,7 +241,7 @@ export default class Header extends Component {
             <div className="m-head">
                 <div className="wrapper">
                     <a href="/" className="logo">
-                        <img src={LOGO} alt="文案圈周刊" />
+                        <img src="images/m-logo.png" alt="文案圈周刊" />
                     </a>
                     <div className="f-item user">
                         <a href="javascript:;" className="icon-user">

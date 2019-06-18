@@ -103,8 +103,8 @@ export default class Login extends Component {
         return (
             <div className="reg-user">
                 <a href="javascript:;" className="r-logo">
-                        <img src={logo} />
-                    </a>
+                    <img src="images/reg_logo.png" />
+                </a>
                 <div class="r-banner">
                     <div class="swiper-container">
                         <div class="swiper-wrapper">
@@ -139,7 +139,7 @@ export default class Login extends Component {
                             <div class="m1-rlogo">
                                 <a href="javascript:;"><img src="css/images/m/r-logo.png" /></a>
                                 <span>登 录</span>
-                            </div> 
+                            </div>
                             <div class="reg-section">
                                 <div class="r-lable mb-40">立即登录，发布灵感创作</div>
                                 {/* <div class="r-input mb-40">
@@ -168,7 +168,7 @@ export default class Login extends Component {
                                     <a href="javascript:;" title="功能开发中"><i class="icon-weixin-r"></i></a>
                                     <a href="javascript:;" title="功能开发中"><i class="icon-weibo-r"></i></a>
                                     <a href="javascript:;" class="f-r">忘记密码？</a>
-                                </div> 
+                                </div>
                                 <a href="javascript:;" className="r-btn" onClick={this.Login}>现在加入</a>
                                 <div className="r-right-txt mb-30">
                                     暂无帐号？点击<a href="/#/Reg">创建账户</a>

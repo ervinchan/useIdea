@@ -39,7 +39,7 @@ export default class Reg extends Component {
         return (
             <div className="reg-body reg-user">
                 <a href="index.html" className="r-logo">
-                    <img src={logo} />
+                    <img src="images/reg_logo.png" />
                 </a>
                 <div className="r-banner">
                     {/* <img src={regBanner} /> */}
