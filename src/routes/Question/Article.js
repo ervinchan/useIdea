@@ -17,7 +17,7 @@ import ed from 'wangeditor'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
 import 'swiper/dist/css/swiper.min.css'
-
+import LazyLoad from 'react-lazyload'
 import 'antd/lib/pagination/style/index.css';
 import '../../static/less/question.less'
 //import { userInfo } from 'os';
@@ -41,13 +41,14 @@ export default class QuestionArticle extends Component {
             commentList: [],
             articleInfo: {},
             commentRenderLen: 2,
-            replyId: ''
+            replyId: '',
+            hitsArticleList:[]
         };
     }
 
     componentWillReceiveProps(nextProps) {
         this.getArticleInfo()
-        this.getSpecialCol()
+        this.getHitsArticle()
         this.getQuestionList()
         this.getCommentList()
     }
@@ -88,7 +89,7 @@ export default class QuestionArticle extends Component {
         this.editor.create()
 
         this.getArticleInfo()
-        this.getSpecialCol()
+        this.getHitsArticle()
         this.getQuestionList()
         this.getCommentList()
     }
@@ -336,52 +337,82 @@ export default class QuestionArticle extends Component {
         this.setState({ replyId: item.id })
     }
     //热门排行
-    getSpecialCol = () => {
+    // getSpecialCol = () => {
 
-        Service.GetNav({
-            subscriber: 0
+    //     Service.GetNav({
+    //         subscriber: 0
+    //     }).then((response) => {
+    //         if (response.data.status === 1) {
+    //             let specialCol = response.data.data
+    //             this.setState({ specialCol })
+    //         }
+    //     })
+    // }
+
+    // createSpecialCol = () => {
+    //     const { specialCol } = this.state
+    //     return specialCol && specialCol.map((item, index) => {
+    //         if (index === 0 || index === 1) {
+    //             return (
+    //                 <li onClick={() => this.gotoRouter(item.href)}>
+    //                     <a href="javascript:;" className="thumb-img">
+    //                         <span>{index + 1}</span>
+    //                         <img src={item.image} />
+    //                     </a>
+    //                     <h1><a href="javascript:;">{item.name}</a></h1>
+    //                     <h3>{item.user && item.user.name}</h3>
+    //                 </li>
+    //             )
+    //         } else {
+    //             return (
+    //                 <li>
+    //                     <a href="#" className="thumb-img">
+    //                         <span>{index + 1}</span>
+    //                         <img src={item.image} />
+    //                     </a>
+    //                     <h1><a href="#">{item.name}</a></h1>
+    //                     <h3>{item.user && item.user.name}</h3>
+    //                     <div className="alt">
+    //                         {
+    //                             item.user &&
+    //                             <img src="css/images/1x1.png" />
+    //                         }
+    //                         <span className="dot"></span>
+    //                         <span>{item.subscriber}人订阅</span>
+    //                     </div>
+    //                 </li>
+    //             )
+    //         }
+    //     })
+    // }
+
+    getHitsArticle = () => {
+        Service.GetAllArticle({
+            hits: 1
         }).then((response) => {
             if (response.data.status === 1) {
-                let specialCol = response.data.data
-                this.setState({ specialCol })
+                let hitsArticleList = response.data.data
+                this.setState({ hitsArticleList })
             }
         })
+            .catch((error) => {
+                console.log(error)
+            })
     }
+    createHitsArticle = () => {
+        const { hitsArticleList } = this.state;
+        return hitsArticleList && hitsArticleList.slice(0, 10).map((item, index) => {
 
-    createSpecialCol = () => {
-        const { specialCol } = this.state
-        return specialCol && specialCol.map((item, index) => {
-            if (index === 0 || index === 1) {
-                return (
-                    <li onClick={() => this.gotoRouter(item.href)}>
-                        <a href="javascript:;" className="thumb-img">
-                            <span>{index + 1}</span>
-                            <img src={item.image} />
-                        </a>
-                        <h1><a href="javascript:;">{item.name}</a></h1>
-                        <h3>{item.user && item.user.name}</h3>
-                    </li>
-                )
-            } else {
-                return (
-                    <li>
-                        <a href="#" className="thumb-img">
-                            <span>{index + 1}</span>
-                            <img src={item.image} />
-                        </a>
-                        <h1><a href="#">{item.name}</a></h1>
-                        <h3>{item.user && item.user.name}</h3>
-                        <div className="alt">
-                            {
-                                item.user &&
-                                <img src="css/images/1x1.png" />
-                            }
-                            <span className="dot"></span>
-                            <span>{item.subscriber}人订阅</span>
-                        </div>
-                    </li>
-                )
-            }
+            return (
+                <li key={index} onClick={() => this.gotoRouter(`/Inspiration/Article/${item.id}`)}>
+                    <a href="javascript:;" className="thumb-img">
+                        <span>{index + 1}</span>
+                        <LazyLoad><img src={item.image} /></LazyLoad>
+                    </a>
+                    <h1><a href="javascript:;">{item.title}</a></h1>
+                    <h3>{item.user.name}</h3>
+                </li>
+            )
         })
     }
 
@@ -657,43 +688,18 @@ export default class QuestionArticle extends Component {
                                 <div className="u-pagination wide"></div>
                             </div> */}
                         </div>
-                        <div className="u-title4">
+                        {/* <div className="u-title4">
                             <b>热门排行</b>
                         </div>
                         <ul className="hot-article suite active">
                             {this.createSpecialCol()}
-                            {/* <li>
-                                <a href="#" className="thumb-img">
-                                    <span>1</span>
-                                    <img src="images/r1.jpg" />
-                                </a>
-                                <h1><a href="#">天猫拾光之旅：双11十年，都藏在这些彩蛋里了！</a></h1>
-                                <h3>jrainlau</h3>
-                            </li>
-                            <li>
-                                <a href="#" className="thumb-img">
-                                    <span>2</span>
-                                    <img src="images/r2.jpg" />
-                                </a>
-                                <h1><a href="#">《风味人间》的画面，每一帧都写着馋</a></h1>
-                                <h3>jrainlau</h3>
-                            </li>
-                            <li>
-                                <a href="#" className="thumb-img">
-                                    <span>3</span>
-                                    <img src="css/images/95x65.png" />
-                                </a>
-                                <h1><a href="#">100多年来，广告如何操控你对“颜值”的认知？</a></h1>
-                                <h3>jrainlau01</h3>
-                                <div className="alt">
-                                    <img src="css/images/1x1.png" />
-                                    <img src="css/images/1x1.png" />
-                                    <img src="css/images/1x1.png" />
-                                    <img src="css/images/1x1.png" />
-                                    <span className="dot"></span>
-                                    <span>473人订阅</span>
-                                </div>
-                            </li> */}
+                        </ul> */}
+                        <div className="u-title4">
+                            <b>热文排行</b>
+                        </div>
+                        <ul className="hot-article suite active">
+                            {/* {this.createSpecialCol()} */}
+                            {this.createHitsArticle()}
                         </ul>
                     </div>
                 </div>
