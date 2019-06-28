@@ -49,7 +49,7 @@ export default class Viewpoint extends Component {
         this.getViewPointMenu(this.categoryIds.id);
         this.getViewPoints();
         this.getHostAuthor();
-        this.getRecommendList(this.categoryIds.id);
+        this.getAllTopArticle(this.categoryIds.id);
         this.getBannerA();
     }
 
@@ -104,23 +104,35 @@ export default class Viewpoint extends Component {
                 console.log(error)
             })
     }
-
-    getRecommendList = () => {
-        Service.GetAllArticle({
-            isTop: 1,
-            categoryId: this.categoryIds.id,
-            pageNo: 1,
-            pageSize: 4
-        }).then((response) => {
-            if (response.data.status === 1) {
-                const recommendList = response.data.data
-                this.setState({ recommendList })
-            }
+    getAllTopArticle = (categoryId, pageNo) => {
+        Service.GetAllTopArticle({
+            categoryId: this.categoryIds.id
         })
+            .then((response) => {
+                let recommendList = response.data.data
+                this.setState({ recommendList })
+                global.constants.loading = false
+            })
             .catch((error) => {
                 console.log(error)
             })
     }
+    // getRecommendList = () => {
+    //     Service.GetAllArticle({
+    //         isTop: 1,
+    //         categoryId: this.categoryIds.id,
+    //         pageNo: 1,
+    //         pageSize: 4
+    //     }).then((response) => {
+    //         if (response.data.status === 1) {
+    //             const recommendList = response.data.data
+    //             this.setState({ recommendList })
+    //         }
+    //     })
+    //         .catch((error) => {
+    //             console.log(error)
+    //         })
+    // }
 
     //热门作者
     getHostAuthor = (categoryId) => {
@@ -210,7 +222,7 @@ export default class Viewpoint extends Component {
 
     createRecommendList = () => {
         const { recommendList } = this.state
-        return recommendList.list && recommendList.list.map((item, index) => {
+        return recommendList && recommendList.map((item, index) => {
             return (
                 <li key={index}>
                     <a className="thumb-img" href={`/#/Inspiration/Article/${item.id}`}>

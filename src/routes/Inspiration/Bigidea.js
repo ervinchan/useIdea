@@ -35,7 +35,8 @@ export default class Bigidea extends Component {
             bannerCList: [],
             bannerDList: [],
             recommendArticle: [],
-            hitsArticleList: []
+            hitsArticleList: [],
+            topArticle: []
         };
     }
 
@@ -52,8 +53,8 @@ export default class Bigidea extends Component {
         this.getBannerC();
         this.getBannerD();
         this.getRecommendArticle();
+        this.getAllTopArticle();
     }
-
     getBannerC = () => {
         Service.GetADList({
             categoryId: this.categoryIds.id,
@@ -113,6 +114,27 @@ export default class Bigidea extends Component {
         })
     }
 
+    createBannerA = () => {
+        const { bannerAList } = this.state
+        return bannerAList.map((item, index) => {
+            return <a href={item.link} target="_blank" className="seat-x315 lighten"><img src={item.image} /></a>
+        })
+    }
+
+
+    getAllTopArticle = (categoryId, pageNo) => {
+        Service.GetAllTopArticle({
+            categoryId: this.categoryIds.id
+        })
+            .then((response) => {
+                let topArticle = response.data.data
+                this.setState({ topArticle })
+                global.constants.loading = false
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
     getBigIdeaDatas = (categoryId, pageNo) => {
         Service.GetAllArticle({
             categoryId: categoryId || '',
@@ -195,15 +217,15 @@ export default class Bigidea extends Component {
     }
 
     createRecommendArticle = () => {
-        const { recommendArticle } = this.state
-        return recommendArticle.list && recommendArticle.list.map((item, index) => {
+        const { topArticle } = this.state
+        return topArticle && topArticle.map((item, index) => {
             return (
                 <li key={index}>
-                    <a className="thumb-img" href="javascript:;">
+                    <a className="thumb-img" href={`/#/Inspiration/Article/${item.id}`}>
                         <img src={item.image} />
                         <span>{item.brand}</span>
                     </a>
-                    <h1><a href="#">{item.description}</a></h1>
+                    <h1><a href={`/#/Inspiration/Article/${item.id}`}>{item.description}</a></h1>
                     <div className="f-bartool clearfix">
                         <Collect item={item} />
                         <Like item={item} />

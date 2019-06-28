@@ -26,8 +26,11 @@ export default class Bookstore extends Component {
             curPage: 1,
             banner: [],
             hotBooks: [],
+
+            bannerAList: [],
             readTimeHotBooks: [],
-            recommendBooks: []
+            recommendBooks: [],
+            recommendList: []
         };
     }
 
@@ -38,10 +41,28 @@ export default class Bookstore extends Component {
     }
 
     componentDidMount() {
-        this.getRecommendBooks();
+        this.getAllTopArticle();
         this.getReadData();
+
+        this.getBannerA();
         let locationState = this.props.location.state
         this.getHotBooks(global.constants.categoryIds['阅读场景'].id);
+    }
+
+
+    getBannerA = () => {
+        Service.GetADList({
+            categoryId: this.categoryIds.id,
+            id: "b3653c6c1da841569e04ccccd5c0a776"
+        }).then((response) => {
+            if (response.data.status === 1) {
+                this.setState({ bannerAList: response.data.data })
+            }
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+
     }
 
     handleFavorite = (index) => {
@@ -122,10 +143,24 @@ export default class Bookstore extends Component {
             })
     }
 
+    getAllTopArticle = (categoryId, pageNo) => {
+        Service.GetAllTopArticle({
+            categoryId: this.categoryIds.id
+        })
+            .then((response) => {
+                let recommendList = response.data.data
+                this.setState({ recommendList })
+                global.constants.loading = false
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+
     //阅读场景首位
     createReadTimeHot = () => {
-        const { readTimeHotBooks } = this.state
-        let firstReadTimeHotBooks = readTimeHotBooks.slice(0, 1);
+        const { recommendList } = this.state
+        let firstReadTimeHotBooks = recommendList.slice(0, 1);
         return (
             firstReadTimeHotBooks[0] &&
             <div className="fs-tuijian">
@@ -135,7 +170,7 @@ export default class Bookstore extends Component {
                     {firstReadTimeHotBooks[0].description}
                     {
                         firstReadTimeHotBooks[0].description.length > 150 &&
-                        <a  href={`/#/Bookstore/Bookbuy/${firstReadTimeHotBooks[0].id}`}>查看原文</a>
+                        <a href={`/#/Bookstore/Bookbuy/${firstReadTimeHotBooks[0].id}`}>查看原文</a>
                     }
                 </div>
                 <ul>
@@ -155,16 +190,16 @@ export default class Bookstore extends Component {
 
     //阅读场景列表
     createReadTimeHotList = () => {
-        const { readTimeHotBooks } = this.state
-        let readTimeHotList = readTimeHotBooks.slice(1, 5);
+        const { bannerAList } = this.state
+        let readTimeHotList = bannerAList && bannerAList.slice(0, 4);
         return readTimeHotList && readTimeHotList.map((item, index) => {
             return (
                 <li>
-                    <a className="thumb-img" href={`/#/Bookstore/Bookbuy/${item.id}`}><img src={item.image} /></a>
-                    <h1><a href={`/#/Bookstore/Bookbuy/${item.id}`}>{item.title}</a></h1>
+                    <a className="thumb-img" href={item.link} target="_blank"><img src={item.image} /></a>
+                    <h1><a href={item.link} target="_blank">{item.name}</a></h1>
                     <div className="alt clearfix">
-                        <a href={`/#/Bookstore/Bookbuy/${item.id}`} className="j_name"><img src={item.user.img} className="thumb-img" />{item.user.name}</a>
-                        <span className="dot"></span>
+                        {/* <a href={item.link} className="j_name" ><img src={item.user && item.user.img} className="thumb-img" />{item.user && item.user.name}</a> */}
+                        {/* <span className="dot"></span> */}
                         <span>{item.description}</span>
                     </div>
                 </li>

@@ -1,6 +1,7 @@
 import React from 'react';
 import Axios from 'axios'
 import { HashRouter } from 'react-router-dom'
+import { } from 'antd'
 import Loading from '../common/Loading/Index'
 //取消请求
 // let CancelToken = axios.CancelToken
@@ -54,8 +55,15 @@ Axios.interceptors.response.use((config) => {
   //     // 在这里设置请求头与携带token信息
   // ])
   global.constants.loading = false
+  const router = new HashRouter()
   if (config.data.status === 2) {
 
+  } else if (config.data.status === 0) {
+    // /* global layer */
+    // layer.alert('请先登录', function (index) {
+    //   layer.close(index);
+    //   router.history.push('/login')
+    // })
   }
   return config
 }, (error) => {

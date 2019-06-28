@@ -415,5 +415,14 @@ class API {
             opts: data
         })
     }
+
+    //置顶区    
+    static GetAllTopArticle(data) {
+        return POST({
+            url: "/a/cms/article/filter/getAllTopArticle?",
+            opts: data
+        })
+    }
+
 }
 export default API
