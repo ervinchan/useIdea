@@ -92,28 +92,56 @@ export default class QuestionArticle extends Component {
         this.getHitsArticle()
         this.getQuestionList()
         this.getCommentList()
+        this.getBannerA()
+        this.getBannerB()
+        this.getBannerC()
     }
 
     getBannerA = () => {
         Service.GetADList({
             categoryId: this.categoryIds.id,
-            id: "588e4f30e9634523b34b5c913bfa4cd2"
+            id: "37e7de978cc14723b8d51ec902ed0f73"
         }).then((response) => {
             if (response.data.status === 1) {
-                this.setState({ bannerAList: response.data.data.slice(0, 1) })
-                this.setState({ bannerBList: response.data.data.slice(1, 4) })
+                this.setState({ bannerAList: response.data.data })
+            }
+        })
+    }
+    getBannerB = () => {
+        Service.GetADList({
+            categoryId: this.categoryIds.id,
+            id: "df2c63345f9b42beb860f9150d4002f7"
+        }).then((response) => {
+            if (response.data.status === 1) {
+                this.setState({ bannerBList: response.data.data })
+            }
+        })
+    }
+    getBannerC = () => {
+        Service.GetADList({
+            categoryId: this.categoryIds.id,
+            id: "f5552d56238d4eb58e83d1966ebca68f"
+        }).then((response) => {
+            if (response.data.status === 1) {
+                this.setState({ bannerCList: response.data.data })
             }
         })
     }
     createBannerA = () => {
-        const { bannerBList } = this.state
-        return bannerBList.map((item, index) => {
+        const { bannerAList } = this.state
+        return bannerAList.map((item, index) => {
             return <a href={item.url} className="seat-x315"><img src={item.image} /></a>
         })
     }
     createBannerB = () => {
         const { bannerBList } = this.state
-        let bannerList = bannerBList.map((item, index) => {
+        return bannerBList.map((item, index) => {
+            return <a href={item.url} className="seat-x315"><img src={item.image} /></a>
+        })
+    }
+    createBannerC = () => {
+        const { bannerCList } = this.state
+        let bannerList = bannerCList.map((item, index) => {
             return <a href={item.url} className="swiper-slide seat-x315"><img src={item.image} /></a>
         })
         return (
@@ -661,7 +689,7 @@ export default class QuestionArticle extends Component {
                     </div>
                     <div className="g-right">
                         {this.createBannerA()}
-                        {/* {this.createBannerC()} */}
+                        {this.createBannerB()}
                         <div className="u-title4">
                             <b>相关问题</b>
                         </div>
@@ -677,7 +705,7 @@ export default class QuestionArticle extends Component {
                             </ul>
                         </div>
                         <div className="slide-seat-315">
-                            {this.createBannerB()}
+                            {this.createBannerC()}
                             {/* <div className="swiper-container">
                                 <div className="swiper-wrapper">
                                     <a href="javascript:;" className="swiper-slide seat-x315"><img src="images/d5.jpg" /></a>

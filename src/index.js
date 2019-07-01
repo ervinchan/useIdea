@@ -16,6 +16,7 @@ import './static/less/module.less';
 
 //import App from './App';
 import * as serviceWorker from './serviceWorker';
+import Search from 'antd/lib/input/Search';
 
 //const Loading = () => <div className="positionC"><Spin tip="加载中..." /></div>;
 
@@ -190,6 +191,11 @@ const QyspaceJobInfo = Loadable({
     loading: Loading,
 });
 
+const SearchList = Loadable({
+    loader: () => import('./routes/Home/SearchList'),
+    loading: Loading,
+});
+
 
 const App = () => (
     <Router>
@@ -236,6 +242,8 @@ const App = () => (
             {/* <Route exact path="/QyspaceArticle/:uid?" component={QyspaceArticle} /> */}
             {/* <Route exact path="/QyspaceJobList/:uid?" component={QyspaceJobList} /> */}
             <Route exact path="/QyspaceJobInfo/:id?" component={QyspaceJobInfo} />
+
+            <Route exact path="/SearchList/:title?" component={SearchList} />
         </Switch>
     </Router>
 );
