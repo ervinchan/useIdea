@@ -189,7 +189,7 @@ export default class UserCenter extends Component {
                                 <span>粉丝</span><a href="javascript:;" onClick={() => this.gotoRouter(`/MyFans/${userInfo && userInfo.id}`)}>{userToolNum && userToolNum.fansNum}</a>
                             </p>
                         </div>
-                        <div className="address"><i className="icon-address-w"></i>{userInfo && userInfo.provence.name}  {userInfo && userInfo.city.name}</div>
+                        <div className="address"><i className="icon-address-w"></i>{userInfo && userInfo.provence && userInfo.provence.name}  {userInfo && userInfo.city && userInfo.city.name}</div>
                         <a href="javascript:;" className="add_upload" onClick={() => this.gotoRouter(`/ArticleEditor`)}>发表作品/经验</a>
                     </div>
                 </div>

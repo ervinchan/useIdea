@@ -42,15 +42,15 @@ export default class QuestionArticle extends Component {
             articleInfo: {},
             commentRenderLen: 2,
             replyId: '',
-            hitsArticleList:[]
+            hitsArticleList: []
         };
     }
 
     componentWillReceiveProps(nextProps) {
-        this.getArticleInfo()
-        this.getHitsArticle()
-        this.getQuestionList()
-        this.getCommentList()
+        this.getArticleInfo(nextProps)
+        this.getHitsArticle(nextProps)
+        this.getQuestionList(nextProps)
+        this.getCommentList(nextProps)
     }
 
     componentDidMount() {
@@ -129,9 +129,9 @@ export default class QuestionArticle extends Component {
     gotoRouter = (router) => {
         this.props.history.push(router)
     }
-    getArticleInfo = () => {
+    getArticleInfo = (nextProps) => {
         Service.GetAllArticle({
-            id: this.props.match.params.aid,
+            id: nextProps ? nextProps.match.params.aid : this.props.match.params.aid,
             categoryId: this.categoryIds.id
         }).then((response) => {
             if (response.data.status === 1) {
@@ -141,14 +141,14 @@ export default class QuestionArticle extends Component {
         })
     }
 
-    getCommentList = () => {
+    getCommentList = (nextProps) => {
 
         // Service.GetCommentList({
         //     contentId: this.props.match.params.aid,
         //     categoryId: this.categoryIds.id
         // })
         Service.GetArticleComment({
-            id: this.props.match.params.aid
+            id: nextProps ? nextProps.match.params.aid : this.props.match.params.aid
         }).then((response) => {
             if (response.data.status === 1) {
                 let commentList = response.data.data
@@ -157,7 +157,7 @@ export default class QuestionArticle extends Component {
         })
     }
 
-    getQuestionList = () => {
+    getQuestionList = (nextProps) => {
         Service.GetQuestion({
             categoryId: this.categoryIds.id,
             isRecommend: 0,
@@ -176,7 +176,7 @@ export default class QuestionArticle extends Component {
 
     createQuestionList = (data) => {
         const { questionList } = this.state;
-        return questionList.list && questionList.list.slice(0, 10).map((item, index) => {
+        return questionList.list && questionList.list.slice(0, 5).map((item, index) => {
             return (
                 <li onClick={() => this.gotoRouter(`/Question/Article/${item.id}`)}>
                     <a href="javascript:;">{item.title}</a><span>{item.commentNum}个回答</span>
