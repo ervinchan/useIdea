@@ -141,7 +141,7 @@ export default class QuestionArticle extends Component {
     }
     createBannerC = () => {
         const { bannerCList } = this.state
-        let bannerList = bannerCList.map((item, index) => {
+        let bannerList = bannerCList && bannerCList.map((item, index) => {
             return <a href={item.url} className="swiper-slide seat-x315"><img src={item.image} /></a>
         })
         return (

@@ -21,7 +21,7 @@ import 'antd/lib/upload/style/index.less';
 import Utils from '../../static/js/utils/utils.js';
 import defaultPhoto from "../../static/images/user/default.png"
 const TabPane = Tabs.TabPane;
-
+const PAGESIZE = 10;
 export default class Question extends Component {
     tabDom = null;
     categoryIds = global.constants.categoryIds['请教'];
@@ -43,7 +43,9 @@ export default class Question extends Component {
             addCategoryName: "",
             userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
             curPage: 1,
-            searchTxt: ""
+            searchTxt: "",
+            pageData: [],
+            getCurPageList: Function
         };
     }
     componentWillReceiveProps(nextProps) {
@@ -92,7 +94,7 @@ export default class Question extends Component {
         this.getBannerB();
         this.getBannerC();
         this.getBannerD();
-        this.getRecommendBooks();
+        this.getBannerE();
         this.getCategory()
     }
 
@@ -163,23 +165,27 @@ export default class Question extends Component {
     getQuestionList = (pageNo) => {
         Service.GetQuestion({
             pageNo: pageNo || 1,
-            pageSize: global.constants.PAGESIZE,
+            pageSize: PAGESIZE,
             categoryId: this.categoryIds.id
         }).then((response) => {
             if (response.data.status === 1) {
                 global.constants.loading = false
                 let questionList = response.data.data
-                this.setState({ questionList })
+                this.setState({ questionList }, () => {
+                    this.handleTabChange('news')
+                })
             }
         })
             .catch((error) => {
                 console.log(error)
             })
     }
-    getRecoList = () => {
+    getRecoList = (pageNo) => {
         Service.GetQuestion({
             isRecommend: 1,
-            categoryId: this.categoryIds.id
+            categoryId: this.categoryIds.id,
+            pageNo: pageNo || 1,
+            pageSize: PAGESIZE,
         }).then((response) => {
             if (response.data.status === 1) {
                 let recoList = response.data.data
@@ -190,10 +196,12 @@ export default class Question extends Component {
                 console.log(error)
             })
     }
-    getReplyList = () => {
+    getReplyList = (pageNo) => {
         Service.GetQuestion({
             parentContentId: 1,
-            categoryId: this.categoryIds.id
+            categoryId: this.categoryIds.id,
+            pageNo: pageNo || 1,
+            pageSize: PAGESIZE,
         }).then((response) => {
             if (response.data.status === 1) {
                 let replyList = response.data.data
@@ -251,8 +259,8 @@ export default class Question extends Component {
         let items = data.list && data.list.map((item, index) => {
             let Time = FormatDate.formatTime(item.createDate)
             let bannerCDom = null, bannerDDom = null;
-            if (bannerCList && (index % 7 === 0)) {
-                const banner = bannerCList[Math.trunc(index / 7)]
+            if (bannerCList && (index % 6 === 0)) {
+                const banner = bannerCList[Math.trunc(index / 6)]
                 if (banner) {
                     const Time2 = FormatDate.formatTime(banner.createDate)
                     bannerCDom = (
@@ -269,9 +277,8 @@ export default class Question extends Component {
 
 
             }
-            if (bannerDList && (index % 10 === 0) && index !== 0) {
-                debugger
-                const banner = bannerCList[Math.trunc(index / 10) - 1]
+            if (bannerDList && (index % 8 === 0) && index !== 0) {
+                const banner = bannerDList[Math.trunc(index / 8) - 1]
                 if (banner) {
                     bannerDDom = (
                         <a href={banner.link} target="_blank" class="seat-x100 darken scale"><img src={banner.image || defaultPhoto} onError={Utils.setDefaultPhoto} /></a>
@@ -328,12 +335,23 @@ export default class Question extends Component {
             }
         })
     }
-    createRecommonList = () => {
-        const { recommendBooks } = this.state
-        return recommendBooks && recommendBooks.list && recommendBooks.list.map((item, index) => {
-            let bookImagUrl = item.bookImagUrl.split('|')[1]
+
+    getBannerE = () => {
+        Service.GetADList({
+            categoryId: this.categoryIds.id,
+            id: "243e981b6d30424c8f3fac513382483a"
+        }).then((response) => {
+            if (response.data.status === 1) {
+                this.setState({ bannerEList: response.data.data })
+            }
+        })
+    }
+    createBannerEList = () => {
+        const { bannerEList } = this.state
+        return bannerEList && bannerEList.map((item, index) => {
+
             return (
-                <li><a href={`/#/Bookstore/Bookbuy/${item.id}`} className="darken"><em><img src={bookImagUrl} /></em><h1>{item.bookName}</h1></a></li>
+                <li><a href={item.url} className="darken" target="_blank"><em><img src={item.image} /></em><h1>{item.name}</h1></a></li>
             )
         })
     }
@@ -342,7 +360,19 @@ export default class Question extends Component {
         this.props.history.push(`/Question/Article/${id}`)
     }
     handleTabChange = (key) => {
+        const { questionList, recoList, replyList, getCurPageList } = this.state;
         console.log(key);
+        switch (key) {
+            case "reco":
+                this.setState({ pageData: recoList, getCurPageList: this.getRecoList });
+                break;
+            case "reply":
+                this.setState({ pageData: replyList, getCurPageList: this.getReplyList });
+                break;
+            default:
+                this.setState({ pageData: questionList, getCurPageList: this.getQuestionList });
+                break;
+        }
     }
 
     setQuestionTxt = (e) => {
@@ -412,7 +442,7 @@ export default class Question extends Component {
     }
     render() {
 
-        const { questionList, recoList, replyList, questionTit, questionTxt, fileList, addCategoryName } = this.state;
+        const { questionList, recoList, replyList, questionTit, questionTxt, fileList, addCategoryName, pageData, getCurPageList } = this.state;
         // const props = {
         //     onRemove: (file) => {
         //         this.setState((state) => {
@@ -452,7 +482,7 @@ export default class Question extends Component {
             })
         });
         return (
-            <div className="">
+            <div className="question-container">
                 {/* 头部 */}
                 < Header />
                 <div className="qj-banner">
@@ -468,7 +498,7 @@ export default class Question extends Component {
                 {/* <!--广告位--> */}
                 <div className="m-seat-x4 wrapper">
                     <ul className="m-row">
-                        {this.createRecommonList()}
+                        {this.createBannerEList()}
                     </ul>
                 </div>
                 <div className="wrapper g-qingjiao">
@@ -478,7 +508,7 @@ export default class Question extends Component {
                                 <input type="text" placeholder="请在此输入请教的标题……" value={questionTit} onChange={this.setQuestionTit} />
                             </div>
                             <div className="in_txt">
-                                <textarea placeholder="清晰简短的问题描述，能有效提升35%的请教成功率……" maxlength="500" value={questionTxt} onChange={this.setQuestionTxt}></textarea>
+                                <textarea placeholder="清晰简短的问题描述，能有效提升35%的请教成功率……" maxLength="500" value={questionTxt} onChange={this.setQuestionTxt}></textarea>
                             </div>
                         </div>
                         <div className="fm-qj-tool clearfix">
@@ -528,7 +558,7 @@ export default class Question extends Component {
                             </div>
                         </div>
                         {/* <!--J进度条--> */}
-                        <Pager getData={this.getQuestionList} data={questionList} />
+                        <Pager getData={getCurPageList} data={pageData} pageSize={PAGESIZE} />
 
                         {/* <!--/J进度条--> */}
                     </div>

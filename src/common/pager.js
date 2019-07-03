@@ -22,13 +22,15 @@ export default class Pager extends Component {
     }
 
     render() {
-        const { data, handlePageChange } = this.props;
+        debugger
+        const { data, pageSize } = this.props;
         const { curPage } = this.state;
+        const PAGESIZE = pageSize || global.constants.PAGESIZE
         return (
             <div>
                 {
-                    data.count > global.constants.PAGESIZE && (
-                        <Pagination className="u-pages" current={curPage} onChange={handlePageChange} total={data && data.count} pageSize={global.constants.PAGESIZE} itemRender={(page, type, originalElement) => {
+                    data.count > PAGESIZE && (
+                        <Pagination className="u-pages" current={curPage} onChange={this.handlePageChange} total={data && data.count} pageSize={PAGESIZE} itemRender={(page, type, originalElement) => {
                             switch (type) {
                                 case 'prev':
                                     return [<a href="javascript:;">{type}</a>,
