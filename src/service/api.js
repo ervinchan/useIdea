@@ -424,5 +424,15 @@ class API {
         })
     }
 
+    //
+    static GetPersonalComment(data) {
+        return POST({
+            url: "/a/cms/comment/filter/personalComment?",
+            opts: data
+        })
+    }
+
+
+
 }
 export default API

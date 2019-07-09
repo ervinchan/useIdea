@@ -90,7 +90,7 @@ export default class NewMessage extends Component {
     getNewComment = () => {
         const { newCommentList } = this.state;
         let pageNo = newCommentList.list && Math.ceil(newCommentList.list.length / PAGESIZE) + 1
-        Service.GetCommentList({
+        Service.GetPersonalComment({
             categoryIdFlag: 1,
             userId: userInfo.id,
             pageSize: PAGESIZE,
@@ -326,6 +326,10 @@ export default class NewMessage extends Component {
                     <div className="tab-item tab-fans">
                         <ul className="lx-fans clearfix">
                             {this.createFansList()}
+                            <div className="nolist" style={{ display: fans.list ? 'none' : 'block' }}>
+                                <i className="icon-no-new"></i>
+                                <span>· 暂无数据 ·</span>
+                            </div>
                         </ul>
                         <div className="more-b" style={{ display: fans.list && (fans.list.length < fans.count) ? 'block' : 'none' }}>
                             <a href="javascript:;" onClick={() => this.getFans()}>更多动态</a>
@@ -333,6 +337,13 @@ export default class NewMessage extends Component {
                     </div>
                     <ul className="tab-item ue-article clearfix">
                         {this.createList()}
+                        <div className="more-b" style={{ display: focus.list && (focus.list.length < focus.count) ? 'block' : 'none' }}>
+                            <a href="javascript:;" onClick={() => this.getFocus()}>更多动态</a>
+                        </div>
+                        <div className="nolist" style={{ display: focus.list ? 'none' : 'block' }}>
+                            <i className="icon-no-new"></i>
+                            <span>· 暂无数据 ·</span>
+                        </div>
                     </ul>
                     <div className="tab-item tab-msg">
                         <ul className="msg-tab u-tabs1 clearfix">

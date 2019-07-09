@@ -150,28 +150,28 @@ export default class Header extends Component {
             if (item.childList) {
                 Lis = this.loopChildren(item, item.childList)
             }
-            // let Li = item.childList && item.name !== "招聘" ?
-            //     <li key={index} ><NavLink to={{
-            //         pathname: `/${url}`,
-            //         state: { navId: item.id },
-            //         // hash: item.id
-            //     }} activeClassName="active" isActive={(match, location) => this.setActive(match, location, url)}>{item.name}</NavLink><ul>{Lis}</ul></li>
-            //     :
-            //     <li key={index} ><NavLink to={{
-            //         pathname: `/${url}`,
-            //         state: { navId: item.id },
-            //         // hash: item.id
-            //     }} activeClassName="active" isActive={(match, location) => this.setActive(match, location, url)}>{item.name}</NavLink></li>
-            // return Li
-            if (item.name !== "招聘") {
-                return (
-                    <li key={index} ><NavLink to={{
-                        pathname: `/${url}`,
-                        state: { navId: item.id },
-                        // hash: item.id
-                    }} activeClassName="active" isActive={(match, location) => this.setActive(match, location, url)}>{item.name}</NavLink>{item.childList && <ul>{Lis}</ul>}</li>
-                )
-            }
+            let Li = item.childList && item.name !== "招聘" ?
+                <li key={index} ><NavLink to={{
+                    pathname: `/${url}`,
+                    state: { navId: item.id },
+                    // hash: item.id
+                }} activeClassName="active" isActive={(match, location) => this.setActive(match, location, url)}>{item.name}</NavLink><ul>{Lis}</ul></li>
+                :
+                <li key={index} ><NavLink to={{
+                    pathname: `/${url}`,
+                    state: { navId: item.id },
+                    // hash: item.id
+                }} activeClassName="active" isActive={(match, location) => this.setActive(match, location, url)}>{item.name}</NavLink></li>
+            return Li
+            // if (item.name !== "招聘") {
+            //     return (
+            //         <li key={index} ><NavLink to={{
+            //             pathname: `/${url}`,
+            //             state: { navId: item.id },
+            //             // hash: item.id
+            //         }} activeClassName="active" isActive={(match, location) => this.setActive(match, location, url)}>{item.name}</NavLink>{item.childList && <ul>{Lis}</ul>}</li>
+            //     )
+            // }
         })
     }
 
@@ -262,8 +262,8 @@ export default class Header extends Component {
                             </div> */}
                             <div className="inlet clearfix">
                                 <a href="/#/Login"><img src={fixpng} className="icon-gr" />个人登录</a>
-                                {/* <a href="/#/LoginQy"><img src={fixpng} className="icon-qy" />企业登录</a> */}
-                                <a href="javascript:;" title="功能开发中"><img src={fixpng} className="icon-qy" />企业登录</a>
+                                <a href="/#/LoginQy"><img src={fixpng} className="icon-qy" />企业登录</a>
+                                {/* <a href="javascript:;" title="功能开发中"><img src={fixpng} className="icon-qy" />企业登录</a> */}
                             </div>
                         </div>
                         {
@@ -281,7 +281,7 @@ export default class Header extends Component {
                                         <a href={`/#/ArticleEditor`}>发表文章</a>
                                     </li>
                                     <li>
-                                        <a href={`/#/UserCenter/${userInfo.id}`}>我的首页</a>
+                                        <a href={`/#/UserNews/${userInfo.id}`}>我的首页</a>
                                     </li>
                                     <li>
                                         <a href={`/#/UserCenter/${userInfo.id}`}>我的心选</a>
