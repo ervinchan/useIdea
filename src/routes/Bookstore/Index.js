@@ -170,9 +170,9 @@ export default class Bookstore extends Component {
             return (
                 <li key={index}>
                     <div className="swiper-slide">
-                        <a className="thumb-img" href={item.link}><img src={item.image} alt={item.title} />
+                        <a className="thumb-img" href={`#/Bookstore/Bookbuy/${item.id}`}><img src={item.image} alt={item.title} />
                         </a>
-                        <h1><a href="#">{item.title}</a></h1>
+                        <h1><a href={`#/Bookstore/Bookbuy/${item.id}`}>{item.title}</a></h1>
                         <div className="f-bartool clearfix">
                             <Collect item={item} />
                             <Like item={item} />

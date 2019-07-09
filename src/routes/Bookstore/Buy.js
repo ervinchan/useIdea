@@ -30,11 +30,15 @@ export default class Bookstore extends Component {
             readList: [],
         }
     }
+    componentWillReceiveProps(nextProps) {
+        this.getBookDatas(nextProps)
+        this.getReadData(nextProps)
+    }
     componentDidMount() {
         console.log(this.props.match.params);
 
-        this.getBookDatas()
-        this.getReadData()
+        this.getBookDatas(this.props)
+        this.getReadData(this.props)
 
 
         $("body").on("click", "[data-el]", function (e) {
@@ -61,7 +65,7 @@ export default class Bookstore extends Component {
         });
     }
 
-    getReadData = () => {
+    getReadData = (props) => {
         Service.GetReads()
             .then((response) => {
                 let readList = response.data.data
@@ -88,9 +92,9 @@ export default class Bookstore extends Component {
             })
     }
 
-    getBookDatas = () => {
+    getBookDatas = (props) => {
         Service.GetBooks({
-            bookId: this.props.match.params.id
+            bookId: props.match.params.id
         }).then((response) => {
             let bookInfo = response.data.data[0]
             this.setState({ bookInfo }, () => {
@@ -144,7 +148,7 @@ export default class Bookstore extends Component {
 
         return sameBookList && sameBookList.map((item, index) => {
             return (
-                <a key={index} className="swiper-slide" href={`/Bookbuy/${item.id}`}>
+                <a key={index} className="swiper-slide" href={`#/Bookstore/Bookbuy/${item.id}`}>
                     <em><img src={item.img} /> </em>
                     <h1>{item.name}</h1>
                     <h3> {item.author}</h3>
@@ -161,9 +165,9 @@ export default class Bookstore extends Component {
             return (
                 <li key={index}>
                     <div className="swiper-slide">
-                        <a className="thumb-img" href={item.link}><img src={item.image} />
+                        <a className="thumb-img" href={`#/Bookstore/Bookbuy/${item.id}`}><img src={item.image} />
                         </a>
-                        <h1><a href="#">{item.title}</a></h1>
+                        <h1><a href={`#/Bookstore/Bookbuy/${item.id}`}>{item.title}</a></h1>
                         <div className="f-bartool clearfix">
                             <Collect item={item} />
                             <Like item={item} />

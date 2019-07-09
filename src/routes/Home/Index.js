@@ -119,7 +119,7 @@ export default class App extends Component {
                     clickable: true
                 }
             });
-            var swiper_bzhd = new Swiper('.m-interact .swiper-container', {
+            var swiper_bzhd = new Swiper('.banner-g .swiper-container', {
                 autoHeight: true,//新增
                 slidesPerView: 'auto',
                 spaceBetween: 20,
@@ -752,7 +752,7 @@ export default class App extends Component {
     }
 
     render() {
-        const { questionList, viewPointList, goodcopyList, bootStoreList, jobList, recommendBooks, noMore } = this.state;
+        const { questionList, viewPointList, goodcopyList, bootStoreList, jobList, recommendBooks, noMore, bannerGList } = this.state;
         const settingsBanner = {
             dots: true,
             className: "swiper-container",
@@ -877,7 +877,7 @@ export default class App extends Component {
                     <div className="m-next"></div>
                 </div >
                 {/* //本周互动 */}
-                < div className="m-interact wrapper" >
+                < div className={"m-interact wrapper " + (bannerGList.length > 4 && 'banner-g')} >
                     <div className="u-title3">
                         <b>本周互动</b>
                         {/* <a href="#">更多></a> */}

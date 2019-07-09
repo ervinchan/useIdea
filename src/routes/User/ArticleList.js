@@ -61,18 +61,18 @@ export default class ArticleList extends Component {
                 let Time = FormatDate.formatTime(item.createDate);
                 return (
                     <li>
-                        <a href="javascript:;" class="face" onClick={() => this.gotoRouter(`/Qyspace/${item.user.id}`)}>
-                            <img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
+                        <a href="javascript:;" class="face" onClick={() => this.gotoRouter(`/Qyspace/${item.auditUser.id}`)}>
+                            <img src={item.auditUser.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
                         </a>
                         <div class="lx_alt clearfix">
-                            <a href="javascript:;" class="j_name" onClick={() => this.gotoRouter(`/Qyspace/${item.user.id}`)}>{item.user.name}</a>
+                            <a href="javascript:;" class="j_name" onClick={() => this.gotoRouter(`/Qyspace/${item.auditUser.id}`)}>{item.auditUser.name}</a>
                             <span>{dataType}</span>
                             <span class="dot"></span>
                             <span>{Time}</span>
                         </div>
                         <div class="lx_box">
-                            <a class="thumb-img" href="javascript:;"><img src={item.image || "images/user/u1.png"} onClick={() => this.gotoRouter(`/Qyspace/${item.user.id}`)} /></a>
-                            <h1><a href="javascript:;" onClick={() => this.gotoRouter(`/Qyspace/${item.user.id}`)}>{item.title}</a></h1>
+                            <a class="thumb-img" href="javascript:;"><img src={item.image || "images/user/u1.png"} onClick={() => this.gotoRouter(`/Qyspace/${item.auditUser.id}`)} /></a>
+                            <h1><a href="javascript:;" onClick={() => this.gotoRouter(`/Qyspace/${item.auditUser.id}`)}>{item.title}</a></h1>
                             <p>{Time}</p>
                         </div>
                         <div class="lx_txt">
@@ -176,8 +176,8 @@ export default class ArticleList extends Component {
                 <ul class="lx-article clearfix">
                     {this.createList()}
                 </ul>
-                <div class="more-b" style={{ display: (data.list && data.list.length > 20 ) ? 'block' : 'none' }}>
-                    <a href="javascript:;">更多动态</a>
+                <div class="more-b" style={{ display: data.list && (data.list.length < data.count) ? 'block' : 'none' }}>
+                    <a href="javascript:;" onClick={() => this.getDatas()}>更多动态</a>
                 </div>
             </div>
         );

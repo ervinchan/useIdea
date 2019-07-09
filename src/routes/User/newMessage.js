@@ -33,11 +33,11 @@ export default class NewMessage extends Component {
         this.state = {
             sortType: 0,
             curPage: 1,
-            newCommentList: [],
-            collectList: [],
-            questionList: [],
-            fans: [],
-            focus: [],
+            newCommentList: {},
+            collectList: {},
+            questionList: {},
+            fans: {},
+            focus: {},
             sysNews: {
                 allNews: [],
                 sysNews: [],
@@ -88,9 +88,13 @@ export default class NewMessage extends Component {
     }
 
     getNewComment = () => {
+        const { newCommentList } = this.state;
+        let pageNo = newCommentList.list && Math.ceil(newCommentList.list.length / PAGESIZE) + 1
         Service.GetCommentList({
             categoryIdFlag: 1,
-            userId: userInfo.id
+            userId: userInfo.id,
+            pageSize: PAGESIZE,
+            pageNo: pageNo || 1
         })
             .then((response) => {
                 let newCommentList = response.data.data
@@ -99,8 +103,12 @@ export default class NewMessage extends Component {
     }
 
     getCollect = () => {
+        const { collectList } = this.state;
+        let pageNo = collectList.list && Math.ceil(collectList.list.length / PAGESIZE) + 1
         Service.GetCollectList({
-            userId: userInfo.id
+            userId: userInfo.id,
+            pageSize: PAGESIZE,
+            pageNo: pageNo || 1
         })
             .then((response) => {
                 let collectList = response.data.data
@@ -109,9 +117,13 @@ export default class NewMessage extends Component {
     }
 
     getQuestion = () => {
+        const { questionList } = this.state;
+        let pageNo = questionList.list && Math.ceil(questionList.list.length / PAGESIZE) + 1
         Service.GetQuestion({
             categoryId: global.constants.categoryIds['请教'].id,
-            userId: userInfo.id
+            userId: userInfo.id,
+            pageSize: PAGESIZE,
+            pageNo: pageNo || 1
         })
             .then((response) => {
                 let questionList = response.data.data
@@ -120,8 +132,12 @@ export default class NewMessage extends Component {
     }
 
     getFans = () => {
+        const { fans } = this.state;
+        let pageNo = fans.list && Math.ceil(fans.list.length / PAGESIZE) + 1
         Service.GetFansList({
-            userId: userInfo.id
+            userId: userInfo.id,
+            pageSize: PAGESIZE,
+            pageNo: pageNo || 1
         })
             .then((response) => {
                 let fans = response.data.data
@@ -130,9 +146,13 @@ export default class NewMessage extends Component {
     }
 
     getFocus = () => {
+        const { focus } = this.state;
+        let pageNo = focus.list && Math.ceil(focus.list.length / PAGESIZE) + 1
         Service.GetCollectList({
             userId: userInfo.id,
-            updateTime: 1
+            updateTime: 1,
+            pageSize: PAGESIZE,
+            pageNo: pageNo || 1
         })
             .then((response) => {
                 let focus = response.data.data
@@ -300,15 +320,15 @@ export default class NewMessage extends Component {
                     </ul>
                 </div>
                 <div className="tab-cont">
-                    <ArticleList data={newCommentList} history={this.props.history} dataType="评论文章" className="tab-item tab-discuss active" />
-                    <ArticleList data={collectList} history={this.props.history} dataType="收藏文章" className="tab-item tab-collection" />
-                    <ArticleList data={questionList} history={this.props.history} dataType="请教回应" className="tab-item tab-consult" />
+                    <ArticleList data={newCommentList} history={this.props.history} getDatas={this.getNewComment} dataType="评论文章" className="tab-item tab-discuss active" />
+                    <ArticleList data={collectList} history={this.props.history} getDatas={this.getCollect} dataType="收藏文章" className="tab-item tab-collection" />
+                    <ArticleList data={questionList} history={this.props.history} getDatas={this.getQuestion} dataType="请教回应" className="tab-item tab-consult" />
                     <div className="tab-item tab-fans">
                         <ul className="lx-fans clearfix">
                             {this.createFansList()}
                         </ul>
-                        <div className="more-b" style={{ display: fans.length < 20 ? 'none' : 'block' }}>
-                            <a href="javascript:;">更多动态</a>
+                        <div className="more-b" style={{ display: fans.list && (fans.list.length < fans.count) ? 'block' : 'none' }}>
+                            <a href="javascript:;" onClick={() => this.getFans()}>更多动态</a>
                         </div>
                     </div>
                     <ul className="tab-item ue-article clearfix">
