@@ -111,7 +111,7 @@ export default class Login extends Component {
     render() {
         const { emailError, pswError, displayPsw } = this.state
         return (
-            <div className="reg-body">
+            <div className="reg-qy-body">
                 <div className="r-banner">
                     <img src={regBanner} />
                     <div className="swiper-container">

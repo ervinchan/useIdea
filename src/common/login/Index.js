@@ -101,7 +101,7 @@ export default class Login extends Component {
     render() {
         const { emailError, pswError, displayPsw } = this.state
         return (
-            <div className="reg-user">
+            <div className="reg-p-user">
                 <a href="javascript:;" className="r-logo">
                     <img src="images/reg_logo.png" />
                 </a>

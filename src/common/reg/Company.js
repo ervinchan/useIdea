@@ -89,8 +89,8 @@ export default class Reg extends Component {
                     passwordConfirm: regPswConfirm,
                     isCompany: "true"
                 }
-                sessionStorage.setItem("regInfo", JSON.stringify(opts))
-                this.props.history.push("/RegInfo")
+                //sessionStorage.setItem("regInfo", JSON.stringify(opts))
+                this.props.history.push({ pathname: "/RegInfo", state: opts })
             } else {
                 return layer.msg(response.data.message)
             }
@@ -149,7 +149,7 @@ export default class Reg extends Component {
     render() {
         const { Nav, emailError, userNameError, pswError, pswConfirmError, agree, displayPsw } = this.state
         return (
-            <div className="reg-body">
+            <div className="reg-qy-body">
                 <div className="r-banner">
                     <img src={regBanner} />
                     <div className="swiper-container">

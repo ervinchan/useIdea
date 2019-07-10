@@ -144,7 +144,7 @@ export default class Reg extends Component {
     render() {
         const { Nav, userNameError, emailError, pswError, pswConfirmError, agree, displayPsw } = this.state
         return (
-            <div className="reg-body">
+            <div className="reg-p-body">
                 <a href="javascript:;" className="r-logo">
                     <img src="images/reg_logo.png" />
                 </a>

@@ -12,7 +12,7 @@ import 'antd/lib/radio/style/index';
 import Header from '../../common/header/Index.js'
 import regBanner from '../../static/images/reg/1.jpg';
 import logo from "../../static/images/reg_logo.png";
-const regInfo = JSON.parse(sessionStorage.getItem("regInfo"))
+//const regInfo = JSON.parse(sessionStorage.getItem("regInfo"))
 const RadioGroup = Radio.Group;
 export default class RegInfo extends Component {
     constructor(props) {
@@ -58,6 +58,10 @@ export default class RegInfo extends Component {
             $(this).parents("[role=menu]").hide();
         });
         this.getRegionDatas()
+        this.regInfo = this.props.location.state
+    }
+    componentWillReceiveProps(nextProps) {
+        this.regInfo = nextProps.location.state
     }
 
     handleEmail = (e) => {
@@ -73,14 +77,14 @@ export default class RegInfo extends Component {
     }
 
     RegConfirm = () => {
-        const { type, info, userPhoto, avatarPhoto, district, city, province, districtItem, cityItem } = this.state;
+        const { type, info, userPhoto, avatarPhoto, district, city, province, districtItem, cityItem, regEmail, regUserName } = this.state;
         /*global layer */
         let g = global.constants;
         g.loading = true;
         var that = this
         var oMyForm = new FormData();
-        for (var x in regInfo) {
-            oMyForm.append(x, regInfo[x]);
+        for (var x in this.regInfo) {
+            oMyForm.append(x, this.regInfo[x]);
         }
         oMyForm.append("shortName", info.shortName || "");
         oMyForm.append("officeLink", info.officeLink || "");
@@ -100,13 +104,18 @@ export default class RegInfo extends Component {
         userPhoto.forEach((file) => {
             oMyForm.append('image', file);
         });
+        let params = {
+            email: this.regInfo.email,
+            loginName: this.regInfo.loginName,
+            isCompany: "true"
+        }
         Service.companyReg({
             form: oMyForm
         }).then((response) => {
             g.loading = false
             if (response.data.status === 1) {
-                sessionStorage.removeItem("regInfo");
-                this.props.history.push("/regFinish")
+                //sessionStorage.removeItem("regInfo");
+                this.props.history.push({ pathname: "/regFinish", state: { user: params } })
 
             } else {
                 layer.alert(response.data.message, function () {
@@ -141,7 +150,9 @@ export default class RegInfo extends Component {
     }
 
     getRegionDatas = () => {
-        Service.getArea()
+        Service.getArea({
+            type: 2
+        })
             .then((response) => {
                 if (response.data.status === 1) {
                     let regionDatas = response.data.data
@@ -182,9 +193,24 @@ export default class RegInfo extends Component {
         })
     }
     setCity = (item) => {
-        let city = item.childList
+        // let city = item.childList
+        // let province = item
+        // this.setState({ city, province, district: [], cityItem: null, districtItem: null })
         let province = item
-        this.setState({ city, province, district: [], cityItem: null, districtItem: null })
+        const { info } = this.state;
+        Service.getArea({
+            id: item.id
+        })
+            .then((response) => {
+                if (response.data.status === 1) {
+                    let city = response.data.data
+                    const cityItem = { city: '', district: '' }
+                    this.setState({ city, province, district: [], cityItem, districtItem: null, info: Object.assign(info, cityItem) })
+                }
+            })
+            .catch((error) => {
+                console.log(error)
+            })
     }
 
     createCity = () => {
@@ -195,9 +221,22 @@ export default class RegInfo extends Component {
     }
 
     setDistrict = (item) => {
-        let district = item.childList
+        // let district = item.childList
+        // let cityItem = item
+        // this.setState({ cityItem, district, districtItem: null })
         let cityItem = item
-        this.setState({ cityItem, district, districtItem: null })
+        Service.getArea({
+            id: item.id
+        })
+            .then((response) => {
+                if (response.data.status === 1) {
+                    let district = response.data.data
+                    this.setState({ cityItem, district, districtItem: null })
+                }
+            })
+            .catch((error) => {
+                console.log(error)
+            })
     }
     createDistrict = () => {
         const { district } = this.state;
@@ -409,7 +448,7 @@ export default class RegInfo extends Component {
                             <ul className="select-group clearfix">
                                 <li>
                                     <div className="u-select">
-                                        <div className="in_province" role="note">{(province && province.name) || "省份"}</div>
+                                        <div className="in_province" role="note">{(province && province.name) || (info.provence && info.provence.name) || "省份"}</div>
                                         <div data-for=".in_province" role="menu">
                                             <ul>
                                                 {this.createRegion()}
@@ -419,7 +458,7 @@ export default class RegInfo extends Component {
                                 </li>
                                 <li>
                                     <div className="u-select">
-                                        <div className="in_city" role="note">{(cityItem && cityItem.name) || "城市"}</div>
+                                        <div className="in_city" role="note">{(cityItem && cityItem.name) || (info.city && info.city.name) || "城市"}</div>
                                         <div data-for=".in_city" role="menu">
                                             <ul>
                                                 {this.createCity()}
@@ -429,7 +468,7 @@ export default class RegInfo extends Component {
                                 </li>
                                 <li>
                                     <div className="u-select">
-                                        <div className="in_area" role="note">{(districtItem && districtItem.name) || "县区"}</div>
+                                        <div className="in_area" role="note">{(districtItem && districtItem.name) || (info.district && info.district.name) || "县区"}</div>
                                         <div data-for=".in_area" role="menu">
                                             <ul>
                                                 {this.createDistrict()}

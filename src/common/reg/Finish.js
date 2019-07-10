@@ -37,7 +37,7 @@ export default class Reg extends Component {
     render() {
         let state = this.props.location.state
         return (
-            <div className="reg-body reg-user">
+            <div className="reg-p-body reg-user">
                 <a href="index.html" className="r-logo">
                     <img src="images/reg_logo.png" />
                 </a>
