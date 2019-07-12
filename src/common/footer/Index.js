@@ -16,12 +16,14 @@ export default class Footer extends Component {
     }
     componentDidMount() {
         $(function () {
-
+            var cnzz_protocol = (("https:" == document.location.protocol) ? "https://" : "http://");
+            $("#footer").append(unescape("%3Cspan id='cnzz_stat_icon_1277720146'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol +
+                "s23.cnzz.com/z_stat.php%3Fid%3D1277720146%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));
         })
     }
     render() {
         return (
-            <div>
+            <div id="footer">
                 <div className="fixed_bottom"></div>
                 <div className="m-footer">
                     <div className="wrapper clearfix">
