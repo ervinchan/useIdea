@@ -133,7 +133,9 @@ export default class UserCenter extends Component {
     }
 
     getRegionDatas = () => {
-        Service.getArea()
+        Service.getArea({
+            type: 2
+        })
             .then((response) => {
                 if (response.data.status === 1) {
                     let regionDatas = response.data.data
@@ -357,10 +359,10 @@ export default class UserCenter extends Component {
                                 </div>
                                 <div class="u-inline width-full">
                                     <label class="u-form-label"><i>*</i>工作地点</label>
-                                    <ul class="select-group clearfix">
+                                    <ul className="select-group clearfix">
                                         <li>
                                             <div className="u-select">
-                                                <div className="in_province" role="note">{(province && province.name) || info.provence || "省份"}</div>
+                                                <div className="in_province" role="note">{(province && province.name) || (info.provence && info.provence.name) || "省份"}</div>
                                                 <div data-for=".in_province" role="menu">
                                                     <ul>
                                                         {this.createRegion()}
@@ -370,7 +372,7 @@ export default class UserCenter extends Component {
                                         </li>
                                         <li>
                                             <div className="u-select">
-                                                <div className="in_city" role="note">{(cityItem && cityItem.name) || info.city || "城市"}</div>
+                                                <div className="in_city" role="note">{(cityItem && cityItem.name) || (info.city && info.city.name) || "城市"}</div>
                                                 <div data-for=".in_city" role="menu">
                                                     <ul>
                                                         {this.createCity()}
@@ -380,7 +382,7 @@ export default class UserCenter extends Component {
                                         </li>
                                         <li>
                                             <div className="u-select">
-                                                <div className="in_area" role="note">{(districtItem && districtItem.name) || info.district || "县区"}</div>
+                                                <div className="in_area" role="note">{(districtItem && districtItem.name) || (info.district && info.district.name) || "县区"}</div>
                                                 <div data-for=".in_area" role="menu">
                                                     <ul>
                                                         {this.createDistrict()}

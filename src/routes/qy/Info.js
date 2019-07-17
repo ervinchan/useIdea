@@ -5,7 +5,7 @@ import $ from 'jquery'
 import Swiper from 'swiper/dist/js/swiper.min.js'
 import FormatDate from '../../static/js/utils/formatDate.js'
 import Utils from '../../static/js/utils/utils.js'
-
+import Validate from '../../static/js/utils/validate.js'
 import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
 import QyHead from './qyHead'
@@ -33,9 +33,9 @@ export default class QyInfo extends Component {
             officeEnvi: [],
             imageUrl: [],
             userPhoto: [],
-            weiXinCode: [],
+            weChatCode: {},
             info: {
-                name: "", sex: "", provence: "", city: "", district: "", infomation: "", officeLink: "", subscription: "", douBan: "", zhiHu: "", weiBo: "", email: "", mobile: "", password: "", newPassword: "", teamSize: ""
+                name: "", sex: "", provence: {}, city: {}, district: {}, infomation: "", officeLink: "", subscription: "", douBan: "", zhiHu: "", weiBo: "", email: "", mobile: "", password: "", newPassword: "", teamSize: ""
             },
             media: {
                 weiboInput: false,
@@ -156,32 +156,41 @@ export default class QyInfo extends Component {
             })
     }
     submitUserInfo = () => {
-        const { info, userPhoto, weiXinCode, teamsizeItem, province, cityItem, districtItem, pswConfirmError, officeEnvi } = this.state;
+        const { info, userPhoto, weChatCode, teamsizeItem, province, cityItem, districtItem, pswConfirmError, officeEnvi } = this.state;
         this.setState({ pswConfirmError: false })
         if (info.newPassword !== info.confirmPassword) {
             return this.setState({ pswConfirmError: true })
         }
+        if ()
+            if (!Validate.checkEmail(info.email)) {
+                layer.msg("请填写正确的邮箱")
+                return this.setState({ emailError: true })
+            }
+        if (!Validate.checkPhone(info.mobile)) {
+            layer.msg("请填写正确的手机号码")
+            return this.setState({ phoneError: true })
+        }
         /*global layer */
         var oMyForm = new FormData();
         oMyForm.append("name", userInfo.name);
-        oMyForm.append("provence", province.name);
-        oMyForm.append('city', cityItem.name);
-        oMyForm.append('district', districtItem.name);
-        oMyForm.append("subscription", info.subscription);
+        oMyForm.append("provence", (province && province.id) || info.provence.id);
+        oMyForm.append('city', cityItem && cityItem.id || info.city.id);
+        oMyForm.append('district', districtItem && districtItem.id || info.district.id);
+        oMyForm.append("subscription", info.subscription || '');
         oMyForm.append('teamSize', teamsizeItem.name);
-        oMyForm.append("douBan", info.douBan);
-        oMyForm.append('zhiHu', info.zhiHu);
-        oMyForm.append("weiBo", info.weiBo);
-        oMyForm.append('email', info.email);
-        oMyForm.append('mobile', info.mobile);
-        oMyForm.append('officeLink', info.officeLink);
-        oMyForm.append('password', info.password);
-        oMyForm.append('newPassword', info.newPassword);
+        oMyForm.append("douBan", info.douBan || '');
+        oMyForm.append('zhiHu', info.zhiHu || '');
+        oMyForm.append("weiBo", info.weiBo || '');
+        oMyForm.append('email', info.email || '');
+        oMyForm.append('mobile', info.mobile || '');
+        oMyForm.append('officeLink', info.officeLink || '');
+        oMyForm.append('password', info.password || '');
+        oMyForm.append('newPassword', info.newPassword || '');
         oMyForm.append('userId', userInfo.id);
         userPhoto.forEach((file) => {
             oMyForm.append('headImage', file);
         });
-        oMyForm.append('weChatCode', weiXinCode);
+        oMyForm.append('weChatCode', weChatCode || '');
         oMyForm.append('file1', officeEnvi[0]);
         oMyForm.append('file2', officeEnvi[1]);
         oMyForm.append('file3', officeEnvi[2]);
@@ -221,7 +230,9 @@ export default class QyInfo extends Component {
     }
 
     getRegionDatas = () => {
-        Service.getArea()
+        Service.getArea({
+            type: 2
+        })
             .then((response) => {
                 if (response.data.status === 1) {
                     let regionDatas = response.data.data
@@ -240,9 +251,24 @@ export default class QyInfo extends Component {
         })
     }
     setCity = (item) => {
-        let city = item.childList
+        // let city = item.childList
+        // let province = item
+        // this.setState({ city, province, district: [], cityItem: null, districtItem: null })
         let province = item
-        this.setState({ city, province, district: [], cityItem: null, districtItem: null })
+        const { info } = this.state;
+        Service.getArea({
+            id: item.id
+        })
+            .then((response) => {
+                if (response.data.status === 1) {
+                    let city = response.data.data
+                    const cityItem = { city: '', district: '' }
+                    this.setState({ city, province, district: [], cityItem, districtItem: null, info: Object.assign(info, cityItem) })
+                }
+            })
+            .catch((error) => {
+                console.log(error)
+            })
     }
 
     createCity = () => {
@@ -253,9 +279,22 @@ export default class QyInfo extends Component {
     }
 
     setDistrict = (item) => {
-        let district = item.childList
+        // let district = item.childList
+        // let cityItem = item
+        // this.setState({ cityItem, district, districtItem: null })
         let cityItem = item
-        this.setState({ cityItem, district, districtItem: null })
+        Service.getArea({
+            id: item.id
+        })
+            .then((response) => {
+                if (response.data.status === 1) {
+                    let district = response.data.data
+                    this.setState({ cityItem, district, districtItem: null })
+                }
+            })
+            .catch((error) => {
+                console.log(error)
+            })
     }
     createDistrict = () => {
         const { district } = this.state;
@@ -269,7 +308,7 @@ export default class QyInfo extends Component {
     createTeamSize = () => {
         const { teamSize } = this.state;
         return teamSize && teamSize.map((item) => {
-            return <li onClick={() => this.onSelectedDistrict(item)}>{item.name}</li>
+            return <li onClick={() => this.onSelectedTeamSize(item)}>{item.name}</li>
         })
     }
     onSelectedTeamSize = (item) => {
@@ -315,7 +354,7 @@ export default class QyInfo extends Component {
 
     setWeChatCode = (file, newUrl) => {
         this.setState(state => ({
-            weiXinCode: file
+            weChatCode: file
         }))
     }
 
@@ -351,7 +390,7 @@ export default class QyInfo extends Component {
     }
 
     render() {
-        const { province, cityItem, districtItem, info, officeEnvi, imageUrl, media, weiXinCode, teamsizeItem, pswConfirmError, userPhoto, userImg } = this.state;
+        const { province, cityItem, districtItem, info, officeEnvi, imageUrl, media, weChatCode, teamsizeItem, pswConfirmError, userPhoto, userImg } = this.state;
 
         return (
             <div className="">
@@ -383,7 +422,7 @@ export default class QyInfo extends Component {
                                     <ul className="select-group clearfix">
                                         <li>
                                             <div className="u-select">
-                                                <div className="in_province" role="note">{(province && province.name) || "省份"}</div>
+                                                <div className="in_province" role="note">{(province && province.name) || (info.provence && info.provence.name) || "省份"}</div>
                                                 <div data-for=".in_province" role="menu">
                                                     <ul>
                                                         {this.createRegion()}
@@ -393,7 +432,7 @@ export default class QyInfo extends Component {
                                         </li>
                                         <li>
                                             <div className="u-select">
-                                                <div className="in_city" role="note">{(cityItem && cityItem.name) || "城市"}</div>
+                                                <div className="in_city" role="note">{(cityItem && cityItem.name) || (info.city && info.city.name) || "城市"}</div>
                                                 <div data-for=".in_city" role="menu">
                                                     <ul>
                                                         {this.createCity()}
@@ -403,7 +442,7 @@ export default class QyInfo extends Component {
                                         </li>
                                         <li>
                                             <div className="u-select">
-                                                <div className="in_area" role="note">{(districtItem && districtItem.name) || "县区"}</div>
+                                                <div className="in_area" role="note">{(districtItem && districtItem.name) || (info.district && info.district.name) || "县区"}</div>
                                                 <div data-for=".in_area" role="menu">
                                                     <ul>
                                                         {this.createDistrict()}
@@ -497,12 +536,45 @@ export default class QyInfo extends Component {
                             <ul className="clearfix">
                                 <li>
                                     <span className="cimg"><i className="icon-wechat"></i></span>
-                                    <span className="alt">{weiXinCode.name || "* 请在这里上传你的公众平台二维码"}</span>
+                                    <span className="alt">{weChatCode.name || "* 请在这里上传你的公众平台二维码"}</span>
                                     <span className="cbtn">
                                         <Upload
                                             name="weChatCode"
                                             className="avatar-uploader"
-                                            {...this.setUploadPorps(weiXinCode, this.setWeChatCode)}
+                                            {...this.setUploadPorps(weChatCode, this.setWeChatCode)}
+                                        >
+                                            <a href="javascript:;">上传</a>
+                                        </Upload>
+                                    </span>
+                                </li>
+                                <li>
+                                    <span className="cimg"><i className="icon-weibo"></i></span>
+                                    <span className={"alt " + (media.weiboInput ? "hide" : "")}>{info.weiBo || "* 请在这里上传你微博首页链接"}</span>
+                                    <input type="text" className={"u-input " + (!media.weiboInput ? "hide" : "show")} placeholder="上传你微博首页链接" value={info.weiBo} onChange={(e) => this.changeInfo(e, 'weiBo')} />
+                                    <span className="cbtn"><a href="javascript:;" onClick={() => this.changeBindUrl("weiboInput")}>{!media.weiboInput ? "点击绑定" : "点击提交"}</a></span>
+                                </li>
+                                <li>
+                                    <span className="cimg"><i className="icon-zhihu"></i></span>
+                                    <span className={"alt " + (media.zhihuInput ? "hide" : "")}>{info.zhiHu || "* 请在这里上传你知乎首页链接"}</span>
+                                    <input type="text" className={"u-input " + (!media.zhihuInput ? "hide" : "show")} placeholder="上传你知乎首页链接" value={info.zhiHu} onChange={(e) => this.changeInfo(e, 'zhiHu')} />
+                                    <span className="cbtn"><a href="javascript:;" onClick={() => this.changeBindUrl("zhihuInput")}>{!media.zhihuInput ? "点击绑定" : "点击提交"}</a></span>
+                                </li>
+                                <li>
+                                    <span className="cimg"><i className="icon-dou"></i></span>
+                                    <span className={"alt " + (media.doubanInput ? "hide" : "")}>{info.douBan || "* 请在这里上传你豆瓣首页链接"}</span>
+                                    <input type="text" className={"u-input " + (!media.doubanInput ? "hide" : "show")} placeholder="上传你豆瓣首页链接" value={info.douBan} onChange={(e) => this.changeInfo(e, 'douBan')} />
+                                    <span className="cbtn"><a href="javascript:;" onClick={() => this.changeBindUrl("doubanInput")}>{!media.doubanInput ? "点击绑定" : "点击提交"}</a></span>
+                                </li>
+                            </ul>
+                            {/* <ul className="clearfix">
+                                <li>
+                                    <span className="cimg"><i className="icon-wechat"></i></span>
+                                    <span className="alt">{weChatCode.name || "* 请在这里上传你的公众平台二维码"}</span>
+                                    <span className="cbtn">
+                                        <Upload
+                                            name="weChatCode"
+                                            className="avatar-uploader"
+                                            {...this.setUploadPorps(weChatCode, this.setWeChatCode)}
                                         >
                                             <a href="javascript:;">上传</a>
                                         </Upload>
@@ -526,7 +598,7 @@ export default class QyInfo extends Component {
                                     <input type="text" className={"u-input " + (!media.doubanInput ? "hide" : "show")} placeholder="上传你豆瓣首页链接" value={info.douBan} onChange={(e) => this.changeInfo(e, 'douBan')} />
                                     <span className="cbtn"><a href="javascript:;" onClick={() => this.changeBindUrl("doubanInput")}>{!media.doubanInput ? "点击绑定" : "点击提交"}</a></span>
                                 </li>
-                            </ul>
+                            </ul> */}
                         </div>
                         <div className="ac-panel ac-horizontal fr-safe">
                             <div className="ac-title ac-darken">密码安全</div>

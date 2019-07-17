@@ -9,7 +9,7 @@ import { POST } from '../../service/service'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
 import CoverModal from './coverModal'
-import userImg from "../../static/images/user/userTx.jpg"
+//import userImg from "../../static/images/user/userTx.jpg"
 import Utils from '../../static/js/utils/utils.js'
 const TabPane = Tabs.TabPane;
 const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
@@ -121,7 +121,7 @@ export default class QyHead extends Component {
                             <span>粉丝</span><a href={`/#/MyFans/${userInfo && userInfo.id}`}>{userToolNum && userToolNum.fansNum}</a>
                         </p>
                     </div>
-                    <div className="address"><i className="icon-address-w"></i>{info.provence}  {info.city}</div>
+                    <div className="address"><i className="icon-address-w"></i>{info.provence.name}  {info.city.name}</div>
                     <a href="javascript:;" className="add_upload" onClick={() => this.gotoRouter(`/ArticleEditor`)}>发表作品/经验</a>
 
                 </div>

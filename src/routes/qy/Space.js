@@ -32,7 +32,9 @@ export default class MyHeart extends Component {
             banner: [],
             jobList: [],
             userPhoto: [],
-            info: {}
+            info: {
+                name: "", sex: "", provence: {}, city: {}, district: {}, infomation: "", officeLink: "", subscription: "", douBan: "", zhiHu: "", weiBo: "", email: "", mobile: "", password: "", newPassword: "", teamSize: ""
+            },
         };
     }
 
@@ -57,6 +59,7 @@ export default class MyHeart extends Component {
         let uid = this.props.match.params.uid
         this.getMyWork(userInfo.id);
         this.getJobList(userInfo.id)
+        this.getUserInfoDetail(userInfo && userInfo.id)
     }
 
     handleTabChange = (key) => {
@@ -81,6 +84,19 @@ export default class MyHeart extends Component {
                 this.setState({ collectList: response.data.data.articles })
             }
         })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+    getUserInfoDetail = (userId) => {
+        Service.getQyInfoDetail({
+            userId: userId
+        })
+            .then((response) => {
+                let userInfoDetail = response.data.data;
+                Object.assign(userInfo, userInfoDetail);
+                this.setState({ info: userInfo });
+            })
             .catch((error) => {
                 console.log(error)
             })

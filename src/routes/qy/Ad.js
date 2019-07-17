@@ -35,6 +35,7 @@ export default class qyAd extends Component {
             $(this).next().show();
         });
         this.getADHistory();
+        this.getADBeing();
     }
     handleTabChange = (key) => {
         console.log(key);
@@ -44,7 +45,7 @@ export default class qyAd extends Component {
     }
     getADHistory = () => {
         Service.getADHistoryList({
-            flag: "false",
+            //flag: "false",
             userId: userInfo && userInfo.id
         }).then((response) => {
             if (response.data.status === 1) {
@@ -57,8 +58,8 @@ export default class qyAd extends Component {
             })
     }
     getADBeing = () => {
-        Service.getADHistoryList({
-            flag: "true",
+        Service.getADBeginList({
+            //flag: "true",
             userId: userInfo && userInfo.id
         }).then((response) => {
             if (response.data.status === 1) {

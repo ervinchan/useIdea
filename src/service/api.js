@@ -260,7 +260,15 @@ class API {
     //广告管理接口-投放列表   
     static getADHistoryList(data) {
         return POST({
-            url: "/a/cms/article/filter/adhistoryList?",
+            url: "/a/ad/adRequirement/filter/getADRequirementAll?",
+            opts: data
+        })
+    }
+
+    //广告管理接口-投放列表   
+    static getADBeginList(data) {
+        return POST({
+            url: "/a/ad/adRequirement/filter/getADRequirementIng?",
             opts: data
         })
     }
@@ -330,7 +338,7 @@ class API {
     //获取用户信息    
     static updateInformation(data) {
         return FormData({
-            url: "/a/sys/user/filter/updateInformation?",
+            url: "/a/sys/user/filter/updateOfficeInformation?",
             opts: data.form
         })
     }

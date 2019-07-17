@@ -22,7 +22,7 @@ import Home from './Home.js';
 import AdManage from './Ad.js'
 import News from '../User/newMessage.js'
 const TabPane = Tabs.TabPane;
-
+const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
 export default class AdModal extends Component {
     /* global $ */
     tabDom = null
@@ -123,7 +123,9 @@ export default class AdModal extends Component {
             email: info.email || "",
             wechatId: info.wechatId || "",
             period: periodName || "",
-            content: info.content || ""
+            content: info.content || "",
+            userId: userInfo.id,
+            myUserId: userInfo.id
         }
         var oMyForm = new FormData();
 
