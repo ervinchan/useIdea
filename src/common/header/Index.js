@@ -20,9 +20,9 @@ export default class Header extends Component {
             roleNames: '游客',
             searchTxt: ""
         }
-        const router = new HashRouter()
+        this.router = new HashRouter()
 
-        router.history.listen((location) => {
+        this.router.history.listen((location) => {
             console.log(location.pathname)
             switch (location.pathname) {
                 case '/Question':
@@ -313,7 +313,9 @@ export default class Header extends Component {
                                         <a href={`/#/QyJobAdd/${userInfo.id}`}>发布岗位</a>
                                     </li>
                                     <li>
-                                        <a href={`/#/QyAd/${userInfo.id}`}>广告投放管理</a>
+                                        <a href={`/#/QyHome/${userInfo.id}`} onClick={() => {
+                                            Utils.gotoRouter(this.router.history, '/QyHome/', { userId: userInfo.id })
+                                        }}>广告投放管理</a>
                                     </li>
                                     <li>
                                         <a href="#">来 信<i className="badge">42</i></a>

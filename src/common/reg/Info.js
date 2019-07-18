@@ -83,14 +83,22 @@ export default class RegInfo extends Component {
         g.loading = true;
         var that = this
         var oMyForm = new FormData();
+        if (!Validate.checkEmail(info.email)) {
+            layer.msg("请填写正确的邮箱")
+            return this.setState({ emailError: true })
+        }
+        if (!Validate.checkPhone(info.mobile)) {
+            layer.msg("请填写正确的手机号码")
+            return this.setState({ phoneError: true })
+        }
         for (var x in this.regInfo) {
             oMyForm.append(x, this.regInfo[x]);
         }
         oMyForm.append("shortName", info.shortName || "");
         oMyForm.append("officeLink", info.officeLink || "");
-        oMyForm.append("provence", province ? province.name : "");
-        oMyForm.append('city', cityItem ? cityItem.name : "");
-        oMyForm.append('district', districtItem ? districtItem.name : "");
+        oMyForm.append("provence", (province && province.id) || info.provence.id);
+        oMyForm.append('city', cityItem && cityItem.id || info.city.id);
+        oMyForm.append('district', districtItem && districtItem.id || info.district.id);
         oMyForm.append("name", info.name || "");
         oMyForm.append("position", info.position || "");
         oMyForm.append("officeName", info.officeName || "");

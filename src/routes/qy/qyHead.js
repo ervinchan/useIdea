@@ -99,17 +99,19 @@ export default class QyHead extends Component {
         return (
             <div className="ue-head">
                 <div className="wrapper">
-                    <div className="userTx">
-                        <Upload
-                            name="userPhoto"
-                            className="avatar-uploader"
-                            {...this.setUploadPorps(userPhoto, setUserPhoto)}
-                        >
-                            <a href="javascript:;">
+                    <div className="userTx header-photo">
+
+                        <a href="javascript:;">
+                            <Upload
+                                name="userPhoto"
+                                className="avatar-uploader"
+                                {...this.setUploadPorps(userPhoto, setUserPhoto)}
+                            >
                                 <img src={userImg || (info && info.photo)} />
                                 <p><i className="icon-user-img"></i><span>更新个人头像</span></p>
-                            </a>
-                        </Upload>
+
+                            </Upload>
+                        </a>
                     </div>
                     <div className="nick-name">
                         <h1><b className="rank">{userInfo && userInfo.name}<i className="icon-rank"></i></b></h1>

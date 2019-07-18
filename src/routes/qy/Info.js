@@ -161,11 +161,10 @@ export default class QyInfo extends Component {
         if (info.newPassword !== info.confirmPassword) {
             return this.setState({ pswConfirmError: true })
         }
-        if ()
-            if (!Validate.checkEmail(info.email)) {
-                layer.msg("请填写正确的邮箱")
-                return this.setState({ emailError: true })
-            }
+        if (!Validate.checkEmail(info.email)) {
+            layer.msg("请填写正确的邮箱")
+            return this.setState({ emailError: true })
+        }
         if (!Validate.checkPhone(info.mobile)) {
             layer.msg("请填写正确的手机号码")
             return this.setState({ phoneError: true })
@@ -326,16 +325,16 @@ export default class QyInfo extends Component {
             imageUrl: [...state.imageUrl, newUrl]
         }), () => {
 
-            // $(".upload-avatar").find("input[type=file]").css({
-            //     position: "absolute",
-            //     left: 0,
-            //     top: 0,
-            //     width: "100%",
-            //     height: "100%",
-            //     opacity: 0,
-            //     zIndex: 1,
-            //     display: "block"
-            // })
+            $(".ac-envi").find("input[type=file]").css({
+                position: "absolute",
+                left: 0,
+                top: 0,
+                width: "100%",
+                height: "100%",
+                opacity: 0,
+                zIndex: 1,
+                display: "block"
+            })
 
         });
     };
@@ -355,7 +354,19 @@ export default class QyInfo extends Component {
     setWeChatCode = (file, newUrl) => {
         this.setState(state => ({
             weChatCode: file
-        }))
+        }), () => {
+            $(".wechat-upload").find("input[type=file]").css({
+                position: "absolute",
+                left: 0,
+                top: 0,
+                width: "100%",
+                height: "100%",
+                opacity: 0,
+                zIndex: 1,
+                display: "block"
+            })
+
+        })
     }
 
     setUserPhoto = (file, newUrl) => {
@@ -363,7 +374,7 @@ export default class QyInfo extends Component {
             userPhoto: [...state.userPhoto, file],
             userImg: newUrl
         }), () => {
-            $(".avatar-uploader").find("input[type=file]").css({
+            $(".header-photo").find("input[type=file]").css({
                 position: "absolute",
                 left: 0,
                 top: 0,
@@ -533,7 +544,7 @@ export default class QyInfo extends Component {
                         </div>
                         <div className="ac-banding fr-bind">
                             <div className="ac-title">宣传绑定</div>
-                            <ul className="clearfix">
+                            <ul className="clearfix wechat-upload">
                                 <li>
                                     <span className="cimg"><i className="icon-wechat"></i></span>
                                     <span className="alt">{weChatCode.name || "* 请在这里上传你的公众平台二维码"}</span>
