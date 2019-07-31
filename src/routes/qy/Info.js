@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Input, Tabs, Pagination, Upload } from 'antd';
+import { Input, Tabs, Pagination, Upload, Checkbox } from 'antd';
 import axios from 'axios'
 import $ from 'jquery'
 import Swiper from 'swiper/dist/js/swiper.min.js'
@@ -15,7 +15,8 @@ import Loading from '../../common/Loading/Index'
 import 'swiper/dist/css/swiper.min.css'
 
 import 'antd/lib/pagination/style/index.css';
-import '../../static/less/u.myaccount.less'
+import 'antd/lib/checkbox/style/index.less';
+import '../../static/less/u.myaccount.less';
 
 const PAGESIZE = 3;
 const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
@@ -33,9 +34,9 @@ export default class QyInfo extends Component {
             officeEnvi: [],
             imageUrl: [],
             userPhoto: [],
-            weChatCode: {},
+            weChatCode: null,
             info: {
-                name: "", sex: "", provence: {}, city: {}, district: {}, infomation: "", officeLink: "", subscription: "", douBan: "", zhiHu: "", weiBo: "", email: "", mobile: "", password: "", newPassword: "", teamSize: ""
+                name: "", sex: "", provence: {}, city: {}, district: {}, infomation: "", officeLink: "", subscription: "false", douBan: "", zhiHu: "", weiBo: "", email: "", mobile: "", password: "", newPassword: "", teamSize: ""
             },
             media: {
                 weiboInput: false,
@@ -50,7 +51,7 @@ export default class QyInfo extends Component {
                 { name: "70-100人" },
                 { name: "100人以上" }
             ],
-            teamsizeItem: "",
+            teamsizeItem: {},
             pswConfirmError: false
         };
     }
@@ -70,7 +71,7 @@ export default class QyInfo extends Component {
 
         $(".u-select li").on("click", function (e) {
             e = window.event || e;
-            e.stopPropagation();
+            // e.stopPropagation();
             $($(this).parents("[role=menu]").data("for")).html($(this).text());
             $(this).parents("[role=menu]").hide();
         });
@@ -175,8 +176,8 @@ export default class QyInfo extends Component {
         oMyForm.append("provence", (province && province.id) || info.provence.id);
         oMyForm.append('city', cityItem && cityItem.id || info.city.id);
         oMyForm.append('district', districtItem && districtItem.id || info.district.id);
-        oMyForm.append("subscription", info.subscription || '');
-        oMyForm.append('teamSize', teamsizeItem.name);
+        oMyForm.append("subscription", info.subscription);
+        oMyForm.append('teamSize', teamsizeItem.name || info.teamSize || '');
         oMyForm.append("douBan", info.douBan || '');
         oMyForm.append('zhiHu', info.zhiHu || '');
         oMyForm.append("weiBo", info.weiBo || '');
@@ -190,14 +191,15 @@ export default class QyInfo extends Component {
             oMyForm.append('headImage', file);
         });
         oMyForm.append('weChatCode', weChatCode || '');
-        oMyForm.append('file1', officeEnvi[0]);
-        oMyForm.append('file2', officeEnvi[1]);
-        oMyForm.append('file3', officeEnvi[2]);
-        Service.updateInformation({
+        oMyForm.append('file1', officeEnvi[0] || '');
+        oMyForm.append('file2', officeEnvi[1] || '');
+        oMyForm.append('file3', officeEnvi[2] || '');
+        Service.updateOfficeInformation({
             form: oMyForm
         }).then((response) => {
             if (response.data.status === 1) {
-                layer.msg("更新成功")
+                layer.msg("更新成功");
+                window.location.reload()
             } else {
                 layer.msg(response.data.message)
             }
@@ -311,6 +313,7 @@ export default class QyInfo extends Component {
         })
     }
     onSelectedTeamSize = (item) => {
+        console.log(item)
         this.setState({ teamsizeItem: item })
     }
 
@@ -390,7 +393,7 @@ export default class QyInfo extends Component {
 
     changeInfo = (e, field) => {
         const { info } = this.state;
-        info[field] = e.target.value
+        info[field] = e.target.value || e.target.checked
         this.setState({ info: info })
     }
 
@@ -400,9 +403,13 @@ export default class QyInfo extends Component {
         this.setState({ media: media })
     }
 
+    onChangeSubscription = (e) => {
+        this.info.subscription = e.target.checked
+    }
+
     render() {
         const { province, cityItem, districtItem, info, officeEnvi, imageUrl, media, weChatCode, teamsizeItem, pswConfirmError, userPhoto, userImg } = this.state;
-
+        const officeImage = info.officeImage && info.officeImage.split(',');
         return (
             <div className="">
                 <Header />
@@ -426,6 +433,7 @@ export default class QyInfo extends Component {
                                     <label className="u-form-label">用户昵称</label>
                                     <div className="ac-form-label">
                                         {userInfo && userInfo.name}
+                                        {/* <input type="text" className="u-input" placeholder="用户昵称" value={info.name} onChange={(e) => this.changeInfo(e, 'name')} /> */}
                                     </div>
                                 </div>
                                 <div className="u-inline">
@@ -468,7 +476,7 @@ export default class QyInfo extends Component {
                                     <ul className="select-group clearfix">
                                         <li>
                                             <div className="u-select">
-                                                <div className="in_province1" role="note">{teamsizeItem && teamsizeItem.name}</div>
+                                                <div className="in_province1" role="note">{teamsizeItem && teamsizeItem.name || info.teamSize}</div>
                                                 <div data-for=".in_province1" role="menu">
                                                     <ul>
                                                         {this.createTeamSize()}
@@ -492,15 +500,15 @@ export default class QyInfo extends Component {
                             <div className="u-row">
                                 <ul className="ac-envi clearfix">
                                     <li>
-                                        <img src={imageUrl && imageUrl[0]} />
+                                        <img src={imageUrl && imageUrl[0] || officeImage && officeImage[0]} />
                                         <i className="fa-close" onClick={() => this.removeOfficeEnvi(officeEnvi[0], 0)}></i>
                                     </li>
                                     <li>
-                                        <img src={imageUrl && imageUrl[1]} />
+                                        <img src={imageUrl && imageUrl[1] || officeImage && officeImage[1]} />
                                         <i className="fa-close" onClick={() => this.removeOfficeEnvi(officeEnvi[1], 1)}></i>
                                     </li>
                                     <li>
-                                        <img src={imageUrl && imageUrl[2]} />
+                                        <img src={imageUrl && imageUrl[2] || officeImage && officeImage[2]} />
                                         <i className="fa-close" onClick={() => this.removeOfficeEnvi(officeEnvi[2], 2)}></i>
                                     </li>
                                     <li>
@@ -535,9 +543,12 @@ export default class QyInfo extends Component {
                             </div>
                             <div className="ac-choice">
                                 <h1>每周精选推荐</h1>
-                                <div className="radio">
+                                {/* <div className="radio">
                                     <input type="checkbox" id="inputChecked1" className="u-checkbox" checked />
                                     <label for="inputChecked1">订阅</label>
+                                </div> */}
+                                <div className="radio">
+                                    <Checkbox onChange={(e) => this.changeInfo(e, 'subscription')}>订阅</Checkbox>
                                 </div>
                                 <div className="u-helptxt">* 绑定邮箱才能订阅每周精选</div>
                             </div>
@@ -547,7 +558,7 @@ export default class QyInfo extends Component {
                             <ul className="clearfix wechat-upload">
                                 <li>
                                     <span className="cimg"><i className="icon-wechat"></i></span>
-                                    <span className="alt">{weChatCode.name || "* 请在这里上传你的公众平台二维码"}</span>
+                                    <span className="alt">{(weChatCode && weChatCode.name) || "* 请在这里上传你的公众平台二维码"}</span>
                                     <span className="cbtn">
                                         <Upload
                                             name="weChatCode"
@@ -641,7 +652,7 @@ export default class QyInfo extends Component {
                 </div>
                 <Footer />
                 <Loading />
-            </div>
+            </div >
         );
     }
 }

@@ -13,7 +13,8 @@ import '../../Constants'
 import AdList from './AdList';
 import Loading from '../../common/Loading/Index'
 const TabPane = Tabs.TabPane;
-const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
+const userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+const PAGESIZE = 17
 export default class qyAd extends Component {
     /* global $ */
     tabDom = null
@@ -43,10 +44,12 @@ export default class qyAd extends Component {
     gotoRouter = (router) => {
         this.props.history.push(router)
     }
-    getADHistory = () => {
+    getADHistory = (pageNo) => {
         Service.getADHistoryList({
             //flag: "false",
-            userId: userInfo && userInfo.id
+            userId: userInfo && userInfo.id,
+            pageNo: pageNo || 1,
+            pageSize: PAGESIZE
         }).then((response) => {
             if (response.data.status === 1) {
                 let historyListData = response.data.data
@@ -57,10 +60,12 @@ export default class qyAd extends Component {
                 console.log(error)
             })
     }
-    getADBeing = () => {
+    getADBeing = (pageNo) => {
         Service.getADBeginList({
             //flag: "true",
-            userId: userInfo && userInfo.id
+            userId: userInfo && userInfo.id,
+            pageNo: pageNo || 1,
+            pageSize: PAGESIZE,
         }).then((response) => {
             if (response.data.status === 1) {
                 let beingListData = response.data.data

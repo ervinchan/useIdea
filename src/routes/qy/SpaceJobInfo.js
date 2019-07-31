@@ -10,6 +10,7 @@ import axios from 'axios'
 import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
 import QyHead from './qyHead'
+import Cooperative from './Cooperative.js';
 import Service from '../../service/api.js'
 import FormatDate from '../../static/js/utils/formatDate.js'
 import Utils from '../../static/js/utils/utils.js'
@@ -35,27 +36,16 @@ export default class UserCenter extends Component {
             userPhoto: [],
             userImg: "",
             jobInfo: {},
-            jobList: {}
+            jobList: {},
+            officeImage: [],
+            cooperativeEnterpriseData: [],
+            userInfo: {}
         };
     }
 
     componentDidMount() {
         var that = this
-        var r_bannerswiper = new Swiper('.qy-envi .swiper-container', {
-            loop: true,
-            speed: 800,
-            autoplay: {
-                delay: 3000
-            },
-            pagination: {
-                el: '.qy-envi .u-pagination',
-                bulletClass: 'bull',
-                bulletActiveClass: 'active',
-                clickable: true
-            }
-        });
-        this.getNews(userInfo && userInfo.id)
-        this.getHotArticles(userInfo && userInfo.id)
+
         this.getJobInfo()
 
 
@@ -82,16 +72,35 @@ export default class UserCenter extends Component {
             global.constants.loading = false
             if (response.data.status === 1) {
                 let data = response.data.data
-                this.setState({ jobInfo: data })
-                this.getUserInfoDetail(data.user.id)
-                this.getJobList(data.user.id)
+                this.setState({ jobInfo: data, userInfo: data.user }, () => {
+
+                    this.getNews(data.user.id)
+                    this.getHotArticles(data.user.id)
+                    this.getOfficeImage(data.user.id)
+                    this.getCooperativeEnterprise(data.user.id)
+                    this.getUserInfoDetail(data.user.id)
+                    this.getJobList(data.user.id)
+                })
             }
         })
             .catch((error) => {
                 console.log(error)
             })
     }
-
+    getCooperativeEnterprise = (userId) => {
+        Service.GetCooperativeEnterprise({
+            userId: userId,
+            myUserId: userInfo && userInfo.id
+        }).then((response) => {
+            global.constants.loading = false
+            if (response.data.status === 1) {
+                this.setState({ cooperativeEnterpriseData: response.data.data })
+            }
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
     getNews = (userId) => {
         POST({
             url: "/a/cms/article/latestAction?",
@@ -111,7 +120,8 @@ export default class UserCenter extends Component {
     getHotArticles = (userId) => {
         Service.GetAllArticle({
             userId: userId,
-            hits: 1
+            pageSize: 10
+            // hits: 1
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -134,6 +144,32 @@ export default class UserCenter extends Component {
         })
             .then((response) => {
                 this.setState({ jobList: response.data.data })
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+    getOfficeImage = (userId) => {
+        Service.getOfficeImage({
+            userId: userId,
+            myUserId: userInfo && userInfo.id
+        })
+            .then((response) => {
+                this.setState({ officeImage: response.data.data }, () => {
+                    var r_bannerswiper = new Swiper('.qy-envi .swiper-container', {
+                        loop: true,
+                        speed: 800,
+                        autoplay: {
+                            delay: 3000
+                        },
+                        pagination: {
+                            el: '.qy-envi .u-pagination',
+                            bulletClass: 'bull',
+                            bulletActiveClass: 'active',
+                            clickable: true
+                        }
+                    });
+                })
             })
             .catch((error) => {
                 console.log(error)
@@ -198,7 +234,7 @@ export default class UserCenter extends Component {
     }
     createHotArticle = () => {
         const { hotArticles } = this.state;
-        return hotArticles && hotArticles.slice(0, 10).map((item, index) => {
+        return hotArticles.list && hotArticles.list.map((item, index) => {
             return (
                 <li key={index} onClick={() => this.gotoRouter(`/Inspiration/Article/${item.id}`)}>
                     <a href="javascript:;" className="thumb-img">
@@ -237,7 +273,7 @@ export default class UserCenter extends Component {
 
     }
     render() {
-        const { jobInfo, userPhoto, userImg } = this.state;
+        const { jobInfo, userPhoto, userImg, officeImage, cooperativeEnterpriseData, userInfo } = this.state;
         return (
             <div className>
                 < Header />
@@ -263,9 +299,9 @@ export default class UserCenter extends Component {
                                 <ul class="clearfix">
                                     <li><span>发布日期：</span>{jobInfo.createDate}</li>
                                     <li><span>工作地点：</span>{jobInfo.jcity}</li>
-                                    <li><span>职位月薪：</span>{jobInfo.pay}/月</li>
-                                    <li><span>工作经验：</span>{jobInfo.experience}</li>
-                                    <li><span>学历要求：</span>{jobInfo.education}</li>
+                                    <li><span>职位月薪：</span>{(jobInfo.pay === '1')?'不限':jobInfo.pay}/月</li>
+                                    <li><span>工作经验：</span>{jobInfo.experience === '1'?'不限':jobInfo.experience}</li>
+                                    <li><span>学历要求：</span>{jobInfo.education === '1'?'不限':jobInfo.education}</li>
                                     <li><span>招聘人数：</span>{jobInfo.jobNum}人</li>
                                 </ul>
                             </div>
@@ -291,23 +327,25 @@ export default class UserCenter extends Component {
                         </div>
                         <div class="qy-envi">
                             <h1><b>创作环境</b></h1>
-                            <div class="swiper-wrapper">
-                                {
-                                    userInfo.file1 &&
-                                    <div class="swiper-slide">
-                                        <a href="javascript:;"><img src={userInfo.file1} /></a>
-                                    </div>
-                                }
-                                {
-                                    userInfo.file2 &&
-                                    <div class="swiper-slide">
-                                        <a href="javascript:;"><img src={userInfo.file2} /></a></div>
-                                }
-                                {
-                                    userInfo.file3 &&
-                                    <div class="swiper-slide">
-                                        <a href="javascript:;"><img src={userInfo.file3} /></a></div>
-                                }
+                            <div class="swiper-container">
+                                <div class="swiper-wrapper">
+                                    {
+                                        officeImage && officeImage.length > 0 &&
+                                        <div class="swiper-slide">
+                                            <a href="javascript:;"><img src={officeImage[0]} /></a>
+                                        </div>
+                                    }
+                                    {
+                                        officeImage && officeImage.length > 1 &&
+                                        <div class="swiper-slide">
+                                            <a href="javascript:;"><img src={officeImage[1]} /></a></div>
+                                    }
+                                    {
+                                        officeImage && officeImage.length > 2 &&
+                                        <div class="swiper-slide">
+                                            <a href="javascript:;"><img src={officeImage[2]} /></a></div>
+                                    }
+                                </div>
                             </div>
                             <div class="u-pagination wide"></div>
                         </div>
@@ -316,9 +354,9 @@ export default class UserCenter extends Component {
                         </script>
                         <div class="qy-info">
                             <p>{userInfo.subscription}</p>
-                            <p>
+                            {/* <p>
                                 <a href="javascript:;">展开</a>
-                            </p>
+                            </p> */}
                         </div>
                         <div class="qy-title1"><b>相近热门岗位</b></div>
                         <div class="m-joblist">
@@ -349,38 +387,7 @@ export default class UserCenter extends Component {
                     <div class="g-right">
                         <div class="qy-r-team">
                             <div class="qy-title">近期合作机构</div>
-                            <ul class="hot-team clearfix">
-                                {/* <li>
-                                    <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                </li>
-                                <li>
-                                    <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                </li>
-                                <li>
-                                    <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                </li>
-                                <li>
-                                    <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                </li>
-                                <li>
-                                    <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                </li>
-                                <li>
-                                    <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                </li>
-                                <li>
-                                    <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                </li>
-                                <li>
-                                    <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                </li>
-                                <li>
-                                    <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                </li>
-                                <li>
-                                    <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                                </li> */}
-                            </ul>
+                            <Cooperative data={cooperativeEnterpriseData} history={this.props.history} />
                         </div>
                         <div class="qy-r-hotart">
                             <div class="qy-title">机构热文排行</div>

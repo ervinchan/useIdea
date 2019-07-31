@@ -335,8 +335,16 @@ class API {
         })
     }
 
-    //获取用户信息    
+    //更新用户信息    
     static updateInformation(data) {
+        return FormData({
+            url: "/a/sys/user/filter/updateInformation?",
+            opts: data.form
+        })
+    }
+
+    //更新企业信息    
+    static updateOfficeInformation(data) {
         return FormData({
             url: "/a/sys/user/filter/updateOfficeInformation?",
             opts: data.form
@@ -363,6 +371,20 @@ class API {
     static getQyInfoDetail(data) {
         return POST({
             url: "/a/sys/user/filter/findOfficeInformation1?",
+            opts: data
+        })
+    }
+    //获取创作环境
+    static getOfficeImage(data) {
+        return POST({
+            url: "/a/sys/sysOfficeInformation/filter/findOfficeImage?",
+            opts: data
+        })
+    }
+    //获取合作企业
+    static GetCooperativeEnterprise(data) {
+        return POST({
+            url: "/a/artuser/articleCollect/filter/findCooperativeEnterprise?",
             opts: data
         })
     }
@@ -440,7 +462,13 @@ class API {
         })
     }
 
-
+    //上传背景图
+    static uploadBackground(data) {
+        return FormData({
+            url: "/a/sys/user/filter/background?",
+            opts: data.form
+        })
+    }
 
 }
 export default API

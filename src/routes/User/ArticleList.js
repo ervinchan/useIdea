@@ -75,8 +75,8 @@ export default class ArticleList extends Component {
                             <h1><a href="javascript:;" onClick={() => this.gotoRouter(`/Qyspace/${item.user.id}`)}>{item.title}</a></h1>
                             <p>{Time}</p>
                         </div>
-                        <div class="lx_txt">
-                            {item.content}
+                        <div class="lx_txt" dangerouslySetInnerHTML={{ __html: item.content }}>
+                            {/* {item.content} */}
                         </div>
                         <div class="lx-bar f-right">
                             {/* <a href="javascript:;" class="reply" onClick={() => this.handleReply(item)}><i class="icon-reply"></i>回复</a> */}

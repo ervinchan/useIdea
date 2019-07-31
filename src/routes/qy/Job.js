@@ -42,40 +42,53 @@ export default class JobList extends Component {
     }
     createList = () => {
         const { data } = this.props
-        const categorys = global.constants.categorys
-        return data.list && data.list.map((item, index) => {
-            let Time = FormatDate.formatTime(item.updateDate)
-            let router = ``
-            switch (item.category.id) {
-                case categorys[0].id:
-                    router = `/Question/Article/`
-                    break;
-                case categorys[1].id:
+        const categorys = global.constants.categoryIds
+        if (data.list) {
+            return data.list && data.list.map((item, index) => {
+                debugger
+                let Time = FormatDate.formatTime(item.updateDate)
+                let router = ``
+                switch (item.category.id) {
+                    case categorys['请教'].id:
+                        router = `/Question/Article/`
+                        break;
+                    case categorys['书单上新'].id:
 
-                case categorys[1].id:
-                    router = `/Bookstore/Bookbuy/`
-                    break;
-                default:
-                    router = `/Inspiration/Article/`
-                    break;
-            }
+                    case categorys['阅读场景'].id:
+                        router = `/Bookstore/Bookbuy/`
+                        break;
+                    case categorys['招聘'].id:
+                        router = `/QyspaceJobInfo/`
+                        break;
+                    default:
+                        router = `/Inspiration/Article/`
+                        break;
+                }
+                return (
+                    <li onClick={() => this.gotoRouter(`${router}${item.id}`)}>
+                        <a class="thumb-img" href="javascript:;">
+                            <img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
+                        </a>
+                        <h1><a href="javascript:;" class="j_name">{item.title}</a></h1>
+                        <h3>{Time}</h3>
+                        <div class="bar"><a href="javascript:;"><i class="icon-qiye"></i>{item.user.name}</a><span><i class="icon-money"></i>{item.pay}</span></div>
+                        <span class="cost"><i class="icon-address"></i>{item.area && item.area.name} {item.city && item.city.name}</span>
+                    </li>
+                )
+            })
+        } else {
             return (
-                <li>
-                    <a class="thumb-img" href="javascript:;">
-                        <img src={item.user.photo || defaultPhoto} onError={Utils.setDefaultPhoto} />
-                    </a>
-                    <h1><a href="javascript:;" class="j_name">{item.user.name}</a></h1>
-                    <h3>{Time}</h3>
-                    <div class="bar"><a href="javascript:;"><i class="icon-qiye"></i>{item.user.name}</a><span><i class="icon-money"></i>{item.pay}</span></div>
-                    <span class="cost"><i class="icon-address"></i>{item.penvicen}</span>
-                </li>
+                <div class="nolist">
+                    <span>· 暂未发布招聘 ·</span>
+                </div>
             )
-        })
+        }
+
     }
     render() {
         const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
         return (
-            <div className="">
+            <div className="m-joblist">
                 {/* 头部 */}
                 {this.createList()}
 

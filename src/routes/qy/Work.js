@@ -10,6 +10,7 @@ import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
 import MyWork from '../User/MyWork.js';
 import MyJob from './Job.js';
+import Cooperative from './Cooperative.js';
 import 'swiper/dist/css/swiper.min.css'
 import '../../static/less/u.icenter.less'
 import 'antd/lib/tabs/style/index.less';
@@ -29,7 +30,8 @@ export default class QyWork extends Component {
             fileList: [],
             collectList: [],
             jobListData: [],
-            hitsArticleList: []
+            hitsArticleList: [],
+            cooperativeEnterpriseData: []
         };
     }
 
@@ -50,6 +52,7 @@ export default class QyWork extends Component {
         });
         this.getMyWork();
         this.getJobList();
+        this.getHitsArticle();
     }
     handleTabChange = (key) => {
         console.log(key);
@@ -121,6 +124,7 @@ export default class QyWork extends Component {
         })
     }
     render() {
+        const { cooperativeEnterpriseData } = this.state
         return (
             <div className="work-job">
                 {/* 头部 */}
@@ -128,7 +132,7 @@ export default class QyWork extends Component {
 
                 <div class="g-left">
                     <Tabs ref={e => this.tabDom = e} className="clearfix" onChange={this.handleTabChange}>
-                        <TabPane tab="最新作品" key="home"><MyWork data={this.state.listData.list} history={this.props.history} /></TabPane>
+                        <TabPane tab="最新作品" key="home"><MyWork data={this.state.listData} history={this.props.history} /></TabPane>
                         <TabPane tab="最新岗位" key="work"><MyJob data={this.state.jobListData} history={this.props.history} /></TabPane>
                     </Tabs>
 
@@ -136,38 +140,12 @@ export default class QyWork extends Component {
                 <div class="g-right">
                     <div class="qy-r-team">
                         <div class="qy-title">近期合作机构</div>
-                        <ul class="hot-team clearfix">
+                        <Cooperative data={cooperativeEnterpriseData} history={this.props.history} />
+                        {/* <ul class="hot-team clearfix">
                             <li>
                                 <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                            </li>
-                            <li>
-                                <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                            </li>
-                            <li>
-                                <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                            </li>
-                            <li>
-                                <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                            </li>
-                            <li>
-                                <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                            </li>
-                            <li>
-                                <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                            </li>
-                            <li>
-                                <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                            </li>
-                            <li>
-                                <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                            </li>
-                            <li>
-                                <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                            </li>
-                            <li>
-                                <a href="javascript:;"><img src="css/images/1x1.png" /></a>
-                            </li>
-                        </ul>
+                            </li> 
+                        </ul> */}
                     </div>
                     <div class="qy-r-hotart">
                         <div class="qy-title">机构热文排行</div>
@@ -177,7 +155,7 @@ export default class QyWork extends Component {
                         </ul>
                     </div>
                 </div>
-            </div>
+            </div >
         );
     }
 }

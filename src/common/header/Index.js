@@ -307,7 +307,9 @@ export default class Header extends Component {
                                 </div>
                                 <ul className="nav clearfix">
                                     <li>
-                                        <a href="#">发布项目</a>
+                                        <a href="javascript:;" onClick={() => {
+                                            Utils.gotoRouter(this.router.history, '/ArticleEditor/', { userId: userInfo.id })
+                                        }}>发布项目</a>
                                     </li>
                                     <li>
                                         <a href={`/#/QyJobAdd/${userInfo.id}`}>发布岗位</a>
@@ -318,7 +320,9 @@ export default class Header extends Component {
                                         }}>广告投放管理</a>
                                     </li>
                                     <li>
-                                        <a href="#">来 信<i className="badge">42</i></a>
+                                        <a href="javascript:;" onClick={() => {
+                                            Utils.gotoRouter(this.router.history, '/QyHome/', { userId: userInfo.id })
+                                        }}>来 信{userInfo.attentionNum !== "0" && <i className="badge">{userInfo.attentionNum}</i>}</a>
                                     </li>
                                     <li className="esc">
                                         <a href="javascript:;" onClick={this.logOut}><span className="icon-exit"></span><span>登 出</span></a>

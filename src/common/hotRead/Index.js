@@ -30,6 +30,7 @@ export default class HotRead extends Component {
     getHotBooks = (categoryId) => {
 
         Service.GetAllArticle({
+            flag: true,
             hits: 1,
             categoryId: categoryId || ''
         })

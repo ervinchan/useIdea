@@ -95,6 +95,7 @@ export default class Login extends Component {
         })
             .then((response) => {
                 if (response.data.status === 1) {
+                    console.log(response.data.data)
                     sessionStorage.setItem('userInfo', JSON.stringify(response.data.data))
                     setTimeout(this.props.history.push("/"), 300)
                 } else {

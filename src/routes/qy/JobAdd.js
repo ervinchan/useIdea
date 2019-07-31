@@ -168,9 +168,21 @@ export default class UserCenter extends Component {
         })
     }
     setCity = (item) => {
-        let city = item.childList
         let province = item
-        this.setState({ city, province, district: [], cityItem: null, districtItem: null })
+        const { info } = this.state;
+        Service.getArea({
+            id: item.id
+        })
+            .then((response) => {
+                if (response.data.status === 1) {
+                    let city = response.data.data
+                    const cityItem = { city: '', district: '' }
+                    this.setState({ city, province, district: [], cityItem, districtItem: null, info: Object.assign(info, cityItem) })
+                }
+            })
+            .catch((error) => {
+                console.log(error)
+            })
     }
 
     createCity = () => {
@@ -181,9 +193,19 @@ export default class UserCenter extends Component {
     }
 
     setDistrict = (item) => {
-        let district = item.childList
         let cityItem = item
-        this.setState({ cityItem, district, districtItem: null })
+        Service.getArea({
+            id: item.id
+        })
+            .then((response) => {
+                if (response.data.status === 1) {
+                    let district = response.data.data
+                    this.setState({ cityItem, district, districtItem: null })
+                }
+            })
+            .catch((error) => {
+                console.log(error)
+            })
     }
     createDistrict = () => {
         const { district } = this.state;
@@ -227,24 +249,29 @@ export default class UserCenter extends Component {
 
     addJob = () => {
         const { info, payItem, experienceItem, educationItem, province, cityItem, districtItem, keywords } = this.state;
+        /*global layer */
         let params = {
             pay: payItem.name || "",
-            experience: info.experience || "",
+            experience: experienceItem.name || "",
             education: educationItem.name || "",
-            jobNum: experienceItem.name || "",
-            area: province.name || "",
-            city: cityItem.name || "",
-            district: districtItem.name || "",
+            jobNum: info.jobNum || "",
+            area: province && province.id || info.provence.id,
+            city: cityItem && cityItem.id || info.city.id,
+            district: cityItem && districtItem.id || info.district.id,
             email: info.email || "",
-            keywords: keywords || "",
+            keywords: keywords || [],
             description: info.description || "",
             jobDescription: info.jobDescription || "",
             content: info.content || "",
             title: info.title || "",
             company: info.company || "",
             phone: info.phone || "",
-            categoryId: global.constants.categorys[0].id || "",
+            categoryId: global.constants.categoryIds['招聘'].id || "",
             userId: (userInfo && userInfo.id) || "",
+        }
+        if (!params.title || !params.pay || !params.experience || !params.education || !params.jobNum || !params.email || !params.keywords.length) {
+            layer.msg("带*号的为必填项")
+            return false;
         }
         var oMyForm = new FormData();
 
@@ -255,6 +282,7 @@ export default class UserCenter extends Component {
             form: oMyForm
         }).then((response) => {
 
+            layer.msg(response.data.message)
         })
             .catch((error) => {
                 console.log(error)
@@ -294,8 +322,8 @@ export default class UserCenter extends Component {
     }
     createJobList = () => {
         const { JobList } = this.state;
-        JobList.list && JobList.list.map((item) => {
-            return <li><a href="javascript:;" onClick={this.gotoRouter(`/QyspaceJobInfo/${item.id}`)}>{item.name}</a></li>
+        return JobList.list && JobList.list.map((item) => {
+            return <li><a href="javascript:;" onClick={() => this.gotoRouter(`/QyspaceJobInfo/${item.id}`)}>{item.title}</a></li>
         })
 
     }
@@ -314,7 +342,7 @@ export default class UserCenter extends Component {
                                 <div class="u-inline width-full">
                                     <label class="u-form-label"><i>*</i>职位名称</label>
                                     <div class="u-form-input width-180">
-                                        <input type="text" class="u-input" placeholder="请填入职位名称" value={info.information} onChange={(e) => this.changeInfo(e, 'information')} />
+                                        <input type="text" class="u-input" placeholder="请填入职位名称" value={info.title} onChange={(e) => this.changeInfo(e, 'title')} />
                                     </div>
                                 </div>
                                 <div class="u-inline width-v5">

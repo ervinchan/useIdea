@@ -6,8 +6,10 @@ import FormatDate from '../../static/js/utils/formatDate.js'
 import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
 import CityGroup from '../../common/cityGroup/Index'
+import RightSide from './RightSide'
 import Service from '../../service/api.js'
 import Utils from '../../static/js/utils/utils.js'
+
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
 
@@ -15,10 +17,10 @@ import 'antd/lib/pagination/style/index.css';
 import '../../static/less/jobs.less';
 
 import defaultPhoto from "../../static/images/user/default.png"
-const PAGESIZE = 3;
+const PAGESIZE = 10;
 
 export default class JobList extends Component {
-
+    categoryIds = global.constants.categoryIds['招聘']
     constructor(props) {
         super(props);
         this.state = {
@@ -33,7 +35,9 @@ export default class JobList extends Component {
             payList: [],
             pay: "1",
             education: "1",
-            experience: "1"
+            experience: "1",
+            bannerCList: [],
+            bannerDList: []
         };
     }
 
@@ -73,9 +77,49 @@ export default class JobList extends Component {
         this.setState({ searchTxt: params ? params.txt : '', city: params ? params.city : '' }, () => {
             this.onSearch()
         })
+        this.getBannerC()
+        this.getBannerD()
+    }
+    getBannerC = () => {
+        Service.GetADList({
+            categoryId: this.categoryIds.id,
+            id: "37e7de978cc14723b8d51ec902ed0f73"
+        }).then((response) => {
+            if (response.data.status === 1) {
+                this.setState({ bannerCList: response.data.data })
+            }
+        })
+            .catch((error) => {
+                console.log(error)
+            })
 
     }
+    getBannerD = () => {
+        Service.GetADList({
+            categoryId: this.categoryIds.id,
+            id: "df2c63345f9b42beb860f9150d4002f7"
+        }).then((response) => {
+            if (response.data.status === 1) {
+                this.setState({ bannerDList: response.data.data })
+            }
+        })
+            .catch((error) => {
+                console.log(error)
+            })
 
+    }
+    createBannerC = () => {
+        const { bannerCList } = this.state
+        return bannerCList.map((item, index) => {
+            return <a href={item.link} target="_blank" className="seat-x110 lighten"><img src={item.image} /></a>
+        })
+    }
+    createBannerD = () => {
+        const { bannerDList } = this.state
+        return bannerDList.map((item, index) => {
+            return <a href={item.link} target="_blank" className="seat-x315 lighten"><img src={item.image} /></a>
+        })
+    }
     getCityList = () => {
         Service.JobCity().then((response) => {
             global.constants.loading = false
@@ -183,7 +227,9 @@ export default class JobList extends Component {
             return <a href="javascript:;" onClick={() => this.setSearchTxt(item.category.name)}>{item.category.name}</a>
         })
     }
-
+    setSearchTxt = (name) => {
+        this.setState({ searchTxt: name })
+    }
     getHotCompany = (categoryId) => {
         Service.GetAllArticle({
             hits: 1,
@@ -217,7 +263,8 @@ export default class JobList extends Component {
     getJobLists = (curPage) => {
         Service.GetAllArticle({
             categoryId: "981892a5c2394fe7b01ce706d917699e",
-            pageNo: this.state.curPage || 1
+            pageNo: this.state.curPage || 1,
+            pageSize: PAGESIZE
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {
@@ -234,26 +281,26 @@ export default class JobList extends Component {
             let Time = FormatDate.formatTime(item.updateDate)
             return (
                 <li>
-                    <a className="thumb-img" href="javascript:;" onClick={this.gotoRouter(item.id)}>
+                    <a className="thumb-img" href="javascript:;" onClick={() => this.gotoRouter(`/QyspaceJobInfo/${item.id}`)}>
                         <img src={item.image} />
                     </a>
-                    <h1><a href="javascript:;" onClick={this.gotoRouter(item.id)}>{item.title}</a></h1>
+                    <h1><a href="javascript:;" onClick={() => this.gotoRouter(`/QyspaceJobInfo/${item.id}`)}>{item.title}</a></h1>
                     <h3>{Time}</h3>
-                    <div className="bar"><a href="javascript:;" onClick={this.gotoRouter(item.id)}><i className="icon-qiye"></i>{item.company}</a><span><i className="icon-money"></i>{item.pay}</span></div>
+                    <div className="bar"><a href="javascript:;" onClick={() => this.gotoRouter(`/QyspaceJobInfo/${item.id}`)}><i className="icon-qiye"></i>{item.company}</a><span><i className="icon-money"></i>{item.pay}</span></div>
                     <span className="cost"><i className="icon-address"></i>{item.jcity}</span>
                 </li>
             )
         })
     }
 
-    gotoRouter = () => {
-
+    gotoRouter = (router) => {
+        this.props.history.push(router)
     }
 
     onSearch = () => {
         const { city, pay, education, experience } = this.state;
         Service.GetAllJob({
-            company: this.state.searchTxt,
+            keyword: this.state.searchTxt,
             categoryId: "981892a5c2394fe7b01ce706d917699e",
             area: city === "不限" ? "1" : city,
             pay: pay,
@@ -349,16 +396,7 @@ export default class JobList extends Component {
                             )
                         }
                     </div>
-                    <div className="g-right">
-                        <a href="javascript:;" className="seat-h110 lighten"><img src="images/17.jpg" /></a>
-                        <a href="javascript:;" className="seat-h190 lighten"><img src="images/d5.jpg" /></a>
-                        <div className="hot-qiye">
-                            <div className="tit">热门公司</div>
-                            <ul className="clearfix">
-                                {this.createHotCompanyList()}
-                            </ul>
-                        </div>
-                    </div>
+                    <RightSide history={this.props.history} />
                 </div>
                 <CityGroup selectCity={this.selectCity} />
                 {/* 底部 */}

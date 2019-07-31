@@ -71,7 +71,9 @@ export default class QyHead extends Component {
                 console.log(error)
             })
     }
-
+    setBackground()=>{
+        
+    }
     render() {
         const { fileList, userToolNum } = this.state;
         const { info, userPhoto, setUserPhoto, userImg } = this.props;
@@ -97,7 +99,7 @@ export default class QyHead extends Component {
             showUploadList: false
         };
         return (
-            <div className="ue-head">
+            <div className="ue-head"  style={{ background: 'url('+userPhoto+') center no-repeat' }}>
                 <div className="wrapper">
                     <div className="userTx header-photo">
 
@@ -114,23 +116,23 @@ export default class QyHead extends Component {
                         </a>
                     </div>
                     <div className="nick-name">
-                        <h1><b className="rank">{userInfo && userInfo.name}<i className="icon-rank"></i></b></h1>
+                        <h1><b className="rank">{info && info.name}<i className="icon-rank"></i></b></h1>
                     </div>
                     <div className="nick-data">
                         <p>
-                            <span>作品</span><a href={`/#/MyFans/${userInfo && userInfo.id}`} >{userToolNum && userToolNum.articleNum}</a>
-                            <span>关注</span><a href={`/#/MyFans/${userInfo && userInfo.id}`} >{userToolNum && userToolNum.attentionNum}</a>
-                            <span>粉丝</span><a href={`/#/MyFans/${userInfo && userInfo.id}`}>{userToolNum && userToolNum.fansNum}</a>
+                            <span>作品</span><a href={`/#/MyFans/${info && info.id}`} >{userToolNum && userToolNum.articleNum}</a>
+                            <span>关注</span><a href={`/#/MyFans/${info && info.id}`} >{userToolNum && userToolNum.attentionNum}</a>
+                            <span>粉丝</span><a href={`/#/MyFans/${info && info.id}`}>{userToolNum && userToolNum.fansNum}</a>
                         </p>
                     </div>
-                    <div className="address"><i className="icon-address-w"></i>{info.provence.name}  {info.city.name}</div>
+                    <div className="address"><i className="icon-address-w"></i>{info.provence && info.provence.name}  {info.city && info.city.name}</div>
                     <a href="javascript:;" className="add_upload" onClick={() => this.gotoRouter(`/ArticleEditor`)}>发表作品/经验</a>
 
                 </div>
                 <a href="javascript:;" className="edit-skin" onClick={this.editSkin}><i className="icon-camera"></i>编辑形象图</a>
 
 
-                <CoverModal />
+                <CoverModal setBackground={setBackground}>
             </div>
         );
     }

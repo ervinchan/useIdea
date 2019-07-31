@@ -9,6 +9,7 @@ import Header from '../../common/header/Index.js'
 import Footer from '../../common/footer/Index.js'
 import Menu from './Menu'
 import CityGroup from '../../common/cityGroup/Index'
+import RightSide from './RightSide'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
 import 'swiper/dist/css/swiper.min.css'
@@ -307,16 +308,7 @@ export default class Job extends Component {
                             )
                         }
                     </div>
-                    <div className="g-right">
-                        <a href="javascript:;" className="seat-h110 lighten"><img src="images/17.jpg" /></a>
-                        <a href="javascript:;" className="seat-h190 lighten"><img src="images/d5.jpg" /></a>
-                        <div className="hot-qiye">
-                            <div className="tit">热门公司</div>
-                            <ul className="clearfix">
-                                {this.createHotCompanyList()}
-                            </ul>
-                        </div>
-                    </div>
+                    <RightSide history={this.props.history} />
                 </div>
                 <CityGroup selectCity={this.selectCity} visible={this.state.visible} />
 

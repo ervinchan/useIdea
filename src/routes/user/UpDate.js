@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Input, Tabs, Pagination, Radio, Upload, Alert } from 'antd';
+import { Input, Tabs, Pagination, Radio, Upload, Checkbox } from 'antd';
 import axios from 'axios'
 import $ from 'jquery'
 import Swiper from 'swiper/dist/js/swiper.min.js'
@@ -14,6 +14,7 @@ import Loading from '../../common/Loading/Index'
 import 'swiper/dist/css/swiper.min.css'
 // import 'antd/lib/radio/style/index';
 import 'antd/lib/pagination/style/index.css';
+import 'antd/lib/checkbox/style/index.less';
 import '../../static/less/u.myaccount.less'
 const RadioGroup = Radio.Group;
 
@@ -32,7 +33,7 @@ export default class InfoUpdate extends Component {
             userPhoto: [],
             weChatCode: [],
             info: {
-                name: "", sex: "保密", provence: "", city: "", district: "", information: "", officeLink: "", subscription: "", douBan: "", zhiHu: "", weiBo: "", email: "", mobile: "", password: "", newPassword: ""
+                name: "", sex: "保密", provence: "", city: "", district: "", information: "", officeLink: "", subscription: false, douBan: "", zhiHu: "", weiBo: "", email: "", mobile: "", password: "", newPassword: ""
             },
             media: {
                 weiboInput: false,
@@ -352,7 +353,7 @@ export default class InfoUpdate extends Component {
 
     changeInfo = (e, field) => {
         const { info } = this.state;
-        info[field] = e.target.value;
+        info[field] = e.target.value || e.target.checked;
         this.setState({ info: info }, () => {
 
         })
@@ -509,9 +510,12 @@ export default class InfoUpdate extends Component {
                             </div>
                             <div className="ac-choice">
                                 <h1>每周精选推荐</h1>
-                                <div className="radio">
+                                {/* <div className="radio">
                                     <input type="checkbox" id="inputChecked1" className="u-checkbox" />
                                     <label>订阅</label>
+                                </div> */}
+                                <div className="radio">
+                                    <Checkbox onChange={(e) => this.changeInfo(e, 'subscription')}>订阅</Checkbox>
                                 </div>
                                 <div className="u-helptxt">* 绑定邮箱才能订阅每周精选</div>
                             </div>

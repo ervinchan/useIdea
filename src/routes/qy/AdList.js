@@ -49,10 +49,10 @@ export default class AdList extends Component {
             return (
                 <tr>
                     <td>{index + 1}</td>
-                    <td>{item.type}</td>
-                    <td><a href={item.link}>{item.name}</a></td>
+                    <td>{item.adType}</td>
+                    <td><a href={item.link}>{item.title}</a></td>
                     <td>{item.period}</td>
-                    <td>{item.releaseTime}</td>
+                    <td>{item.createDate}</td>
                     <td>{item.soldOutTime}</td>
                 </tr>
             )

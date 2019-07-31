@@ -75,8 +75,8 @@ export default class UserCenter extends Component {
             $(".u-select [role=menu]").hide();
             $(this).next().show();
         });
-        this.getCollectList();
-        this.getMyWork();
+        //this.getCollectList();
+        //this.getMyWork();
         this.getUserInfoDetail(userInfo.id)
     }
     getUserInfoDetail = (userId) => {
@@ -101,28 +101,28 @@ export default class UserCenter extends Component {
         this.props.history.push(router)
     }
 
-    getCollectList = () => {
-        POST({
-            url: "/a/artuser/articleCollect/collectList?",
-            opts: {
-                userId: userInfo && userInfo.id
-            }
-        }).then((response) => {
-            global.constants.loading = false
-            if (response.data.status === 1) {
-                this.setState({ collectList: response.data.data.articles })
-            }
-        })
-            .catch((error) => {
-                console.log(error)
-            })
-    }
-    getMyWork = () => {
-        POST({
-            url: "/a/cms/article/latestAction?",
-            opts: {
-                userId: userInfo && userInfo.id
-            }
+    // getCollectList = () => {
+    //     POST({
+    //         url: "/a/artuser/articleCollect/collectList?",
+    //         opts: {
+    //             userId: userInfo && userInfo.id
+    //         }
+    //     }).then((response) => {
+    //         global.constants.loading = false
+    //         if (response.data.status === 1) {
+    //             this.setState({ collectList: response.data.data.articles })
+    //         }
+    //     })
+    //         .catch((error) => {
+    //             console.log(error)
+    //         })
+    // }
+    getMyWork = (pageNo = 1) => {
+
+        Service.GetLatestAction({
+            userId: userInfo && userInfo.id,
+            pageSize: this.PAGESIZE,
+            pageNo: pageNo
         }).then((response) => {
             global.constants.loading = false
             if (response.data.status === 1) {

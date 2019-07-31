@@ -13,23 +13,20 @@ import 'antd/lib/tabs/style/index.less';
 import { POST } from '../../service/service'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
-import userImg from "../../static/images/user/userTx.jpg"
-import Work from './Work.js';
-import Home from './Home.js';
-import AdManage from './Ad.js'
-import News from '../User/newMessage.js'
+import Utils from '../../static/js/utils/utils.js';
 const TabPane = Tabs.TabPane;
 const userInfo = JSON.parse(sessionStorage.getItem("userInfo"))
 export default class CoverModal extends Component {
     /* global $ */
-    tabDom = null
+    uploadDom = null;
     constructor(props) {
         super(props);
         this.state = {
             listData: [],
             activeKey: 'news',
             fileList: [],
-            collectList: []
+            collectList: [],
+            coverImg:null
         };
     }
 
@@ -69,11 +66,28 @@ export default class CoverModal extends Component {
             $(".u-select [role=menu]").hide();
             $(this).next().show();
         });
-        this.getCollectList();
-        this.getMyWork();
+        //this.getCollectList();
+        //this.getMyWork();
     }
-    handleTabChange = (key) => {
-        console.log(key);
+    submitBackground = (key) => {
+        const {fileList} = this.state
+        var oMyForm = new FormData();
+        fileList.forEach((file) => {
+            oMyForm.append('background', file);
+        });
+        oMyForm.append("userId", JSON.parse(sessionStorage.getItem("userInfo")).id);
+        oMyForm.append("myUserId", JSON.parse(sessionStorage.getItem("userInfo")).id);
+        Service.uploadBackground({
+            form: oMyForm
+        }).then(res=>{
+            if(res.status===1){
+                this.handleCancel()
+                this.props.setBackground()
+            }else{
+                layer.msg(res.message)
+            }
+            
+        })
     }
     handleChangePhoto = () => {
 
@@ -81,44 +95,32 @@ export default class CoverModal extends Component {
     gotoRouter = (router) => {
         this.props.history.push(router)
     }
-
-    getCollectList = () => {
-        POST({
-            url: "/a/artuser/articleCollect/collectList?",
-            opts: {
-                userId: userInfo && userInfo.id
-            }
-        }).then((response) => {
-            global.constants.loading = false
-            if (response.data.status === 1) {
-                this.setState({ collectList: response.data.data.articles })
-            }
-        })
-            .catch((error) => {
-                console.log(error)
-            })
-    }
-    getMyWork = () => {
-        POST({
-            url: "/a/cms/article/latestAction?",
-            opts: {
-                userId: userInfo && userInfo.id
-            }
-        }).then((response) => {
-            global.constants.loading = false
-            if (response.data.status === 1) {
-                this.setState({ listData: response.data.data })
-            }
-        })
-            .catch((error) => {
-                console.log(error)
-            })
-    }
     handleCancel = (e) => {
         /*global layer */
         layer.closeAll()
     }
     render() {
+        const {coverImg,fileList} = this.state;
+        const props = Utils.uploadProps(fileList, (file, newUrl) => {
+            this.setState(state => ({
+                fileList: [...state.fileList, file],
+                coverImg: newUrl
+            }), () => {
+                $(".initial_pic").find("input[type=file]").css({
+                    position: "absolute",
+                    left: 0,
+                    top: 0,
+                    width: "100%",
+                    height: "100%",
+                    opacity: 0,
+                    zIndex: 1,
+                    display: "block"
+                })
+
+            })
+           
+            
+        });
         return (
             <div className="cover-modal">
                 <div className="title">封面形象图上传中心<i className="icon-close1" onClick={this.handleCancel}></i></div>
@@ -127,7 +129,11 @@ export default class CoverModal extends Component {
                         机构形象图标准尺寸1920*400像素
                     </div>
                     <div className="initial_pic">
-                        <div className="btn_b"><a href="javascript:;">+ 上传设计好的形象图</a></div>
+                        {/* <div className="btn_b"><a href="javascript:;">+ 上传设计好的形象图</a></div> */}
+                        <Upload className="upload-btn" {...props} ref={(e) => this.uploadDom = e}>
+                                <img className="img" src={coverImg} />
+                                <a className=" btn_b" href="javascript:;">+ 上传设计好的形象图</a>
+                            </Upload>
                         <div className="loading_block">
                             <h1>正在上传</h1>
                             <p><span></span></p>
@@ -135,8 +141,8 @@ export default class CoverModal extends Component {
                     </div>
                     <div className="helptxt">* 图片不合规范，请上传1920*400像素标准尺寸图片，文件大小2Mb以内</div>
                     <div className="imbtn">
-                        <a href="javascript:;" className="active">提交上传</a>
-                        <a href="javascript:;" data-el="closeAll">取消</a>
+                        <a href="javascript:;" className="active" onClick={this.submitBackground}>提交上传</a>
+                        <a href="javascript:;" data-el="closeAll" onClick={this.handleCancel}>取消</a>
                     </div>
                 </div>
             </div>

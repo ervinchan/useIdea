@@ -35,6 +35,7 @@ export default class MyHeart extends Component {
             info: {
                 name: "", sex: "", provence: {}, city: {}, district: {}, infomation: "", officeLink: "", subscription: "", douBan: "", zhiHu: "", weiBo: "", email: "", mobile: "", password: "", newPassword: "", teamSize: ""
             },
+            officeImage: []
         };
     }
 
@@ -60,6 +61,7 @@ export default class MyHeart extends Component {
         this.getMyWork(userInfo.id);
         this.getJobList(userInfo.id)
         this.getUserInfoDetail(userInfo && userInfo.id)
+        this.getOfficeImage(uid)
     }
 
     handleTabChange = (key) => {
@@ -72,22 +74,22 @@ export default class MyHeart extends Component {
         this.props.history.push(router)
     }
 
-    getCollectList = () => {
-        POST({
-            url: "/a/artuser/articleCollect/collectList?",
-            opts: {
-                userId: JSON.parse(sessionStorage.getItem("userInfo")).id
-            }
-        }).then((response) => {
-            global.constants.loading = false
-            if (response.data.status === 1) {
-                this.setState({ collectList: response.data.data.articles })
-            }
-        })
-            .catch((error) => {
-                console.log(error)
-            })
-    }
+    // getCollectList = () => {
+    //     POST({
+    //         url: "/a/artuser/articleCollect/collectList?",
+    //         opts: {
+    //             userId: JSON.parse(sessionStorage.getItem("userInfo")).id
+    //         }
+    //     }).then((response) => {
+    //         global.constants.loading = false
+    //         if (response.data.status === 1) {
+    //             this.setState({ collectList: response.data.data.articles })
+    //         }
+    //     })
+    //         .catch((error) => {
+    //             console.log(error)
+    //         })
+    // }
     getUserInfoDetail = (userId) => {
         Service.getQyInfoDetail({
             userId: userId
@@ -107,6 +109,32 @@ export default class MyHeart extends Component {
         })
             .then((response) => {
                 this.setState({ listData: response.data.data })
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+    getOfficeImage = (userId) => {
+        Service.getOfficeImage({
+            userId: userId,
+            myUserId: userInfo && userInfo.id
+        })
+            .then((response) => {
+                this.setState({ officeImage: response.data.data }, () => {
+                    var r_bannerswiper = new Swiper('.qy-envi .swiper-container', {
+                        loop: true,
+                        speed: 800,
+                        autoplay: {
+                            delay: 3000
+                        },
+                        pagination: {
+                            el: '.qy-envi .u-pagination',
+                            bulletClass: 'bull',
+                            bulletActiveClass: 'active',
+                            clickable: true
+                        }
+                    });
+                })
             })
             .catch((error) => {
                 console.log(error)
@@ -145,7 +173,7 @@ export default class MyHeart extends Component {
     }
 
     render() {
-        const { toolList, userImg, info, userPhoto } = this.state;
+        const { toolList, userImg, info, userPhoto, officeImage } = this.state;
 
         return (
             <div className="">
@@ -160,9 +188,9 @@ export default class MyHeart extends Component {
                             
                         </ul> */}
                         <Tabs ref={e => this.tabDom = e} className="clearfix" onChange={this.handleTabChange}>
-                            <TabPane tab="机构首页" key="home"><Home data={this.state.listData} history={this.props.history} match={this.props.match} /></TabPane>
+                            <TabPane tab="机构首页" key="home"><Home officeImage={officeImage} data={this.state.listData} history={this.props.history} match={this.props.match} /></TabPane>
                             <TabPane tab="项目文章" key="work"><Article data={this.state.listData} history={this.props.history} match={this.props.match} /></TabPane>
-                            <TabPane tab="最新招聘" key="ad"><Job data={this.state.jobList} history={this.props.history} match={this.props.match} /></TabPane>
+                            <TabPane tab="最新招聘" key="ad"><Job officeImage={officeImage} data={this.state.jobList} history={this.props.history} match={this.props.match} /></TabPane>
                         </Tabs>
                     </div>
 
