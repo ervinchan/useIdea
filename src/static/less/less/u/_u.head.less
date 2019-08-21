@@ -382,14 +382,27 @@
         position: relative;
         overflow: hidden;
 
+        .upload-btn .ant-upload {
+            line-height: 192px;
+            text-align: center;
+        }
+
         .btn_b {
             line-height: 32px;
-            .absolute();
-            left: 0;
+            // .absolute();
+            // left: 0;
             top: 50%;
             width: 100%;
             margin-top: -16px;
             text-align: center;
+
+            display: inline-block;
+            line-height: 32px;
+            padding: 0 1.2em;
+            border: 1px #eee solid;
+            font-size: 13px;
+            color: #666;
+            background-image: linear-gradient(180deg, #fff, #f6f6f6);
 
             a {
                 display: inline-block;

@@ -53,7 +53,6 @@ export default class qyHome extends Component {
         });
         //this.getCollectList();
         //this.getMyWork();
-        this.getUserInfo();
         this.getUserInfoDetail(userInfo.id);
         this.getNewsArticles(userInfo.id);
         this.getJobList()
@@ -67,7 +66,7 @@ export default class qyHome extends Component {
             .then((response) => {
                 let userInfoDetail = response.data.data;
                 Object.assign(userInfo, userInfoDetail);
-                //sessionStorage.setItem('userInfo', JSON.stringify(userInfo))
+                sessionStorage.setItem('userInfo', JSON.stringify(userInfo))
             })
             .catch((error) => {
                 console.log(error)
@@ -81,13 +80,6 @@ export default class qyHome extends Component {
     }
     gotoRouter = (router) => {
         this.props.history.push(router)
-    }
-    getUserInfo = () => {
-        Service.getUserInfo({
-            userId: userInfo && userInfo.id
-        }).then((response) => {
-
-        })
     }
     getJobList = () => {
         Service.GetAllArticle({
@@ -167,7 +159,7 @@ export default class qyHome extends Component {
     createJobList = () => {
         const { jobListData } = this.state;
         if (jobListData.list) {
-            return (<ul class="qy-rjob">
+            return (<ul className="qy-rjob">
                 {jobListData.list && jobListData.list.map((item) => {
                     return <li><a href="javascript:;" onClick={() => this.gotoRouter(`/QyspaceJobInfo/${item.id}`)}>{item.title}</a></li>
                 })}
@@ -175,7 +167,7 @@ export default class qyHome extends Component {
             )
         } else {
             return (
-                <div class="nolist">
+                <div className="nolist">
                     <span>· 暂未发布招聘 ·</span>
                 </div>
             )
@@ -211,51 +203,51 @@ export default class qyHome extends Component {
         return (
             <div className="">
                 {/* 头部 */}
-                <div class="g-left">
-                    <div class="qy-info">
+                <div className="g-left">
+                    <div className="qy-info">
                         <p>{userInfo.officeIntroduction}</p>
                         {/* <p>
                             <a href="javascript:;">展开</a>
                         </p> */}
                     </div>
-                    <div class="qy-envi">
+                    <div className="qy-envi">
                         <h1><b>创作环境</b></h1>
-                        <div class="swiper-container">
-                            <div class="swiper-wrapper">
+                        <div className="swiper-container">
+                            <div className="swiper-wrapper">
                                 {
                                     officeImage && officeImage.length > 0 &&
-                                    <div class="swiper-slide">
+                                    <div className="swiper-slide">
                                         <a href="javascript:;"><img src={officeImage[0]} /></a>
                                     </div>
                                 }
                                 {
                                     officeImage && officeImage.length > 1 &&
-                                    <div class="swiper-slide">
+                                    <div className="swiper-slide">
                                         <a href="javascript:;"><img src={officeImage[1]} /></a></div>
                                 }
                                 {
                                     officeImage && officeImage.length > 2 &&
-                                    <div class="swiper-slide">
+                                    <div className="swiper-slide">
                                         <a href="javascript:;"><img src={officeImage[2]} /></a></div>
                                 }
                             </div>
                         </div>
-                        <div class="u-pagination wide"></div>
+                        <div className="u-pagination wide"></div>
                     </div>
-                    <div class="u-title">
+                    <div className="u-title">
                         <b>最新文章</b>
                     </div>
                     <MyWork data={newsArticles} tab="最新文章" history={this.props.history} getData={this.getNewsArticles} params={this.props.match} />
-                    {/* <div class="nolist" style={{ display: (newsArticles.length > 0 ? 'none' : 'block') }}>
-                        <i class="icon-no-art"></i>
+                    {/* <div className="nolist" style={{ display: (newsArticles.length > 0 ? 'none' : 'block') }}>
+                        <i className="icon-no-art"></i>
                         <span>· 暂未发表文章 ·</span>
                     </div> */}
                 </div>
-                <div class="g-right">
-                    <div class="qy-r-team">
-                        <div class="qy-title">近期合作机构</div>
+                <div className="g-right">
+                    <div className="qy-r-team">
+                        <div className="qy-title">近期合作机构</div>
                         <Cooperative data={cooperativeEnterpriseData} history={this.props.history} />
-                        {/* <ul class="hot-team clearfix">
+                        {/* <ul className="hot-team clearfix">
                             <li>
                                 <a href="javascript:;"><img src="css/images/1x1.png" /></a>
                             </li>
@@ -288,11 +280,11 @@ export default class qyHome extends Component {
                             </li>
                         </ul> */}
                     </div>
-                    <div class="qy-r-jobs clearfix">
-                        <div class="qy-title">最新招聘 <a href="javascript:;" class="add" onClick={() => this.gotoRouter(`/QyJobAdd/${userInfo.id}`)}>发布招聘+</a></div>
+                    <div className="qy-r-jobs clearfix">
+                        <div className="qy-title">最新招聘 <a href="javascript:;" className="add" onClick={() => this.gotoRouter(`/QyJobAdd/${userInfo.id}`)}>发布招聘+</a></div>
                         {/* <MyJob data={this.state.jobListData} history={this.props.history} /> */}
                         {this.createJobList()}
-                        {/* <div class="nolist">
+                        {/* <div className="nolist">
                             <span>· 暂未发布招聘 ·</span>
                         </div> */}
                     </div>

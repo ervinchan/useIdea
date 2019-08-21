@@ -5,7 +5,6 @@ import Service from '../../service/api.js'
 import 'swiper/dist/css/swiper.min.css'
 import '../../static/less/u.icenter.less'
 import 'antd/lib/modal/style/index';
-import { POST } from '../../service/service'
 import '../../Constants'
 import Loading from '../../common/Loading/Index'
 import CoverModal from './coverModal'
@@ -24,7 +23,8 @@ export default class QyHead extends Component {
             collectList: [],
             visibleCover: false,
             userImg: "",
-            userToolNum: {}
+            userToolNum: {},
+            backgroundImg: ""
         };
     }
 
@@ -33,6 +33,7 @@ export default class QyHead extends Component {
         this.getNumberByUser();
         //this.getMyWork();
     }
+
     gotoRouter = (router) => {
         this.props.history.push(router)
     }
@@ -71,11 +72,11 @@ export default class QyHead extends Component {
                 console.log(error)
             })
     }
-    setBackground()=>{
-        
+    setBackground = (url) => {
+        this.setState({ backgroundImg: url })
     }
     render() {
-        const { fileList, userToolNum } = this.state;
+        const { fileList, userToolNum, backgroundImg } = this.state;
         const { info, userPhoto, setUserPhoto, userImg } = this.props;
         const tabTit = `来信中心`;
         const props = {
@@ -98,8 +99,9 @@ export default class QyHead extends Component {
             fileList,
             showUploadList: false
         };
+        let bgImg = backgroundImg || info.background
         return (
-            <div className="ue-head"  style={{ background: 'url('+userPhoto+') center no-repeat' }}>
+            <div className="ue-head" style={{ background: 'url(' + bgImg + ') center no-repeat' }}>
                 <div className="wrapper">
                     <div className="userTx header-photo">
 
@@ -132,7 +134,7 @@ export default class QyHead extends Component {
                 <a href="javascript:;" className="edit-skin" onClick={this.editSkin}><i className="icon-camera"></i>编辑形象图</a>
 
 
-                <CoverModal setBackground={setBackground}>
+                <CoverModal setBackground={this.setBackground} />
             </div>
         );
     }

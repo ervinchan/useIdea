@@ -130,26 +130,26 @@ export default class QyWork extends Component {
                 {/* 头部 */}
 
 
-                <div class="g-left">
+                <div className="g-left">
                     <Tabs ref={e => this.tabDom = e} className="clearfix" onChange={this.handleTabChange}>
                         <TabPane tab="最新作品" key="home"><MyWork data={this.state.listData} history={this.props.history} /></TabPane>
                         <TabPane tab="最新岗位" key="work"><MyJob data={this.state.jobListData} history={this.props.history} /></TabPane>
                     </Tabs>
 
                 </div>
-                <div class="g-right">
-                    <div class="qy-r-team">
-                        <div class="qy-title">近期合作机构</div>
+                <div className="g-right">
+                    <div className="qy-r-team">
+                        <div className="qy-title">近期合作机构</div>
                         <Cooperative data={cooperativeEnterpriseData} history={this.props.history} />
-                        {/* <ul class="hot-team clearfix">
+                        {/* <ul className="hot-team clearfix">
                             <li>
                                 <a href="javascript:;"><img src="css/images/1x1.png" /></a>
                             </li> 
                         </ul> */}
                     </div>
-                    <div class="qy-r-hotart">
-                        <div class="qy-title">机构热文排行</div>
-                        <ul class="qy-hotart">
+                    <div className="qy-r-hotart">
+                        <div className="qy-title">机构热文排行</div>
+                        <ul className="qy-hotart">
                             {this.createHitArticle()}
 
                         </ul>

@@ -26,7 +26,7 @@ export default class CoverModal extends Component {
             activeKey: 'news',
             fileList: [],
             collectList: [],
-            coverImg:null
+            coverImg: null
         };
     }
 
@@ -70,23 +70,24 @@ export default class CoverModal extends Component {
         //this.getMyWork();
     }
     submitBackground = (key) => {
-        const {fileList} = this.state
+        const { fileList } = this.state
         var oMyForm = new FormData();
-        fileList.forEach((file) => {
-            oMyForm.append('background', file);
-        });
+        // fileList.forEach((file) => {
+        //     oMyForm.append('background', file);
+        // });
+        oMyForm.append('background', fileList);
         oMyForm.append("userId", JSON.parse(sessionStorage.getItem("userInfo")).id);
         oMyForm.append("myUserId", JSON.parse(sessionStorage.getItem("userInfo")).id);
         Service.uploadBackground({
             form: oMyForm
-        }).then(res=>{
-            if(res.status===1){
+        }).then(res => {
+            if (res.data.status === 1) {
                 this.handleCancel()
-                this.props.setBackground()
-            }else{
+                this.props.setBackground(res.data.data)
+            } else {
                 layer.msg(res.message)
             }
-            
+
         })
     }
     handleChangePhoto = () => {
@@ -100,10 +101,10 @@ export default class CoverModal extends Component {
         layer.closeAll()
     }
     render() {
-        const {coverImg,fileList} = this.state;
+        const { coverImg, fileList } = this.state;
         const props = Utils.uploadProps(fileList, (file, newUrl) => {
             this.setState(state => ({
-                fileList: [...state.fileList, file],
+                fileList: file,
                 coverImg: newUrl
             }), () => {
                 $(".initial_pic").find("input[type=file]").css({
@@ -118,8 +119,8 @@ export default class CoverModal extends Component {
                 })
 
             })
-           
-            
+
+
         });
         return (
             <div className="cover-modal">
@@ -131,9 +132,9 @@ export default class CoverModal extends Component {
                     <div className="initial_pic">
                         {/* <div className="btn_b"><a href="javascript:;">+ 上传设计好的形象图</a></div> */}
                         <Upload className="upload-btn" {...props} ref={(e) => this.uploadDom = e}>
-                                <img className="img" src={coverImg} />
-                                <a className=" btn_b" href="javascript:;">+ 上传设计好的形象图</a>
-                            </Upload>
+                            <img className="img" src={coverImg} />
+                            <a className=" btn_b" href="javascript:;">+ 上传设计好的形象图</a>
+                        </Upload>
                         <div className="loading_block">
                             <h1>正在上传</h1>
                             <p><span></span></p>
