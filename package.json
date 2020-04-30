@@ -16,7 +16,7 @@
         "http-proxy-middleware": "^0.19.1",
         "imports-loader": "^0.8.0",
         "install": "^0.12.2",
-        "jquery": "^3.3.1",
+        "jquery": "^3.5.0",
         "layer": "^0.1.0",
         "marquee": "^0.2.1",
         "rc-wang-editor": "^0.9.5",
